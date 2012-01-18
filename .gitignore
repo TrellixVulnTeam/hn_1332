@@ -9,6 +9,7 @@ __pycache__
 # Binary distributions
 /python-src/build
 /python-src/dist
+/python-src/*.egg-info
 
 # OS temporary rubbish
 .DS_Store
