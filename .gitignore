@@ -1,0 +1,5 @@
+# Editor project and temporary files
+/*.komodoproject
+/*.kpf
+/.project
+
