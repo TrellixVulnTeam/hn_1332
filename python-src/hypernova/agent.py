@@ -51,7 +51,7 @@ class Agent:
         self._log.addHandler(self._log_handler)
         self._log.setLevel(logging.DEBUG)
 
-        self._log.info("initialised logging")
+        self._log.info('initialised logging')
 
 class AgentRequestHandler(BaseHTTPRequestHandler):
 
@@ -60,7 +60,7 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
     def do_GET(self):
-        self.send_response(200)
-        self.send_header('Content-Type', 'text/html')
+        self.send_response(500)
+        self.send_header('Content-Type', 'application/json')
         self.end_headers()
-        self.wfile.write(b"<html><head><title>HyperNova</title></head><body><h1>HyperNova</h1><p>It's alive!</p></body></html>")
+        self.wfile.write(b'<html><head><title>HyperNova</title></head><body><h1>HyperNova</h1><p>It\'s alive!</p></body></html>')
