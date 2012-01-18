@@ -21,3 +21,16 @@ Then generate an egg from our source code:
 Which can be installed like so:
 
     sudo easy_install-3.2 dist/hypernova-VERSION-py3.2.egg
+
+Execution
+---------
+
+Until initialisation scripts and other fanciness arrive, you can launch the
+agent using the Python CLI. The fastest way is to do this, which passes the
+command to execute straight to the Python interpreter and doesn't open the
+interactive shell:
+
+    python3.2 -c 'from hypernova.agent import Agent; Agent().execute()'
+
+By default, the server will listen on 0.0.0.0:8080, so making an HTTP request to
+port 8080 on the target machine should yield somje form of output.
