@@ -1,3 +1,5 @@
+#!/usr/bin/env python3.2
+
 #
 # HyperNova server management framework
 #
