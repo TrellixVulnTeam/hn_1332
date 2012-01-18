@@ -3,5 +3,12 @@
 /*.kpf
 /.project
 
+# Interpreter temporary files
+__pycache__
+
+# Binary distributions
+/python-src/build
+/python-src/dist
+
 # OS temporary rubbish
 .DS_Store
