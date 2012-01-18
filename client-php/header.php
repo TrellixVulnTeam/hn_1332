@@ -24,12 +24,12 @@ g/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <div id="logo"></div>
 
-<!--<div id="menu">
+<div id="menu">
 <div class="link"><a href="/">home</a></div>
-<div class="link"><a href="/34234">support</a></div>
+<div class="link"><a href="http://google.com/">support</a></div>
 <div class="link"><a href="/234234">hosting</a></div>
 <div class="link"><a href="/23423">cloud</a></div>
-</div>-->
+</div>
 
 <div id="lines"></div>
 
