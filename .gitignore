@@ -3,3 +3,5 @@
 /*.kpf
 /.project
 
+# OS temporary rubbish
+.DS_Store
