@@ -5,6 +5,7 @@
 
 # Interpreter temporary files
 __pycache__
+*.pyc
 
 # Binary distributions
 /python-src/build
