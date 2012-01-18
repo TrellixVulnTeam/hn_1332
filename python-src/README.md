@@ -33,4 +33,4 @@ interactive shell:
     python3.2 -c 'from hypernova.agent import Agent; Agent().execute()'
 
 By default, the server will listen on 0.0.0.0:8080, so making an HTTP request to
-port 8080 on the target machine should yield somje form of output.
+port 8080 on the target machine should yield some form of output.
