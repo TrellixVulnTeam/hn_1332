@@ -11,6 +11,7 @@
 
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from hypernova import modules
+from hypernova.agent.module_base import BaseRequestHandler
 import json
 import logging
 import logging.handlers
@@ -22,14 +23,22 @@ if __name__ == '__main__':
 
 class Agent:
 
-    addr = None
-    port = None
-    log  = None
+    addr    = None
+    port    = None
+    log     = None
+    timeout = None
 
-    def __init__(self, addr='0.0.0.0', port=8080, log='/tmp/hn-main.log'):
-        self.addr = addr
-        self.port = port
-        self.log  = log
+    _log           = None
+    _log_formatter = None
+    _log_handler   = None
+    _server        = None
+
+    def __init__(self, addr='0.0.0.0', port=8080, log='/tmp/hn-main.log',
+                 timeout=0.5):
+        self.addr    = addr
+        self.port    = port
+        self.log     = log
+        self.timeout = timeout
 
     def execute(self):
         self._init_logging()
@@ -38,7 +47,6 @@ class Agent:
         self._log.info('entering server main loop')
         self._server.serve_forever()
         self._log.info('server exiting')
-
 
     def _init_logging(self):
         self._log_formatter = logging.Formatter(
@@ -58,15 +66,6 @@ class Agent:
 
 
 class AgentRequestHandler(BaseHTTPRequestHandler):
-
-    error_message_format_native = {
-        'status': {
-            'successful': False,
-            'error_code': '%(code)d',
-            'message': '%(message)s',
-            'explanation': '%(explain)s'
-        }
-    }
 
     def handle_one_request(self):
 
@@ -92,10 +91,8 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
             if not self.parse_request():
                 return
 
-            # Regardless of what happens here, we'll always send a JSON response
             self.send_header('Content-Type', 'application/json');
 
-            # Try to find the right module and RequestHandler
             module_name = self.path[1:].replace('/', '.')
             try:
                 module = getattr(modules, module_name)
@@ -104,15 +101,28 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
                 self.send_error(501, 'Unsupported module')
                 return
 
-            # Try to match a method to that HTTP command
             try:
                 method = getattr(handler, 'do_' + self.command.lower())
             except AttributeError:
                 self.send_error(405, 'Unsupported method')
                 return
 
-            # Execute the method and return a response
-            result = method()
+            try:
+                length = int(self.headers.get('Content-Length'))
+                raw = self.rfile.read(length)
+            except TypeError:
+                self.log_message('Content-Length not set; assuming no parameters')
+                length = 0
+                raw = ''
+
+            try:
+                params = json.loads(str(raw))
+            except ValueError:
+                self.log_error('Failed to interpret parameters as valid JSON!')
+                self.send_error(400, 'Invalid parameters')
+                return
+
+            result = method(params)
             self.wfile.write(result)
             self.wfile.flush()
 
@@ -123,5 +133,21 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
 
     def send_error(self, code, message=None):
 
-        self.error_message_format = json.dumps(self.error_message_format_native)
-        super().send_error(code, message)
+        try:
+            shortmsg, longmsg = self.responses[code]
+        except KeyError:
+            shortmsg, longmsg = '', ''
+
+        if message is None:
+            message = shortmsg
+
+        explain = longmsg
+
+        self.log_error("code %d, message %s", code, message)
+
+        self.send_response(code, message)
+        self.send_header("Content-Type", self.error_content_type)
+        self.send_header('Connection', 'close')
+        self.end_headers()
+
+        self.wfile.write(BaseRequestHandler._format_response({}, False, code, ''))
