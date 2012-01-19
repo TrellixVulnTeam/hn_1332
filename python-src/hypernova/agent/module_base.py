@@ -13,7 +13,7 @@ import json
 
 class BaseRequestHandler:
 
-    def _format_response(response={}, successful=False, error_code=500,
+    def _format_response(response={}, successful=True, error_code=0,
                          message='', explanation=''):
         native = {
             'status': {
