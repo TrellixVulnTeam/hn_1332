@@ -91,22 +91,22 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
             if not self.parse_request():
                 return
 
-            # Regardless of what happens here, we send a JSON response
+            # Regardless of what happens here, we'll always send a JSON response
             self.send_header('Content-Type', 'application/json');
 
-            # Try to find the right module RequestHandler
+            # Try to find the right module and RequestHandler
+            module_name = self.path[1:].replace('/', '.')
             try:
-                module_name = self.url.replace('/', '.')
                 module = getattr(modules, module_name)
             except AttributeError:
-                self.send_error(501, "Unsupported method (%r)" % self.command)
+                self.send_error(501, 'Unsupported method')
                 return
 
             method()
             self.wfile.flush()
 
         except socket.timeout as e:
-            self.log_error("Request timed out: %r", e)
+            self.log_error('Request timed out: %r', e)
             self.close_connection = 1
             return
 
