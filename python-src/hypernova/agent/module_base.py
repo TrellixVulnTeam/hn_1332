@@ -13,14 +13,16 @@ import json
 
 class BaseRequestHandler:
 
-    def _format_response(successful=False, error_code=500, message='',
-                         explanation=''):
+    def _format_response(response={}, successful=False, error_code=500,
+                         message='', explanation=''):
         native = {
             'status': {
                 'successful': successful,
                 'error_code': error_code,
                 'message': message,
                 'explanation': explanation
-            }
+            },
+            'response': response
         }
+
         return bytes(json.dumps(native), 'UTF-8')
