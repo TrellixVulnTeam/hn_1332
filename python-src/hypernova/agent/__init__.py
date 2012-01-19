@@ -110,17 +110,17 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
             try:
                 length = int(self.headers.get('Content-Length'))
                 raw = self.rfile.read(length)
+
+                try:
+                    params = json.loads(str(raw))
+                except ValueError:
+                    self.log_error('Failed to interpret parameters as valid JSON!')
+                    self.send_error(400, 'Invalid parameters')
+                    return
+
             except TypeError:
                 self.log_message('Content-Length not set; assuming no parameters')
-                length = 0
-                raw = ''
-
-            try:
-                params = json.loads(str(raw))
-            except ValueError:
-                self.log_error('Failed to interpret parameters as valid JSON!')
-                self.send_error(400, 'Invalid parameters')
-                return
+                params = {}
 
             result = method(params)
             self.wfile.write(result)
@@ -143,10 +143,10 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
 
         explain = longmsg
 
-        self.log_error("code %d, message %s", code, message)
+        self.log_error("Returning %d: %s", code, message)
 
         self.send_response(code, message)
-        self.send_header("Content-Type", self.error_content_type)
+        self.send_header('Content-Type', self.error_content_type)
         self.send_header('Connection', 'close')
         self.end_headers()
 
