@@ -56,6 +56,7 @@ class Agent:
 
         self._log.info('initialised logging')
 
+
 class AgentRequestHandler(BaseHTTPRequestHandler):
 
     error_message_format_native = {
@@ -98,11 +99,21 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
             module_name = self.path[1:].replace('/', '.')
             try:
                 module = getattr(modules, module_name)
+                handler = getattr(module, 'AgentRequestHandler')
             except AttributeError:
-                self.send_error(501, 'Unsupported method')
+                self.send_error(501, 'Unsupported module')
                 return
 
-            method()
+            # Try to match a method to that HTTP command
+            try:
+                method = getattr(handler, 'do_' + self.command.lower())
+            except AttributeError:
+                self.send_error(405, 'Unsupported method')
+                return
+
+            # Execute the method and return a response
+            result = method()
+            self.wfile.write(result)
             self.wfile.flush()
 
         except socket.timeout as e:
