@@ -11,7 +11,19 @@
 
 from hypernova.agent.module_base import BaseRequestHandler
 from hypernova.client.module_base import BaseActionHandler
+import subprocess
 
 class AgentRequestHandler(BaseRequestHandler):
-    def do_status():
-        return BaseRequestHandler._format_response(True, 200)
+    def do_loadaverages():
+        raw = str(subprocess.check_output(['cat', '/proc/loadavg']), 'UTF-8')
+        parts = raw.split(' ')
+
+        return BaseRequestHandler._format_response(
+            {
+                '1m':  float(parts[0]),
+                '5m':  float(parts[1]),
+                '15m': float(parts[2])
+            },
+            True,
+            200
+        )
