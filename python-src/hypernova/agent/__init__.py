@@ -18,9 +18,6 @@ import logging.handlers
 import socket
 import sys
 
-if __name__ == '__main__':
-    Agent().execute()
-
 class Agent:
 
     addr    = None
