@@ -23,51 +23,77 @@ class Agent:
 
     addr    = None
     port    = None
-    log     = None
     timeout = None
 
-    _log           = None
-    _log_formatter = None
-    _log_handler   = None
-    _server        = None
+    main_main_log = None
+    req_main_log  = None
+    log_level     = None
 
-    def __init__(self, addr='0.0.0.0', port=8080, log='/tmp/hn-main.log',
-                 timeout=0.5):
-        self.addr    = addr
-        self.port    = port
-        self.log     = log
+    _main_main_log      = None
+    _main_log_formatter = None
+    _main_log_handler   = None
+    _req_main_log       = None
+    _req_log_formatter  = None
+    _req_log_handler    = None
+    _server             = None
+
+    def __init__(self, addr='0.0.0.0', port=8080, timeout=0.5,
+                 main_log='/tmp/hn-main.log', req_log='/tmp/hn-request.log',
+                 log_level='debug'):
+        self.addr = addr
+        self.port = port
         self.timeout = timeout
+
+        self.main_log = main_log
+        self.req_log = req_log
+        self.log_level = log_level.upper()
 
     def execute(self):
         self._init_logging()
 
         self._server = MultiThreadedHTTPServer((self.addr, self.port),
             AgentRequestHandler)
-        self._log.info('entering server main loop')
+        self._main_log.info('entering server main loop')
         self._server.serve_forever()
-        self._log.info('server exiting')
+        self._main_log.info('server exiting')
 
     def _init_logging(self):
-        self._log_formatter = logging.Formatter(
+        log_level = getattr(logging, self.log_level)
+
+        self._main_log_formatter = logging.Formatter(
             fmt = '[%(asctime)s] [%(levelname)-1s] %(message)s',
             datefmt = '%d/%m/%Y %I:%M:%S'
         )
 
-        self._log_handler = logging.handlers.RotatingFileHandler(
-            self.log, mode = 'w')
-        self._log_handler.setFormatter(self._log_formatter)
+        self._main_log = logging.getLogger('hn-main')
+        self._main_log.setLevel(log_level)
+        self._main_log_handler = logging.handlers.RotatingFileHandler(
+            self.main_log, mode='a')
+        self._main_log_handler.setFormatter(self._main_log_formatter)
+        self._main_log.addHandler(self._main_log_handler)
 
-        self._log = logging.getLogger('hn-main')
-        self._log.addHandler(self._log_handler)
-        self._log.setLevel(logging.DEBUG)
+        self._req_log = logging.getLogger('hn-request')
+        self._req_log.setLevel(log_level)
+        self._req_log_handler = logging.handlers.RotatingFileHandler(
+            self.req_log, mode='a')
+        self._req_log_handler.setFormatter(self._main_log_formatter)
+        self._req_log.addHandler(self._req_log_handler)
 
-        self._log.info('initialised logging')
+        self._main_log.info('initialised logging')
 
 
 class MultiThreadedHTTPServer(ThreadingMixIn, HTTPServer):
     pass
 
 class AgentRequestHandler(BaseHTTPRequestHandler):
+
+    _log = None
+
+    def __init__(self, request, client_address, server):
+
+        self._log = logging.getLogger('hn-request')
+
+        super().__init__(request, client_address, server)
 
     def handle_one_request(self):
 
@@ -124,14 +150,26 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
                 self.log_message('Content-Length not set; assuming no parameters')
                 params = {}
 
+            self.log_message('Executing action')
             result = method(params)
-            self.wfile.write(result)
+
+            self.log_message('Sending response')
+            self.wfile.write(BaseRequestHandler._serialise_response(result))
             self.wfile.flush()
+            self.send_response(result['status']['error_code'])
+
+            self.log_message('Processing complete')
 
         except socket.timeout as e:
             self.log_error('Request timed out: %r', e)
             self.close_connection = 1
             return
+
+    def log_message(self, format, *args):
+
+        msg = format %args
+        self._log.info('[%s:%d] %s'
+            %(self.client_address[0], self.client_address[1], msg))
 
     def send_error(self, code, message=None):
 
@@ -152,4 +190,5 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
         self.send_header('Connection', 'close')
         self.end_headers()
 
-        self.wfile.write(BaseRequestHandler._format_response({}, False, code, ''))
+        response = BaseRequestHandler._format_response({}, False, code, '')
+        self.wfile.write(BaseRequestHandler._serialise_response(response))

@@ -15,14 +15,17 @@ class BaseRequestHandler:
 
     def _format_response(response={}, successful=True, error_code=0,
                          message='', explanation=''):
-        native = {
+
+        return {
             'status': {
                 'successful': successful,
-                'error_code': error_code,
+                'error_code': int(error_code),
                 'message': message,
                 'explanation': explanation
             },
             'response': response
         }
 
-        return bytes(json.dumps(native), 'UTF-8')
+    def _serialise_response(native_response):
+
+        return bytes(json.dumps(native_response), 'UTF-8')
