@@ -1,0 +1,33 @@
+#!/usr/bin/env bash
+
+#
+# HyperNova server management framework
+#
+# Agent launch bootstrapper
+#
+# Copyright (c) 2012 TDM Ltd
+#                    Luke Carrier <luke.carrier@tdm.info>
+#
+
+PYTHON='/usr/bin/python3.2'
+HNROOT="$(dirname "$(readlink -fn "$0")")"
+
+ADDR='0.0.0.0'
+PORT='8080'
+
+MAIN_LOG='/tmp/hn-main.log'
+REQ_LOG='/tmp/hn-request.log'
+LOG_LEVEL='debug'
+
+[ -f "/etc/default/hn-agent" ] && . "/etc/default/hn-agent"
+
+"$PYTHON" -c "
+from hypernova.agent import Agent
+agent = Agent(
+    addr='${ADDR}',
+    port=${PORT},
+    main_log='${MAIN_LOG}',
+    req_log='${REQ_LOG}',
+    timeout=0.5
+)
+agent.execute()"
