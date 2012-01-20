@@ -25,12 +25,13 @@ Which can be installed like so:
 Execution
 ---------
 
-Until initialisation scripts and other fanciness arrive, you can launch the
-agent using the Python CLI. The fastest way is to do this, which passes the
-command to execute straight to the Python interpreter and doesn't open the
-interactive shell:
+Since the fanciness is starting to come together, you can now run the server via
+a shell script in the python-src directory:
 
-    python3.2 -c 'from hypernova.agent import Agent; Agent().execute()'
+    cd python-src
+    bin/agent
+  
+Hit Ctrl-C to kill it when you're done.
 
 By default, the server will listen on 0.0.0.0:8080, so making an HTTP request to
 port 8080 on the target machine should yield some form of output.
