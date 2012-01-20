@@ -12,6 +12,7 @@
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from hypernova import modules
 from hypernova.agent.module_base import BaseRequestHandler
+import gnupg
 import json
 import logging
 import logging.handlers
@@ -29,17 +30,29 @@ class Agent:
     req_main_log  = None
     log_level     = None
 
+    name   = None
+    domain = None
+
+    gnupg_home        = None
+    gnupg_fingerprint = None
+
+    _server = None
+
     _main_main_log      = None
     _main_log_formatter = None
     _main_log_handler   = None
     _req_main_log       = None
     _req_log_formatter  = None
     _req_log_handler    = None
-    _server             = None
+
+    _gpg = None
 
     def __init__(self, addr='0.0.0.0', port=8080, timeout=0.5,
                  main_log='/tmp/hn-main.log', req_log='/tmp/hn-request.log',
-                 log_level='debug'):
+                 log_level='debug',
+                 name='box', domain='example.net',
+                 gnupg_home='/tmp/hn-gnupg', gnupg_keyid=''):
+
         self.addr = addr
         self.port = port
         self.timeout = timeout
@@ -48,22 +61,51 @@ class Agent:
         self.req_log = req_log
         self.log_level = log_level.upper()
 
-    def execute(self):
-        self._init_logging()
+        self.name       = name
+        self.domain     = domain
+        self.full_name  = '%s.%s' %(name, domain)
+        self.email_addr = '%s@%s' %(name, domain)
 
-        self._server = MultiThreadedHTTPServer((self.addr, self.port),
-            AgentRequestHandler)
+        self.gnupg_home  = gnupg_home
+        self.gnupg_keyid = gnupg_keyid
+
+    def execute(self):
+
+        self._init_logging()
+        self._init_gnupg()
+
+        self._server = AgentServer((self.addr, self.port),
+            AgentRequestHandler, self._gpg)
         self._main_log.info('entering server main loop')
         self._server.serve_forever()
         self._main_log.info('server exiting')
 
+    def get_gpg_credentials(self):
+
+        return (self._gpg, self._gpg_)
+
+    def _init_gnupg(self):
+
+        self._gpg = gnupg.GPG(gnupghome=self.gnupg_home)
+        gpg_secrets = self._gpg.list_keys(True)
+
+        for key in gpg_secrets:
+            print(key.keyid, key.fingerprint)
+            if key.keyid == self.gnupg_keyid:
+                self._gpg_secret_key = key
+                break
+
+        if not hasattr(self, '_gpg_secret_key'):
+            self._main_log.error('no GPG private key configured; aborting')
+            sys.exit(78) # configuration issue (sysexits.h)
+
     def _init_logging(self):
+
         log_level = getattr(logging, self.log_level)
 
         self._main_log_formatter = logging.Formatter(
             fmt = '[%(asctime)s] [%(levelname)-1s] %(message)s',
-            datefmt = '%d/%m/%Y %I:%M:%S'
-        )
+            datefmt = '%d/%m/%Y %I:%M:%S')
 
         self._main_log = logging.getLogger('hn-main')
         self._main_log.setLevel(log_level)
@@ -82,14 +124,19 @@ class Agent:
         self._main_log.info('initialised logging')
 
 
-class MultiThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+class AgentServer(ThreadingMixIn, HTTPServer):
     pass
+
 
 class AgentRequestHandler(BaseHTTPRequestHandler):
 
     _log = None
 
     def __init__(self, request, client_address, server):
+
+        # Overridden from BaseHTTPRequestHandler
+        #
+        # This override enables logging to our dedicated request log.
 
         self._log = logging.getLogger('hn-request')
 

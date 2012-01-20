@@ -14,10 +14,17 @@ HNROOT="$(dirname "$(readlink -fn "$0")")"
 
 ADDR='0.0.0.0'
 PORT='8080'
+TIMEOUT=0.5
 
 MAIN_LOG='/tmp/hn-main.log'
 REQ_LOG='/tmp/hn-request.log'
 LOG_LEVEL='debug'
+
+NAME='box'
+DOMAIN='example.net'
+
+GNUPG_HOME='/tmp/hn-gnupg'
+GNUPG_KEYID='20FDA224D0A4CAC6'
 
 [ -f "/etc/default/hn-agent" ] && . "/etc/default/hn-agent"
 
@@ -26,8 +33,11 @@ from hypernova.agent import Agent
 agent = Agent(
     addr='${ADDR}',
     port=${PORT},
+    timeout=${TIMEOUT},
     main_log='${MAIN_LOG}',
     req_log='${REQ_LOG}',
-    timeout=0.5
+    log_level='${LOG_LEVEL}',
+    gnupg_home='${GNUPG_HOME}',
+    gnupg_keyid='${GNUPG_KEYID}'
 )
 agent.execute()"

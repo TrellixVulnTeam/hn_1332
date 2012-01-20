@@ -14,17 +14,18 @@ from setuptools import setup
 import hypernova as hn
 
 setup(
-    name         = hn.__friendly_name__,
-    version      = hn.__version__,
-    description  = hn.__description__,
-    author       = hn.__author__,
-    author_email = hn.__author_email__,
-    url          = hn.__url__,
-    packages     = ['hypernova'],
-    classifiers  = [
+    name             = hn.__friendly_name__,
+    version          = hn.__version__,
+    description      = hn.__description__,
+    author           = hn.__author__,
+    author_email     = hn.__author_email__,
+    url              = hn.__url__,
+    packages         = ['hypernova'],
+    install_requires = ['python-gnupg'],
+    classifiers      = [
         'Programming Language :: Python',
         'Topic :: Internet'
     ],
-    keywords     = 'cloud linux networking system',
-    license      = 'GPL'
+    keywords         = 'cloud linux networking system',
+    license          = 'GPL'
 )
