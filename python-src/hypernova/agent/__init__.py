@@ -16,6 +16,7 @@ import json
 import logging
 import logging.handlers
 import socket
+from socketserver import ThreadingMixIn
 import sys
 
 class Agent:
@@ -40,7 +41,8 @@ class Agent:
     def execute(self):
         self._init_logging()
 
-        self._server = HTTPServer((self.addr, self.port), AgentRequestHandler)
+        self._server = MultiThreadedHTTPServer((self.addr, self.port),
+            AgentRequestHandler)
         self._log.info('entering server main loop')
         self._server.serve_forever()
         self._log.info('server exiting')
@@ -61,6 +63,9 @@ class Agent:
 
         self._log.info('initialised logging')
 
+
+class MultiThreadedHTTPServer(ThreadingMixIn, HTTPServer):
+    pass
 
 class AgentRequestHandler(BaseHTTPRequestHandler):
 
