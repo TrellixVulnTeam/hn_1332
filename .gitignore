@@ -2,6 +2,7 @@
 /*.komodoproject
 /*.kpf
 /.project
+.redcar
 
 # Interpreter temporary files
 __pycache__
