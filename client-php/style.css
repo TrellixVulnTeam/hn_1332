@@ -121,6 +121,7 @@ a:visited {text-decoration: none;}
 }
 
 .title {
+	letter-spacing: 1px;
 	color: #bf3710;
 	font-size: 15px;
 }
