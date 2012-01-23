@@ -120,11 +120,9 @@ a:visited {text-decoration: none;}
 	width: 100%;
 }
 
-. {
-	padding-bottom: 15px;
-	padding-right: 30px;
-	margin-top: 0px;
-	padding-left: 30px;
+.title {
+	color: #bf3710;
+	font-size: 15px;
 }
 
 p {
