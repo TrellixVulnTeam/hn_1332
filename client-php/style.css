@@ -1,13 +1,14 @@
 body {
+	font-family: Verdana;
+	letter-spacing: 0px;
 	padding: 0px;
 	margin: 0px;
 	background-repeat: repeat;
-	background-image: url(images/grain.png);
+	background-image: url(images/background.png);
 	background-color: #2e2e2e;
-	color: #f4f4f4;
-	line-height: 1px;
+	color: #ebebeb;
+	line-height: 17px;
 	font-size: 12px;
-	font-family: Verdana, Arial;
 }
 
 #wrapper {
@@ -58,6 +59,9 @@ body {
 .links_item {
 }
 #banner {
+	border-bottom-color: #6c2103;
+	border-bottom-style: solid;
+	border-bottom-width: 4px;
 	padding-top: 20px;
 	max-height: 300px;
 	min-height: 300px;
@@ -68,25 +72,42 @@ body {
 	position: relative;
 }
 #banner_block {
+	padding-bottom: 25px;
+	padding-right: 30px;
 	margin-right: auto;
 	margin-left: auto;
 	padding-left: 30px;
-	padding-top: 15px;
+	padding-top: 25px;
 	position: relative;
-	height: 220px;
-	width: 940px;
+	height: 225px;
+	width: 880px;
 	background-repeat: repeat;
 	background-image: url(images/banner_block.png);
 	-moz-border-radius: 5px;
 	border-radius: 5px;
 }
 #content {
+	padding-top: 35px;
+	border-bottom-color: #292929;
+	border-bottom-style: solid;
+	border-bottom-width: 4px;
+	background-image: url(images/grain.png);
+	background-repeat: repeat;
 	min-height: 400px;
 	position: relative;
 	width: 100%;
 }
 
+p {
+	padding-right: 30px;
+	margin-top: 0px;
+	padding-left: 30px;
+}
+
 #footer {
+	padding-left: 30px;
+	margin-bottom: 15px;
+	margin-top: 25px;
 	height: 100px;
 	width: 100%;
 }
