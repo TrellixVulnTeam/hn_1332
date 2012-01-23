@@ -162,6 +162,7 @@ p {
 }
 
 #footer {
+	position: relative;
 	padding-left: 30px;
 	margin-bottom: 15px;
 	margin-top: 25px;
