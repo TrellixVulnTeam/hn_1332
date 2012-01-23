@@ -57,6 +57,25 @@ You'll need to make sure the agent has read/write access to the keystore, else
 it won't be able to run. chown'ing the /var/lib/hypernova directory to a
 dedicated hypernova user would be a good idea.
 
+Allowing clients
+----------------
+
+All clients connecting to the server must encrypt their queries with a GPG key
+that's been imported by the server. Generating the keypair can be done with the
+same procedure as above (though on the frontend, not the backend). You then need
+to import the public key into the agent, like so:
+
+    # on the client
+    gpg --export 5FBE20D3 > client_server_name.pub
+
+    # on the server
+    gpg --homedir /var/lib/hypernova/gpg --import client_server_name.pub
+    gpg --homedir /var/lib/hypernova/gpg --edit-key 5FBE20D3
+        sign
+        Really sign? (y/N) y
+        ^D
+        Save changes? (y/N) y
+
 Execution
 ---------
 

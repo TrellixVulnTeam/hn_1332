@@ -10,9 +10,8 @@
 #
 
 from http.server import HTTPServer, BaseHTTPRequestHandler
-from hypernova import modules
+from hypernova import GPG, modules
 from hypernova.agent.module_base import BaseRequestHandler
-import gnupg
 import json
 import logging
 import logging.handlers
@@ -57,8 +56,8 @@ class Agent:
         self.port = port
         self.timeout = timeout
 
-        self.main_log = main_log
-        self.req_log = req_log
+        self.main_log  = main_log
+        self.req_log   = req_log
         self.log_level = log_level.upper()
 
         self.name       = name
@@ -80,13 +79,10 @@ class Agent:
         self._server.serve_forever()
         self._main_log.info('server exiting')
 
-    def get_gpg_credentials(self):
-
-        return (self._gpg, self._gpg_)
-
     def _init_gpg(self):
 
-        self._gpg = gnupg.GPG(gnupghome=self.gnupg_home)
+        self._gpg = GPG.get_gpg(gnupghome=self.gnupg_home,
+                                          instancename='hn-agent')
         gpg_secrets = self._gpg.list_keys(True)
 
         for key in gpg_secrets:
@@ -138,6 +134,7 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
         # This override enables logging to our dedicated request log.
 
         self._log = logging.getLogger('hn-request')
+        self._gpg = GPG.get_gpg(instancename='hn-agent')
 
         super().__init__(request, client_address, server)
 
@@ -167,47 +164,60 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
 
             self.send_header('Content-Type', 'application/json');
 
-            module_name = self.path[1:].replace('/', '.')
-            try:
-                module = getattr(modules, module_name)
-                handler = getattr(module, 'AgentRequestHandler')
-            except AttributeError:
-                self.send_error(501, 'Unsupported module')
-                return
-
-            try:
-                method = getattr(handler, 'do_' + self.command.lower())
-            except AttributeError:
-                self.send_error(405, 'Unsupported method')
-                return
-
+            # Decrypt request body, if sent
             try:
                 length = int(self.headers.get('Content-Length'))
                 raw = self.rfile.read(length)
-
-                try:
-                    params = json.loads(str(raw))
-                except ValueError:
-                    self.log_error('Failed to interpret parameters as valid JSON!')
-                    self.send_error(400, 'Invalid parameters')
-                    return
-
             except TypeError:
-                self.log_message('Content-Length not set; assuming no parameters')
-                params = {}
+                self.log_error('Content-Length not set; assuming no parameters')
+                self.send_error(400, 'No parameters')
+                return
 
-            self.log_message('Executing action')
-            result = method(params)
+            # Decrypt parameters
+            clear = self._gpg.decrypt(raw)
+            if str(clear) == '':
+                self.log_error('decrypted request body seemed empty; potential authentication failure')
+                self.send_error(403, 'Access denied')
+                return
 
-            self.log_message('Sending response')
-            self.wfile.write(BaseRequestHandler._serialise_response(result))
-            self.wfile.flush()
-            self.send_response(result['status']['error_code'])
+            # Decode the parameters
+            try:
+                print(str(clear))
+                params = json.loads(str(clear))
+            except ValueError:
+                self.log_error('failed to interpret parameters as JSON')
+                self.send_error(400, 'Invalid parameters')
+                return
 
-            self.log_message('Processing complete')
+            # Establish the action to perform
+            #module_name = self.path[1:].replace('/', '.')
+            #try:
+            #    module = getattr(modules, module_name)
+            #    handler = getattr(module, 'AgentRequestHandler')
+            #except AttributeError:
+            #    self.send_error(501, 'Unsupported module')
+            #    return
+
+            #try:
+            #    method = getattr(handler, 'do_' + self.command.lower())
+            #except AttributeError:
+            #    self.send_error(405, 'Unsupported method')
+            #    return            # Perform the action
+
+            # Legacy code begins here
+
+            #self.log_message('Executing action')
+            #result = method(params)
+
+            #self.log_message('Sending response')
+            #self.wfile.write(BaseRequestHandler._serialise_response(result))
+            #self.wfile.flush()
+            #self.send_response(result['status']['error_code'])
+
+            self.log_message('processing complete')
 
         except socket.timeout as e:
-            self.log_error('Request timed out: %r', e)
+            self.log_error('request timed out (%r)', e)
             self.close_connection = 1
             return
 
@@ -229,7 +239,7 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
 
         explain = longmsg
 
-        self.log_error("Returning %d: %s", code, message)
+        self.log_error('returning %d: %s', code, message)
 
         self.send_response(code, message)
         self.send_header('Content-Type', self.error_content_type)
