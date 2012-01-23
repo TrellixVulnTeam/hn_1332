@@ -48,15 +48,34 @@ body {
 }
 
 #links {
-	margin-top: 20px;
-	margin-right: 30px;
-	height: 30px;
+	margin-top: 25px;
+	margin-right: 25px;
 	float: right;
-	width: 400px;
 	position: relative;
 }
 
 .links_item {
+	padding-right: 10px;
+	padding-left: 10px;
+	padding-bottom: 5px;
+	padding-top: 5px;
+	float: left;
+	margin-right: 8px;
+	background-image: url(images/banner_block.png);
+	background-repeat: repeat;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+	
+#links a {color: #ebebeb; text-decoration: none; display:block;}
+#links a:hover {color: #6c2103; text-decoration: none; display:block;}
+#links a:active {text-decoration: none; display:block;}
+#links a:visited {text-decoration: none; display:block;}
+
+a {color: #6c2103; text-decoration: none;}
+a:hover {color: #ebebeb; text-decoration: none;}
+a:active {text-decoration: none;}
+a:visited {text-decoration: none;}
+
 }
 #banner {
 	border-bottom-color: #6c2103;
@@ -87,6 +106,7 @@ body {
 	border-radius: 5px;
 }
 #content {
+	padding-bottom: 35px;
 	padding-top: 35px;
 	border-bottom-color: #292929;
 	border-bottom-style: solid;
@@ -99,6 +119,7 @@ body {
 }
 
 p {
+	padding-bottom: 15px;
 	padding-right: 30px;
 	margin-top: 0px;
 	padding-left: 30px;
