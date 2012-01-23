@@ -66,15 +66,10 @@ body {
 	-moz-border-radius: 3px;
 	border-radius: 3px;
 	
-#links a {color: #ebebeb; text-decoration: none; display:block;}
-#links a:hover {color: #6c2103; text-decoration: none; display:block;}
-#links a:active {text-decoration: none; display:block;}
-#links a:visited {text-decoration: none; display:block;}
-
-a {color: #6c2103; text-decoration: none;}
-a:hover {color: #ebebeb; text-decoration: none;}
-a:active {text-decoration: none;}
-a:visited {text-decoration: none;}
+a {color: #ebebeb; text-decoration: none; display:block;}
+a:hover {color: #6c2103; text-decoration: none; display:block;}
+a:active {text-decoration: none; display:block;}
+a:visited {text-decoration: none; display:block;}
 
 }
 #banner {
