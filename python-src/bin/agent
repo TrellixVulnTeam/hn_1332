@@ -24,7 +24,7 @@ NAME='box'
 DOMAIN='example.net'
 
 GNUPG_HOME='/tmp/hn-gnupg'
-GNUPG_KEYID='20FDA224D0A4CAC6'
+GNUPG_FINGERPRINT=''
 
 [ -f "/etc/default/hn-agent" ] && . "/etc/default/hn-agent"
 
@@ -38,6 +38,6 @@ agent = Agent(
     req_log='${REQ_LOG}',
     log_level='${LOG_LEVEL}',
     gnupg_home='${GNUPG_HOME}',
-    gnupg_keyid='${GNUPG_KEYID}'
+    gnupg_fingerprint='${GNUPG_FINGERPRINT}'
 )
 agent.execute()"

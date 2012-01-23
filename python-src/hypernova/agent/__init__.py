@@ -51,7 +51,7 @@ class Agent:
                  main_log='/tmp/hn-main.log', req_log='/tmp/hn-request.log',
                  log_level='debug',
                  name='box', domain='example.net',
-                 gnupg_home='/tmp/hn-gnupg', gnupg_keyid=''):
+                 gnupg_home='/tmp/hn-gnupg', gnupg_fingerprint=''):
 
         self.addr = addr
         self.port = port
@@ -66,13 +66,13 @@ class Agent:
         self.full_name  = '%s.%s' %(name, domain)
         self.email_addr = '%s@%s' %(name, domain)
 
-        self.gnupg_home  = gnupg_home
-        self.gnupg_keyid = gnupg_keyid
+        self.gnupg_home        = gnupg_home
+        self.gnupg_fingerprint = gnupg_fingerprint
 
     def execute(self):
 
         self._init_logging()
-        self._init_gnupg()
+        self._init_gpg()
 
         self._server = AgentServer((self.addr, self.port),
             AgentRequestHandler, self._gpg)
@@ -84,14 +84,13 @@ class Agent:
 
         return (self._gpg, self._gpg_)
 
-    def _init_gnupg(self):
+    def _init_gpg(self):
 
         self._gpg = gnupg.GPG(gnupghome=self.gnupg_home)
         gpg_secrets = self._gpg.list_keys(True)
 
         for key in gpg_secrets:
-            print(key.keyid, key.fingerprint)
-            if key.keyid == self.gnupg_keyid:
+            if key['fingerprint'] == self.gnupg_fingerprint:
                 self._gpg_secret_key = key
                 break
 
