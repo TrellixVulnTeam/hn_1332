@@ -2,7 +2,7 @@ body {
 	padding: 0px;
 	margin: 0px;
 	background-repeat: repeat;
-	background-image: url(/images/background.png);
+	background-image: url(images/grain.png);
 	background-color: #2e2e2e;
 	color: #f4f4f4;
 	line-height: 1px;
@@ -11,9 +11,6 @@ body {
 }
 
 #wrapper {
-	border-color: #ff1700;
-	border-style: dashed;
-	border-width: 1px;
 	margin-left: auto;
 	margin-bottom: 0px;
 	margin-right: auto;
@@ -24,22 +21,29 @@ body {
 }
 
 #header {
+	border-left-width: 0px;
+	border-bottom-width: 4px;
+	border-right-width: 0px;
+	border-top-width: 0px;
+	background-repeat: no-repeat;
+	background-image: url(images/header.png);
 	position: relative;
-	height: 370px;
+	height: 60px;
 	width: 100%;
 	margin: 0px;
-	border-color: #00ff2c;
-	border-style: dotted;
-	border-width: 1px;
+	border-color: #6c2103;
+	border-style: solid;
 }
 
 #logo {
+	margin-top: 7px;
+	background-repeat: no-repeat;
 	float: left;
 	position: relative;
-	margin-left: 60px;
+	margin-left: 30px;
 	height: 50px;
-	width: 200px;
-	background-image: url(/images/logo.png);
+	width: 300px;
+	background-image: url(images/logo.png);
 }
 
 #links {
@@ -47,9 +51,6 @@ body {
 	margin-right: 30px;
 	height: 30px;
 	float: right;
-	border-color: #ff0a97;
-	border-style: double;
-	border-width: 1px;
 	width: 400px;
 	position: relative;
 }
@@ -57,23 +58,36 @@ body {
 .links_item {
 }
 #banner {
-	background-color: #0077ff;
+	max-height: 300px;
+	min-height: 300px;
+	background-image: url(images/banner.png);
+	background-repeat: no-repeat;
 	height: 300px;
 	width: 100%;
-	border-color: #7dc32b;
-	border-style: solid;
-	border-width: 1px;
 	position: relative;
 }
+#banner_block {
+	margin-right: auto;
+	margin-left: auto;
+	padding-left: 30px;
+	padding-top: 15px;
+	position: relative;
+	margin-top: 20px;
+	height: 220px;
+	width: 940px;
+	background-repeat: repeat;
+	background-image: url(images/banner_block.png);
+	-moz-border-radius: 5px;
+	border-radius: 5px;
+}
 #content {
-	background-color: #ff69ae;
 	min-height: 400px;
 	position: relative;
 	width: 100%;
 }
 
 #footer {
-	background-color: #a5ffb7;
 	height: 100px;
 	width: 100%;
 }
+
