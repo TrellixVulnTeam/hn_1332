@@ -108,8 +108,6 @@ a:visited {text-decoration: none;}
 	border-radius: 5px;
 }
 #content {
-	padding-bottom: 35px;
-	padding-top: 35px;
 	border-bottom-color: #292929;
 	border-bottom-style: solid;
 	border-bottom-width: 4px;
@@ -120,7 +118,36 @@ a:visited {text-decoration: none;}
 	width: 100%;
 }
 
+#left {
+	text-align: justify;
+	width: 333px;
+	float: left;
+	padding-bottom: 35px;
+	padding-top: 35px;
+	position: relative;
+}
+
+#middle {
+	text-align: justify;
+	width: 333px;
+	float: left;
+	padding-bottom: 35px;
+	padding-top: 35px;
+	position: relative;
+}
+
+#right {
+	text-align: justify;
+	width: 333px;
+	float: right;
+	padding-bottom: 35px;
+	padding-top: 35px;
+	position: relative;
+}
+
 .title {
+	padding-bottom: 15px;
+	padding-left: 30px;
 	letter-spacing: 1px;
 	color: #bf3710;
 	font-size: 15px;
