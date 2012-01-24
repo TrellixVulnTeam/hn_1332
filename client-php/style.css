@@ -38,31 +38,30 @@ body {
 
 #logo {
 	margin-top: 7px;
-	background-repeat: no-repeat;
 	float: left;
 	position: relative;
 	margin-left: 30px;
 	height: 50px;
 	width: 300px;
-	background-image: url(images/logo.png);
 }
 
 #links {
-	display: block;
+	float: right;
 	margin-top: 25px;
 	margin-right: 25px;
-	float: right;
 	position: relative;
 }
 
 .links_item {
+	min-width: 55px;
+	margin-left: 8px;
+	text-align: center;
 	display: block;
 	padding-right: 10px;
 	padding-left: 10px;
 	padding-bottom: 5px;
 	padding-top: 5px;
 	float: left;
-	margin-right: 8px;
 	background-image: url(images/banner_block.png);
 	background-repeat: repeat;
 	-moz-border-radius: 3px;
@@ -74,8 +73,8 @@ body {
 .links_item a:active {text-decoration: none; display:block;}
 .links_item a:visited {text-decoration: none; display:block;}
 
-a {color: #c85012; text-decoration: none;}
-a:hover {color: #ebebeb; text-decoration: none;}
+a {color: #dfdfdf; text-decoration: none;}
+a:hover {color: #c85012; text-decoration: none;}
 a:active {text-decoration: none;}
 a:visited {text-decoration: none;}
 
@@ -107,6 +106,21 @@ a:visited {text-decoration: none;}
 	-moz-border-radius: 5px;
 	border-radius: 5px;
 }
+
+.button {
+	text-align: center;
+	display: block;
+	padding-right: 10px;
+	padding-left: 10px;
+	padding-bottom: 5px;
+	padding-top: 5px;
+	float: left;
+	background-image: url(images/banner_block.png);
+	background-repeat: repeat;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
 #content {
 	border-bottom-color: #292929;
 	border-bottom-style: solid;
@@ -157,7 +171,7 @@ a:visited {text-decoration: none;}
 }
 
 p {
-	padding-bottom: 15px;
+	padding-bottom: 10px;
 	margin-top: 0px;
 }
 
