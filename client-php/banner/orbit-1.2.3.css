@@ -12,7 +12,9 @@
 	width: 940px;
 	height: 450px;
 	background: url('banner/orbit/loading.gif') no-repeat center center;
-	overflow: hidden; }
+	overflow: hidden;
+	-moz-border-radius: 5px;
+	border-radius: 5px; }
 #featured>img,  
 #featured>div,
 #featured>a { display: none; }
