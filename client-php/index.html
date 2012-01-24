@@ -40,13 +40,27 @@ g/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <script type="text/javascript">
      $(window).load(function() {
-         $('#featured').orbit();
+         $('#featured').orbit({
+            animation: 'vertical-slide',                  // fade, horizontal-slide, vertical-slide, horizontal-push
+     		animationSpeed: 800,                // how fast animtions are
+     		timer: true, 			 // true or false to have the timer
+     		advanceSpeed: 800, 		 // if timer is enabled, time between transitions 
+     		pauseOnHover: false, 		 // if you hover pauses the slider
+     		startClockOnMouseOut: false, 	 // if clock should start on MouseOut
+     		startClockOnMouseOutAfter: 1000, 	 // how long after MouseOut should the timer start again
+     		afterSlideChange: function(){} 	 // empty function 
+
+         });
      });
 </script>
 
 <div id="banner_block">
 
-hello
+<div id="featured"> 
+     <img src="images/banner/1.png" alt="Overflow: Hidden No More" />
+     <img src="images/banner/2.png" alt="HTML Captions" />
+     <img src="images/banner/3.png" alt="and more features" />
+</div>
 
 </div>
 
