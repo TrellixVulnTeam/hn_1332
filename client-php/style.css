@@ -62,7 +62,7 @@ body {
 	padding-bottom: 5px;
 	padding-top: 5px;
 	float: left;
-	background-image: url(images/banner_block.png);
+	background-image: url(images/dark_block.png);
 	background-repeat: repeat;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
@@ -102,7 +102,22 @@ a:visited {text-decoration: none;}
 	padding-bottom: 5px;
 	padding-top: 5px;
 	float: left;
-	background-image: url(images/banner_block.png);
+	background-image: url(images/dark_block.png);
+	background-repeat: repeat;
+	-moz-border-radius: 3px;
+	border-radius: 3px;
+}
+
+.button_layout {
+	margin-right: 200px;
+	text-align: center;
+	display: block;
+	padding-right: 10px;
+	padding-left: 10px;
+	padding-bottom: 5px;
+	padding-top: 5px;
+	float: left;
+	background-image: url(images/dark_block.png);
 	background-repeat: repeat;
 	-moz-border-radius: 3px;
 	border-radius: 3px;
@@ -150,6 +165,15 @@ a:visited {text-decoration: none;}
 	float: right;
 	padding-bottom: 35px;
 	padding-top: 35px;
+	position: relative;
+}
+
+#buttons_block {
+	margin-top: -30px;
+	margin-left: 30px;
+	text-align: justify;
+	width: 960px;
+	float: left;
 	position: relative;
 }
 
