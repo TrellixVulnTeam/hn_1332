@@ -54,7 +54,7 @@ body {
 }
 
 .links_item {
-	width: 55px;
+	min-width: 55px;
 	margin-left: 8px;
 	text-align: center;
 	display: block;
