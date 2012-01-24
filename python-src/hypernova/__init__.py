@@ -18,7 +18,6 @@ __friendly_name__ = 'HyperNova'
 __url__           = 'http://hypernova.cloudnova.net/'
 __version__       = '0.1.0'
 
-
 class GPG(gnupg.GPG):
     """
     gnupg.GPG instance factory.
@@ -27,7 +26,7 @@ class GPG(gnupg.GPG):
     instances = {}
 
     def get_gpg(gpgbinary='gpg', gnupghome=None, verbose=False,
-                 use_agent=False, keyring=None, instancename=None):
+                use_agent=False, keyring=None, instancename=None):
 
         if not instancename:
             instancename = str(locals())
