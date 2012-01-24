@@ -20,7 +20,12 @@ setup(
     author           = hn.__author__,
     author_email     = hn.__author_email__,
     url              = hn.__url__,
-    packages         = ['hypernova'],
+    packages         = [
+        'hypernova',
+        'hypernova.agent',
+        'hypernova.client',
+        'hypernova.modules'
+    ],
     install_requires = ['python-gnupg'],
     classifiers      = [
         'Programming Language :: Python',
