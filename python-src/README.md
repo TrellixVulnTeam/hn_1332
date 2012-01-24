@@ -70,11 +70,9 @@ to import the public key into the agent, like so:
 
     # on the server
     gpg --homedir /var/lib/hypernova/gpg --import client_server_name.pub
-    gpg --homedir /var/lib/hypernova/gpg --edit-key 5FBE20D3
+    gpg --homedir /var/lib/hypernova/gpg --sign-key 5FBE20D3
         sign
         Really sign? (y/N) y
-        ^D
-        Save changes? (y/N) y
 
 Execution
 ---------
