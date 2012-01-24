@@ -175,14 +175,13 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
 
             # Decrypt parameters
             clear = self._gpg.decrypt(raw)
-            if str(clear) == '':
+            if str(clear) == '': # decryption failed
                 self.log_error('decrypted request body seemed empty; potential authentication failure')
                 self.send_error(403, 'Access denied')
                 return
 
             # Decode the parameters
             try:
-                print(str(clear))
                 params = json.loads(str(clear))
             except ValueError:
                 self.log_error('failed to interpret parameters as JSON')
@@ -190,29 +189,32 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
                 return
 
             # Establish the action to perform
-            #module_name = self.path[1:].replace('/', '.')
-            #try:
-            #    module = getattr(modules, module_name)
-            #    handler = getattr(module, 'AgentRequestHandler')
-            #except AttributeError:
-            #    self.send_error(501, 'Unsupported module')
-            #    return
+            (module_name, action) = params['action'].rsplit('.', 1)
 
-            #try:
-            #    method = getattr(handler, 'do_' + self.command.lower())
-            #except AttributeError:
-            #    self.send_error(405, 'Unsupported method')
-            #    return            # Perform the action
+            try:
+                module = getattr(modules, module_name)
+                handler = getattr(module, 'AgentRequestHandler')
+            except (AttributeError, KeyError):
+                self.send_error(501, 'Unsupported module')
+                return
 
-            # Legacy code begins here
+            try:
+                method = getattr(handler, 'do_' + action.lower())
+            except AttributeError:
+                self.send_error(405, 'Unsupported method')
+                return
 
-            #self.log_message('Executing action')
-            #result = method(params)
+            # Perform the action
+            if 'parameters' not in params:
+                params['parameters'] = {}
 
-            #self.log_message('Sending response')
-            #self.wfile.write(BaseRequestHandler._serialise_response(result))
-            #self.wfile.flush()
-            #self.send_response(result['status']['error_code'])
+            self.send_response(200, 'OK')
+            self.end_headers()
+
+            result = method(params['parameters'])
+            encoded_result = BaseRequestHandler._serialise_response(result)
+            self.wfile.write(encoded_result)
+            self.wfile.flush()
 
             self.log_message('processing complete')
 
