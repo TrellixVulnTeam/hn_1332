@@ -34,6 +34,25 @@ piwikTracker.enableLinkTracking();
 <!-- End Piwik Tracking Code -->
 
 <body>
+
+<script type="text/javascript">
+     $(window).load(function() {
+         $('#links ul').hide().fadeIn('8000');
+         $('#featured').orbit({
+            animation: 'fade',
+     		animationSpeed: 800,
+     		timer: true,
+     		advanceSpeed: 4000,
+     		pauseOnHover: false,
+     		startClockOnMouseOut: false,
+     		startClockOnMouseOutAfter: 1000,
+     		afterSlideChange: function(){}
+
+         });
+     });
+</script>
+
+
 <div id="wrapper">
 
 <div id="header">
@@ -50,22 +69,6 @@ piwikTracker.enableLinkTracking();
 </div>
 
 <div id="banner">
-
-<script type="text/javascript">
-     $(window).load(function() {
-         $('#featured').orbit({
-            animation: 'fade',
-     		animationSpeed: 800,
-     		timer: true,
-     		advanceSpeed: 4000,
-     		pauseOnHover: false,
-     		startClockOnMouseOut: false,
-     		startClockOnMouseOutAfter: 1000,
-     		afterSlideChange: function(){}
-
-         });
-     });
-</script>
 
 <div id="banner_block">
 
