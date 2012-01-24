@@ -92,15 +92,12 @@ a:visited {text-decoration: none;}
 	position: relative;
 }
 #banner_block {
-	padding-bottom: 25px;
-	padding-right: 30px;
+	margin-bottom: 20px;
 	margin-right: auto;
 	margin-left: auto;
-	padding-left: 30px;
-	padding-top: 25px;
 	position: relative;
 	height: 225px;
-	width: 880px;
+	width: 940px;
 	background-repeat: repeat;
 	background-image: url(images/banner_block.png);
 	-moz-border-radius: 5px;
