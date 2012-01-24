@@ -87,10 +87,10 @@ class Agent:
 
         for key in gpg_secrets:
             if key['fingerprint'] == self.gnupg_fingerprint:
-                self._gpg_secret_key = key
+                self._gpg._secret_key = key
                 break
 
-        if not hasattr(self, '_gpg_secret_key'):
+        if not hasattr(self._gpg, '_secret_key'):
             self._main_log.error('no GPG private key configured; aborting')
             sys.exit(78) # configuration issue (sysexits.h)
 
@@ -219,7 +219,10 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
 
             result = method(params['parameters'])
             encoded_result = BaseRequestHandler._serialise_response(result)
-            self.wfile.write(encoded_result)
+            encoded_result = str(self._gpg.encrypt(encoded_result,
+                                                   clear.fingerprint,
+                                                   sign=self._gpg._secret_key['fingerprint']))
+            self.wfile.write(bytes(encoded_result, 'UTF-8'))
             self.wfile.flush()
 
             self.log_message('processing complete')
