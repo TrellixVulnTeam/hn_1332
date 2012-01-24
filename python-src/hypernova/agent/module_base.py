@@ -28,4 +28,4 @@ class BaseRequestHandler:
 
     def _serialise_response(native_response):
 
-        return bytes(json.dumps(native_response), 'UTF-8')
+        return json.dumps(native_response)
