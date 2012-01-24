@@ -180,6 +180,12 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
                 self.send_error(403, 'Access denied')
                 return
 
+            # Verify signature integrity
+            if not hasattr(clear, 'fingerprint'):
+                self.log_error('data unsigned or signing key not in local key store')
+                self.send_error(403, 'Access denied')
+                return
+
             # Decode the parameters
             try:
                 params = json.loads(str(clear))
@@ -225,7 +231,7 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
 
     def log_message(self, format, *args):
 
-        msg = format %args
+        msg = format %(args)
         self._log.info('[%s:%d] %s'
             %(self.client_address[0], self.client_address[1], msg))
 
