@@ -14,7 +14,7 @@ from hypernova.client.module_base import BaseActionHandler
 import subprocess
 
 class AgentRequestHandler(BaseRequestHandler):
-    def do_loadaverages(params):
+    def do_load_averages(params):
         raw = str(subprocess.check_output(['cat', '/proc/loadavg']), 'UTF-8')
         parts = raw.split(' ')
 
