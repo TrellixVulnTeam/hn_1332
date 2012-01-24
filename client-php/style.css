@@ -46,6 +46,7 @@ body {
 }
 
 #links ul {
+	display: none;
 	float: right;
 	margin-top: 25px;
 	margin-right: 25px;
