@@ -9,31 +9,29 @@
 #                    Luke Carrier <luke.carrier@tdm.info>
 #
 
+from configparser import ConfigParser
 from http.server import HTTPServer, BaseHTTPRequestHandler
-from hypernova import GPG, modules
+from hypernova import GPG
+import hypernova.modules
 from hypernova.agent.module_base import BaseRequestHandler
 import json
 import logging
 import logging.handlers
+import os
 import socket
 from socketserver import ThreadingMixIn
 import sys
 
 class Agent:
+    """
+    HyperNova agent.
 
-    addr    = None
-    port    = None
-    timeout = None
-
-    main_main_log = None
-    req_main_log  = None
-    log_level     = None
-
-    name   = None
-    domain = None
-
-    gnupg_home        = None
-    gnupg_fingerprint = None
+    The agent class provides a long-running daemon process that behaves as an
+    HTTP server. Once launched, it listens on the specified address and port
+    combination for PGP-encrypted (and signed) connections, calling out to its
+    modules to perform actions on the server and returning relevant data to the
+    client.
+    """
 
     _server = None
 
@@ -46,88 +44,167 @@ class Agent:
 
     _gpg = None
 
-    def __init__(self, addr='0.0.0.0', port=8080, timeout=0.5,
-                 main_log='/tmp/hn-main.log', req_log='/tmp/hn-request.log',
-                 log_level='debug',
-                 name='box', domain='example.net',
-                 gnupg_home='/tmp/hn-gnupg', gnupg_fingerprint=''):
+    def __init__(self, config_root_dir):
+        """
+        Prepare the agent daemon.
 
-        self.addr = addr
-        self.port = port
-        self.timeout = timeout
+        Initialise the internals of the daemon such that it can be executed as
+        desired. The agent first opens its log files to ensure errors are duly
+        noted before parsing all files in the specified directory.
 
-        self.main_log  = main_log
-        self.req_log   = req_log
-        self.log_level = log_level.upper()
+        To launch the server, simple call the execute() method on the agent
+        object.
+        """
 
-        self.name       = name
-        self.domain     = domain
-        self.full_name  = '%s.%s' %(name, domain)
-        self.email_addr = '%s@%s' %(name, domain)
+        # Initialise logging early
+        #
+        # This allows us to print messages to the screen when errors occur
+        # without the developer having to be wary of whether the loggers have
+        # been configured yet.
+        self._init_logging()
 
-        self.gnupg_home        = gnupg_home
-        self.gnupg_fingerprint = gnupg_fingerprint
+        self._init_config(config_root_dir)
 
     def execute(self):
+        """
+        Execute the agent daemon.
 
-        self._init_logging()
+        Enters into the main server loop after configuring the loggers to write
+        their output to the logs specified in the configuration, instead of
+        sys.STDOUT.
+        """
+
         self._init_gpg()
+        self._config_logging()
 
-        self._server = AgentServer((self.addr, self.port),
-            AgentRequestHandler, self._gpg)
+        addr = (self._config['server']['address'],
+                int(self._config['server']['port']))
+        self._server = AgentServer(addr, AgentRequestHandler, self._gpg)
         self._main_log.info('entering server main loop')
         self._server.serve_forever()
         self._main_log.info('server exiting')
 
-    def _init_gpg(self):
+    def _init_config(self, config_root_dir):
+        """
+        Initialise configuration values.
 
-        self._gpg = GPG.get_gpg(gnupghome=self.gnupg_home,
+        See __init__() for more information.
+        """
+
+        self._main_log.info('loading configuration from directory %s'
+                            %(config_root_dir))
+        self._config = ConfigParser()
+        try:
+            config_files = os.listdir(config_root_dir)
+        except OSError:
+            self._main_log.error('directory does not exist')
+            sys.exit(78)
+
+        for config_file in config_files:
+
+            # Skip dotfiles
+            if config_file.startswith('.'):
+                continue
+
+            self._main_log.info('loading configuration file %s' %(config_file))
+            config_file = os.path.join(config_root_dir, config_file)
+            self._config.read_file(open(config_file, 'r'))
+
+    def _init_gpg(self):
+        """
+        Initialise GPG encryption and signing mechanisms.
+
+        See __init__() for more information.
+        """
+
+        self._gpg = GPG.get_gpg(gnupghome=self._config['gpg']['key_store'],
                                           instancename='hn-agent')
         gpg_secrets = self._gpg.list_keys(True)
 
         for key in gpg_secrets:
-            if key['fingerprint'] == self.gnupg_fingerprint:
+            if key['fingerprint'] == self._config['gpg']['fingerprint']:
                 self._gpg._secret_key = key
                 break
 
         if not hasattr(self._gpg, '_secret_key'):
             self._main_log.error('no GPG private key configured; aborting')
-            sys.exit(78) # configuration issue (sysexits.h)
+            sys.exit(78)
 
     def _init_logging(self):
+        """
+        Initialise logs.
 
-        log_level = getattr(logging, self.log_level)
+        Ensure that logging output doesn't get lost; since log files aren't
+        available until configuration has been loaded. This is necessary before
+        configuration is loaded in case an error occurs during initialisation.
+
+        See __init__() for more information.
+        """
 
         self._main_log_formatter = logging.Formatter(
             fmt = '[%(asctime)s] [%(levelname)-1s] %(message)s',
             datefmt = '%d/%m/%Y %I:%M:%S')
 
         self._main_log = logging.getLogger('hn-main')
-        self._main_log.setLevel(log_level)
-        self._main_log_handler = logging.handlers.RotatingFileHandler(
-            self.main_log, mode='a')
-        self._main_log_handler.setFormatter(self._main_log_formatter)
-        self._main_log.addHandler(self._main_log_handler)
+        self._main_log.setLevel(logging.DEBUG)
 
         self._req_log = logging.getLogger('hn-request')
-        self._req_log.setLevel(log_level)
-        self._req_log_handler = logging.handlers.RotatingFileHandler(
-            self.req_log, mode='a')
-        self._req_log_handler.setFormatter(self._main_log_formatter)
-        self._req_log.addHandler(self._req_log_handler)
+        self._req_log.setLevel(logging.DEBUG)
 
         self._main_log.info('initialised logging')
 
+    def _config_logging(self):
+        """
+        Configure the logs with known paths.
+
+        Allow the log objects to log to their respective files instead of
+        STDOUT, since log paths are known after configuration has been loaded.
+        """
+
+        self._main_log_handler = logging.handlers.RotatingFileHandler(
+            self._config['logging']['main_log'], mode='a')
+        self._main_log_handler.setFormatter(self._main_log_formatter)
+        self._main_log.addHandler(self._main_log_handler)
+
+        self._req_log_handler = logging.handlers.RotatingFileHandler(
+            self._config['logging']['request_log'], mode='a')
+        self._req_log_handler.setFormatter(self._main_log_formatter)
+        self._req_log.addHandler(self._req_log_handler)
+
 
 class AgentServer(ThreadingMixIn, HTTPServer):
+    """
+    Agent multi-threaded HTTP server.
+
+    The HyperNova agent executes each operation in its own thread to increase
+    performance, scalability and stability. In doing so, the server is always
+    free to open new connections with clients, since all requests are
+    non-blocking.
+
+    For details of the execution workflow used to serve each request, see the
+    AgentRequestHandler class.
+    """
     pass
 
 
 class AgentRequestHandler(BaseHTTPRequestHandler):
+    """
+    Agent request handler.
+
+    This class is instantiated once per request, and is active only during the
+    lifetime of this request.
+    """
 
     _log = None
 
     def __init__(self, request, client_address, server):
+        """
+        Initialise the request.
+
+        Initialises the logger and GPG interface in preparation for handling the
+        request. This enables us to write any debugging information to the log
+        and retain key metadata to save resources with larger GPG keyrings.
+        """
 
         # Overridden from BaseHTTPRequestHandler
         #
@@ -139,6 +216,9 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
         super().__init__(request, client_address, server)
 
     def handle_one_request(self):
+        """
+        Serve a single request.
+        """
 
         # Overridden from BaseHTTPRequestHandler
         #
@@ -152,7 +232,7 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
                 self.requestline = ''
                 self.request_version = ''
                 self.command = ''
-                self.send_error(414)
+                self.send_error(414, 'Request entity too large')
                 return
 
             if not self.raw_requestline:
@@ -162,9 +242,14 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
             if not self.parse_request():
                 return
 
+            # We will *always* return JSON from this point onward
             self.send_header('Content-Type', 'application/json');
 
-            # Decrypt request body, if sent
+            # Ensure the request has a body
+            #
+            # To ensure security, the action to perform is ascertained based
+            # upon the action value in the JSON body of the request. If this is
+            # not set, there's no point wasting CPU cycles trying to decrypt it.
             try:
                 length = int(self.headers.get('Content-Length'))
                 raw = self.rfile.read(length)
@@ -173,14 +258,23 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
                 self.send_error(400, 'No parameters')
                 return
 
-            # Decrypt parameters
+            # Verify signature trustworthiness and decrypt parameters
+            #
+            # The body of the request will be an ASCII-armored PGP message. In
+            # order to read it we must do two things:
+            #
+            # * ensure that the content within the body was signed by a trusted
+            #   keypair present in our keyring; and
+            # * successfully decrypt the output using the server's private key.
+            #
+            # Only when both criteria are met can we be sure that the request
+            # came from an authorised machine.
             clear = self._gpg.decrypt(raw)
-            if str(clear) == '': # decryption failed
+            if str(clear) == '':
                 self.log_error('decrypted request body seemed empty; potential authentication failure')
                 self.send_error(403, 'Access denied')
                 return
 
-            # Verify signature integrity
             if not hasattr(clear, 'fingerprint'):
                 self.log_error('data unsigned or signing key not in local key store')
                 self.send_error(403, 'Access denied')
@@ -195,6 +289,14 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
                 return
 
             # Establish the action to perform
+            #
+            # The action parameter in the request is passed in the form:
+            #
+            #     module.submodule.action
+            #
+            # Submodule support is not yet part of the agent, but is likely to
+            # be incorporated very soon and will enable cleaner namespacing of
+            # actions.
             (module_name, action) = params['action'].rsplit('.', 1)
 
             try:
@@ -233,12 +335,27 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
             return
 
     def log_message(self, format, *args):
+        """
+        Write a message to the log.
+        """
+
+        # Overridden from BaseHTTPRequestHandler
+        #
+        # The override enables us to reformat the logs to preserve information
+        # crucial to issue diagnosis and troubleshooting, like the details of
+        # socket, which would otherwise be discarded.
 
         msg = format %(args)
         self._log.info('[%s:%d] %s'
             %(self.client_address[0], self.client_address[1], msg))
 
     def send_error(self, code, message=None):
+
+        # Overridden from BaseHTTPRequestHandler
+        #
+        # In order to ensure consistency and stability in client applications,
+        # we must format the data we're sending to the client in JSON at all
+        # times. By default, HTTP-style errors are returned by instances.
 
         try:
             shortmsg, longmsg = self.responses[code]
@@ -259,3 +376,15 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
 
         response = BaseRequestHandler._format_response({}, False, code, '')
         self.wfile.write(BaseRequestHandler._serialise_response(response))
+
+# Execute the agent application.
+#
+# If the module file was the entry point for execution, instantiate the agent
+# class and execute it. This won't occur if the module was imported from
+# elsewhere.
+if __name__ == '__main__':
+    try:
+        Agent(sys.argv[1]).execute()
+    except IndexError:
+        print('%s <config dir>' %(sys.argv[0]),)
+        sys.exit(78)

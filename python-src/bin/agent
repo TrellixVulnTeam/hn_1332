@@ -10,34 +10,8 @@
 #
 
 PYTHON='/usr/bin/python3.2'
-HNROOT="$(dirname "$(readlink -fn "$0")")"
+HNROOT='/usr/lib/python3.2/site-packages/HyperNova-0.1.0-py3.2.egg/hypernova'
 
-ADDR='0.0.0.0'
-PORT='8080'
-TIMEOUT=0.5
+[ -z "$CONFDIR" ] && CONFDIR="/etc/hypernova"
 
-MAIN_LOG='/tmp/hn-main.log'
-REQ_LOG='/tmp/hn-request.log'
-LOG_LEVEL='debug'
-
-NAME='box'
-DOMAIN='example.net'
-
-GNUPG_HOME='/tmp/hn-gnupg'
-GNUPG_FINGERPRINT=''
-
-[ -f "/etc/default/hn-agent" ] && . "/etc/default/hn-agent"
-
-"$PYTHON" -c "
-from hypernova.agent import Agent
-agent = Agent(
-    addr='${ADDR}',
-    port=${PORT},
-    timeout=${TIMEOUT},
-    main_log='${MAIN_LOG}',
-    req_log='${REQ_LOG}',
-    log_level='${LOG_LEVEL}',
-    gnupg_home='${GNUPG_HOME}',
-    gnupg_fingerprint='${GNUPG_FINGERPRINT}'
-)
-agent.execute()"
+"$PYTHON" "$HNROOT/agent/__init__.py" "$CONFDIR"
