@@ -375,7 +375,9 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
         response = BaseRequestHandler._format_response({}, False, code, '')
-        self.wfile.write(BaseRequestHandler._serialise_response(response))
+        response = bytes(BaseRequestHandler._serialise_response(response),
+                         'UTF-8')
+        self.wfile.write(response)
 
 # Execute the agent application.
 #
