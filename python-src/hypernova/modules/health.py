@@ -10,7 +10,6 @@
 #
 
 from hypernova.agent.module_base import BaseRequestHandler
-from hypernova.client.module_base import BaseActionHandler
 import subprocess
 
 class AgentRequestHandler(BaseRequestHandler):
