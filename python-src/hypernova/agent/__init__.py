@@ -162,6 +162,7 @@ class Agent:
         STDOUT, since log paths are known after configuration has been loaded.
         """
 
+        self._main_log.info('redirecting logging output to files')
         self._main_log_handler = logging.handlers.RotatingFileHandler(
             self._config['logging']['main_log'], mode='a')
         self._main_log_handler.setFormatter(self._main_log_formatter)
