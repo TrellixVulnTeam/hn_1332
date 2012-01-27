@@ -14,5 +14,11 @@ __pycache__
 /python-src/dist
 /python-src/*.egg-info
 
+# chroot environment stuff
+/python-src/chroot/etc/hypernova/agent/*
+/python-src/chroot/tmp/*
+/python-src/chroot/var/lib/hypernova/gpg/*
+/python-src/chroot/var/log/hypernova/*
+
 # OS temporary rubbish
 .DS_Store
