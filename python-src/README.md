@@ -25,6 +25,19 @@ Which can be installed like so:
 Configuration
 -------------
 
+Upon launch, the HyperNova agent loads configuration files in
+/etc/hypernova/agent in alphabetical order. To simplify running in development,
+you can run the chroot/bin/agent script with the CONFDIR environment variable
+set to test it:
+
+    cd chroot
+    CONFDIR=etc/hypernova/agent usr/bin/hn-agent
+
+To configure the daemon initially, it'd be a good idea to copy the agent.ini
+file to a new location (like local-agent.ini!) in the same directory and make
+your changes there, since they'll take precedence over those specified in files
+loaded before it.
+
 Some security consideration is required before the agent will actually run.
 Initially, you'll need to configure a GPG secret key for the server to
 authenticate clients against. You'll want to do something like this to generate
@@ -45,14 +58,6 @@ what we're interested in:
 
     Key fingerprint = C461 B300 17B0 091E A832  177D 9433 88AC D723 87C4
 
-We need to configure the agent's key directory now; the directory where all
-authorised servers' keys are kept and where our own private key is kept.
-
-Now, edit the file /etc/default/hn-agent, and pop the following values in:
-
-    GNUPG_HOME='/path/to/keydir'
-    GNUPG_FINGERPRINT='C461B30017B0091EA832177D943388ACD72387C4'
-
 You'll need to make sure the agent has read/write access to the keystore, else
 it won't be able to run. chown'ing the /var/lib/hypernova directory to a
 dedicated hypernova user would be a good idea.
@@ -66,12 +71,24 @@ same procedure as above (though on the frontend, not the backend). You then need
 to import the public key into the agent, like so:
 
     # on the client
-    gpg --export 5FBE20D3 > client_server_name.pub
+    gpg --export 5FBE20D3 > chroot/tmp/client.pub
 
     # on the server
-    gpg --homedir /var/lib/hypernova/gpg --import client_server_name.pub
+    gpg --homedir /var/lib/hypernova/gpg --import chroot/tmp/client.pub
     gpg --homedir /var/lib/hypernova/gpg --sign-key 5FBE20D3
-        sign
+        Really sign? (y/N) y
+
+To ensure that the response isn't being spoofed, similar verification checks
+should occur in the client, so we'll need the client to sign the keys of the
+server (to demonstrate trust):
+
+    # on the server
+    gpg --homedir /var/lib/hypernova/gpg \
+        --export 4FBE20D2 > chroot/tmp/server.pub
+
+    # on the client
+    gpg --import chroot/tmp/server.pub
+    gpg --sign-key 4FBE20D2
         Really sign? (y/N) y
 
 Execution
@@ -80,10 +97,50 @@ Execution
 Since the fanciness is starting to come together, you can now run the server via
 a shell script in the python-src directory:
 
-    cd python-src
-    bin/agent
+    cd python-src/chroot
+    CONFDIR=etc/hypernova/agent usr/bin/hn-agent
 
 Hit Ctrl-C to kill it when you're done.
 
-By default, the server will listen on 0.0.0.0:8080, so making an HTTP request to
-port 8080 on the target machine should yield some form of output.
+Making requests
+---------------
+
+Since bi-directional encryption and signing now takes place in the server, you
+can't query the agent using cURL any more. A primitive client is available,
+however.
+
+Requests to the agent (and responses gleaned from it) are formatted in JSON. For
+now, you'll need to write the contents of the packet yourself. A basic example
+that'd return the load averages would look something like so:
+
+    {
+        "action": "status.load_averages"
+        "parameters": {
+        }
+    }
+
+Now, we need to know the fingerprints of both the client and server keys. These
+can be obtained using the --fingerprint switch with the gnupg utility:
+
+    gpg --fingerprint
+
+The command should look like the following:
+
+    cd python-src/chroot
+    usr/bin/hn-client '{"action":"status.load_averages"}' CLIENTFP SERVERFP
+
+...and the following response should be yielded (though averages may differ ;)):
+
+    {
+        "response": {
+            "15m": 0.05, 
+            "1m": 0.0, 
+            "5m": 0.01
+        }, 
+        "status": {
+            "error_code": 200, 
+            "explanation": "", 
+            "message": "", 
+            "successful": true
+        }
+    }
