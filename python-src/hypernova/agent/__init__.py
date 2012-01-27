@@ -96,6 +96,7 @@ class Agent:
         self._config = ConfigParser()
         try:
             config_files = os.listdir(config_root_dir)
+            config_files.sort()
         except OSError:
             self._main_log.error('directory does not exist')
             sys.exit(78)
