@@ -300,7 +300,7 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
             (module_name, action) = params['action'].rsplit('.', 1)
 
             try:
-                module = getattr(modules, module_name)
+                module = getattr(hypernova.modules, module_name)
                 handler = getattr(module, 'AgentRequestHandler')
             except (AttributeError, KeyError):
                 self.send_error(501, 'Unsupported module')
