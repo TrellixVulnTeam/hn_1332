@@ -16,7 +16,12 @@ class AgentRequestHandler(BaseRequestHandler):
 
     def do_load_averages(params):
 
-        raw = str(subprocess.check_output(['cat', '/proc/loadavg']), 'UTF-8')
+        try:
+            with open('/proc/loadavgs', 'r') as f:
+                raw = f.read()
+        except IOError:
+            return BaseRequestHandler._format_response(False, 0x00000001)
+
         parts = raw.split(' ')
 
         return BaseRequestHandler._format_response(
