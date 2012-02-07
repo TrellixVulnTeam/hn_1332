@@ -9,9 +9,11 @@ should work, though we've developed and tested it primarily with version 3.2.2,
 the latest available release.
 
 The installation procedure uses setuptools, so you'll want to install
-Distribute:
+Distribute. We also depend on a few modules not shipped as part of the Python
+standard library:
 
     sudo python3.2 < <(curl -s http://python-distribute.org/distribute_setup.py)
+    sudo easy_install-3.2 python_gnupg
 
 Then generate an egg from our source code:
 
@@ -71,6 +73,14 @@ same procedure as above (though on the frontend, not the backend). You then need
 to import the public key into the agent, like so:
 
     # on the client
+    sudo gpg --gen-key
+        Your selection? 1
+        What keysize do you want? (2048) 2048
+        Key is valid for? (0) 0
+        Real name: client
+        Email address: client@domain.com
+        Comment:
+        Change (N)ame, (C)omment, (E)mail or (O)kay/(Q)uit? O
     gpg --export 5FBE20D3 > chroot/tmp/client.pub
 
     # on the server
@@ -133,14 +143,14 @@ The command should look like the following:
 
     {
         "response": {
-            "15m": 0.05, 
-            "1m": 0.0, 
+            "15m": 0.05,
+            "1m": 0.0,
             "5m": 0.01
-        }, 
+        },
         "status": {
-            "error_code": 200, 
-            "explanation": "", 
-            "message": "", 
+            "error_code": 200,
+            "explanation": "",
+            "message": "",
             "successful": true
         }
     }
