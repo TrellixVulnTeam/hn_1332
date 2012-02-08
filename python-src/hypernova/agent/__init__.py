@@ -22,6 +22,9 @@ import socket
 from socketserver import ThreadingMixIn
 import sys
 
+# Agent instance configuration.
+config = ConfigParser()
+
 class Agent:
     """
     HyperNova agent.
@@ -93,7 +96,6 @@ class Agent:
 
         self._main_log.info('loading configuration from directory %s'
                             %(config_root_dir))
-        self._config = ConfigParser()
         try:
             config_files = os.listdir(config_root_dir)
             config_files.sort()
@@ -109,7 +111,9 @@ class Agent:
 
             self._main_log.info('loading configuration file %s' %(config_file))
             config_file = os.path.join(config_root_dir, config_file)
-            self._config.read_file(open(config_file, 'r'))
+            globals()['config'].read_file(open(config_file, 'r'))
+
+        self._config = globals()['config']
 
     def _init_gpg(self):
         """
