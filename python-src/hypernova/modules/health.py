@@ -9,7 +9,7 @@
 #                    Luke Carrier <luke.carrier@tdm.info>
 #
 
-from hypernova.agent.module_base import BaseRequestHandler
+from hypernova.agent.modulebase import BaseRequestHandler
 import subprocess
 
 class AgentRequestHandler(BaseRequestHandler):

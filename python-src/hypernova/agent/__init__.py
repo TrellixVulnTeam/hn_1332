@@ -13,7 +13,7 @@ from configparser import ConfigParser
 from http.server import HTTPServer, BaseHTTPRequestHandler
 from hypernova import GPG
 import hypernova.modules
-from hypernova.agent.module_base import BaseRequestHandler
+from hypernova.agent.modulebase import BaseRequestHandler
 import json
 import logging
 import logging.handlers
