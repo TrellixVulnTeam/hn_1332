@@ -1,5 +1,6 @@
 # Editor project and temporary files
 /*.komodoproject
+.komodotools
 /*.kpf
 /.project
 .redcar
