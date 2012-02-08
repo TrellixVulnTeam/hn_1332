@@ -108,7 +108,7 @@ Since the fanciness is starting to come together, you can now run the server via
 a shell script in the python-src directory:
 
     cd python-src/chroot
-    CONFDIR=etc/hypernova/agent usr/bin/hn-agent
+    CONFDIR=etc/hypernova/agent bin/hn-agent
 
 Hit Ctrl-C to kill it when you're done.
 
@@ -137,7 +137,7 @@ can be obtained using the --fingerprint switch with the gnupg utility:
 The command should look like the following:
 
     cd python-src/chroot
-    usr/bin/hn-client '{"action":"status.load_averages"}' CLIENTFP SERVERFP
+    bin/hn-client '{"action":"status.load_averages"}' CLIENTFP SERVERFP
 
 ...and the following response should be yielded (though averages may differ ;)):
 
