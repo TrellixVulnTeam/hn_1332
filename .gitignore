@@ -14,6 +14,7 @@ __pycache__
 /python-src/build
 /python-src/dist
 /python-src/*.egg-info
+/python-src/chroot/bin/elevator
 
 # chroot environment stuff
 /python-src/chroot/etc/hypernova/agent/*
