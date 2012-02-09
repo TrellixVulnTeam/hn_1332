@@ -9,14 +9,12 @@
 #                    Luke Carrier <luke.carrier@tdm.info>
 #
 
-from configparser import ConfigParser
 from http.server import HTTPServer, BaseHTTPRequestHandler
-from hypernova import GPG
-import hypernova.modules
-from hypernova.agent.modulebase import BaseRequestHandler
+from hypernova import GPG, modules
 import json
 import logging
 import logging.handlers
+from hypernova.libraries.configuration import ConfigurationFactory
 import os
 import socket
 from socketserver import ThreadingMixIn
@@ -76,6 +74,7 @@ class Agent:
 
         self._init_gpg()
         self._config_logging()
+        self._init_modules()
 
         addr = (self._config['server']['address'],
                 int(self._config['server']['port']))
@@ -90,26 +89,15 @@ class Agent:
 
         See __init__() for more information.
         """
-
+        
         self._main_log.info('loading configuration from directory %s'
                             %(config_root_dir))
-        self._config = ConfigParser()
-        try:
-            config_files = os.listdir(config_root_dir)
-            config_files.sort()
-        except OSError:
-            self._main_log.error('directory does not exist')
+        self._config = ConfigurationFactory.get('hn-agent', config_root_dir,
+                                                self._main_log)
+        
+        if not self._config:
+            self._main_log.critical('loading configuration failed')
             sys.exit(78)
-
-        for config_file in config_files:
-
-            # Skip dotfiles
-            if config_file.startswith('.'):
-                continue
-
-            self._main_log.info('loading configuration file %s' %(config_file))
-            config_file = os.path.join(config_root_dir, config_file)
-            self._config.read_file(open(config_file, 'r'))
 
     def _init_gpg(self):
         """
@@ -172,7 +160,27 @@ class Agent:
             self._config['logging']['request_log'], mode='a')
         self._req_log_handler.setFormatter(self._main_log_formatter)
         self._req_log.addHandler(self._req_log_handler)
+    
+    def _init_modules(self):
+        """
+        Allow modules a chance to initialise (if necessary).
+        
+        Some modules may require specialised configuration in order to function.
+        here, the agent passes the configuration it has loaded to the
+        initialisation methods of each of the modules it has loaded. This
+        facilitates loading custom configuration directly from the configuration
+        files.
+        """
+        
+        for module_name in modules.__all__:
+            self._main_log.info('initialising module %s' %(module_name))
+            module = getattr(modules, module_name)
+            if not hasattr(module, '_agent_init'):
+                self._main_log.warn('module %s had no initialiser (_agent_init)'
+                                    %(module_name))
+                continue
 
+            module._agent_init(self._config)
 
 class AgentServer(ThreadingMixIn, HTTPServer):
     """
@@ -302,7 +310,7 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
             (module_name, action) = params['action'].rsplit('.', 1)
 
             try:
-                module = getattr(hypernova.modules, module_name)
+                module = getattr(modules, module_name)
                 handler = getattr(module, 'AgentRequestHandler')
             except (AttributeError, KeyError):
                 self.send_error(501, 'Unsupported module')
@@ -322,7 +330,7 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
             result = method(params['parameters'])
-            encoded_result = BaseRequestHandler._serialise_response(result)
+            encoded_result = modules.serialise_response(result)
             encoded_result = str(self._gpg.encrypt(encoded_result,
                                                    clear.fingerprint,
                                                    sign=self._gpg._secret_key['fingerprint']))
@@ -376,8 +384,8 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
         self.send_header('Connection', 'close')
         self.end_headers()
 
-        response = BaseRequestHandler._format_response({}, False, code, '')
-        response = bytes(BaseRequestHandler._serialise_response(response),
+        response = modules.AgentRequestHandlerBase._format_response({}, False, code, '')
+        response = bytes(modules.serialise_response(response),
                          'UTF-8')
         self.wfile.write(response)
 
