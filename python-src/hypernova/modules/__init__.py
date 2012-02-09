@@ -10,6 +10,28 @@
 #
 
 import pkgutil
+import json
+
+class AgentRequestHandlerBase:
+
+    def _format_response(response={}, successful=True, error_code=0,
+                         message='', explanation=''):
+
+        return {
+            'status': {
+                'successful': successful,
+                'error_code': int(error_code),
+                'message': message,
+                'explanation': explanation
+            },
+            'response': response
+        }
+
+
+
+def serialise_response(native_response):
+
+    return json.dumps(native_response)
 
 # Import submodules
 #
