@@ -9,22 +9,22 @@
 #                    Luke Carrier <luke.carrier@tdm.info>
 #
 
-from hypernova.agent.modulebase import BaseRequestHandler
+from hypernova.modules import AgentRequestHandlerBase
 import subprocess
 
-class AgentRequestHandler(BaseRequestHandler):
+class AgentRequestHandler(AgentRequestHandlerBase):
 
     def do_load_averages(params):
 
         try:
-            with open('/proc/loadavgs', 'r') as f:
+            with open('/proc/loadavg', 'r') as f:
                 raw = f.read()
-        except IOError:
-            return BaseRequestHandler._format_response(False, 0x00000001)
+        except IOError as e:
+            return AgentRequestHandler._format_response(False, 1)
 
         parts = raw.split(' ')
 
-        return BaseRequestHandler._format_response(
+        return AgentRequestHandler._format_response(
             {
                 '1m':  float(parts[0]),
                 '5m':  float(parts[1]),
