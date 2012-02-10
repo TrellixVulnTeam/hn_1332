@@ -64,6 +64,32 @@ You'll need to make sure the agent has read/write access to the keystore, else
 it won't be able to run. chown'ing the /var/lib/hypernova directory to a
 dedicated hypernova user would be a good idea.
 
+Configuring elevator
+--------------------
+
+THe elevator tool enables the HyperNova agent to execute commands as root
+despite actually running as an unprivileged user. Its configuration options can
+only be set at configure-time, so we have to compile it ourselves. The
+installation procedure is relatively simple though:
+
+    git submodule init
+    git submodule update
+
+    cd python-src/chroot/src/elevator
+    ./configure --prefix=/usr/local/hn-elevator \
+                --target-uid=0 \
+                --target-gid=0 \
+                --allow-uid=1000 \
+                --allow-gid=1000
+    make
+    sudo make install
+
+You'll then need to configure the agent via your local.ini file:
+
+    [elevation]
+    method = elevator
+    binary = /usr/local/hn-elevator/bin/elevator
+
 Allowing clients
 ----------------
 
