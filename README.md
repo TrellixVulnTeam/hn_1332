@@ -8,6 +8,12 @@ To install HyperNova, you'll need Python 3.x. Any version in the 3.x series
 should work, though we've developed and tested it primarily with version 3.2.2,
 the latest available release.
 
+First of all, initialise any of the submodules within the repository, since
+these are dependencies necessary for installation and operation:
+
+    git submodule init
+    git submodule update
+
 The installation procedure uses setuptools, so you'll want to install
 Distribute. We also depend on a few modules not shipped as part of the Python
 standard library:
@@ -18,19 +24,13 @@ Due to some bugs in the python-gnupg library used for authentication, in order
 to install and use HyperNova without any spurious key validation errors, you'll
 need to install our patched version:
 
-    # This doesn't work:
-    #sudo easy_install-3.2 python-gnupg
-
-    # This does work:
-    git submodule init
-    git submodule update
-    cd python-src/chroot/src/python-gnupg
+    cd deps/python-gnupg
     python3.2 setup.py bdist_egg
     sudo easy_install-3.2 dist/python_gnupg-VERSION-py3.2.egg
 
 Then generate an egg from our source code:
 
-    cd python-src
+    cd src
     python3.2 setup.py bdist_egg
 
 Which can be installed like so:
@@ -49,8 +49,8 @@ set to test it:
     CONFDIR=etc/hypernova/agent usr/bin/hn-agent
 
 To configure the daemon initially, it'd be a good idea to copy the agent.ini
-file to a new location (like local-agent.ini!) in the same directory and make
-your changes there, since they'll take precedence over those specified in files
+file to a new location (like local.ini!) in the same directory and make your
+changes there, since they'll take precedence over those specified in files
 loaded before it.
 
 Some security consideration is required before the agent will actually run.
@@ -58,8 +58,8 @@ Initially, you'll need to configure a GPG secret key for the server to
 authenticate clients against. You'll want to do something like this to generate
 the key in the agent's key store:
 
-    sudo mkdir -p /var/lib/hypernova/gpg
-    sudo gpg --homedir /var/lib/hypernova/gpg --gen-key
+    sudo mkdir -p chroot/var/lib/hypernova/gpg
+    sudo gpg --homedir chroot/var/lib/hypernova/gpg --gen-key
         Your selection? 1
         What keysize do you want? (2048) 2048
         Key is valid for? (0) 0
@@ -74,7 +74,7 @@ what we're interested in:
     Key fingerprint = C461 B300 17B0 091E A832  177D 9433 88AC D723 87C4
 
 You'll need to make sure the agent has read/write access to the keystore, else
-it won't be able to run. chown'ing the /var/lib/hypernova directory to a
+it won't be able to run. chown'ing the chroot/var/lib/hypernova directory to a
 dedicated hypernova user would be a good idea.
 
 Configuring elevator
@@ -88,7 +88,7 @@ installation procedure is relatively simple though:
     git submodule init
     git submodule update
 
-    cd python-src/chroot/src/elevator
+    cd deps/elevator
     ./configure --prefix=/usr/local/hn-elevator \
                 --target-uid=0 \
                 --target-gid=0 \
@@ -101,7 +101,7 @@ You'll then need to configure the agent via your local.ini file:
 
     [elevation]
     method = elevator
-    binary = /usr/local/hn-elevator/bin/elevator
+    binary = chroot/bin/elevator
 
 Allowing clients
 ----------------
@@ -123,8 +123,8 @@ to import the public key into the agent, like so:
     gpg --export 5FBE20D3 > chroot/tmp/client.pub
 
     # on the server
-    gpg --homedir /var/lib/hypernova/gpg --import chroot/tmp/client.pub
-    gpg --homedir /var/lib/hypernova/gpg --sign-key 5FBE20D3
+    gpg --homedir chroot/var/lib/hypernova/gpg --import chroot/tmp/client.pub
+    gpg --homedir chroot/var/lib/hypernova/gpg --sign-key 5FBE20D3
         Really sign? (y/N) y
 
 To ensure that the response isn't being spoofed, similar verification checks
@@ -132,7 +132,7 @@ should occur in the client, so we'll need the client to sign the keys of the
 server (to demonstrate trust):
 
     # on the server
-    gpg --homedir /var/lib/hypernova/gpg \
+    gpg --homedir chroot/var/lib/hypernova/gpg \
         --export 4FBE20D2 > chroot/tmp/server.pub
 
     # on the client
@@ -146,7 +146,7 @@ Execution
 Since the fanciness is starting to come together, you can now run the server via
 a shell script in the python-src directory:
 
-    cd python-src/chroot
+    cd chroot
     CONFDIR=etc/hypernova/agent bin/hn-agent
 
 Hit Ctrl-C to kill it when you're done.
@@ -175,7 +175,7 @@ can be obtained using the --fingerprint switch with the gnupg utility:
 
 The command should look like the following:
 
-    cd python-src/chroot
+    cd chroot
     bin/hn-client '{"action":"status.load_averages"}' CLIENTFP SERVERFP
 
 ...and the following response should be yielded (though averages may differ ;)):
