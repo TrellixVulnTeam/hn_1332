@@ -21,12 +21,12 @@ class AgentRequestHandler(AgentRequestHandlerBase):
 
         cmd    = elevate_cmd([where_is('whoami')])
         target = ConfigurationFactory.get('hn-agent')['elevation']['target']
-        
+
         try:
-            elevated_user = subprocess.check_output(cmd)
+            elevated_user = str(subprocess.check_output(cmd), 'UTF-8').strip('\n')
         except subprocess.CalledProcessError:
             elevated_user = None
-            
+
         if elevated_user == target:
             status = True
         else:
