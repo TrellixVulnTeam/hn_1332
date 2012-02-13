@@ -10,30 +10,6 @@
 #
 
 import os
-import platform
-
-def get_os():
-    """
-    Attempt to guess the OS type and release.
-
-    This hacky function attempts to guess the OS type based on the presence of a
-    few specific files.
-
-    Returns None of the OS name/version metadata cannot be found, else returns
-    a tuple containing the (name, version, release_title).
-    """
-
-    return platform.dist()
-
-def get_package_manager(releaseinfo):
-    """
-    Attempt to guess the package manager.
-    """
-
-    if releaseinfo[0].lower() in ('centos', 'fedora'):
-        return ('rpm', 'yum')
-
-    return None
 
 def where_is(binary, raise_exc=True, path=None):
     """
