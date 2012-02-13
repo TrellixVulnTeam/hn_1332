@@ -26,3 +26,20 @@ class AgentRequestHandler(AgentRequestHandlerBase):
             success,
             int(success)
         )
+
+    def do_update(params):
+
+        pm = get_package_manager()
+        pm.refresh()
+
+        if 'upgrade' in params and params['upgrade']:
+            upgrade = True
+        else:
+            upgrade = False
+        success = pm.update(upgrade)
+
+        return AgentRequestHandler._format_response(
+            '',
+            success,
+            int(success)
+        )

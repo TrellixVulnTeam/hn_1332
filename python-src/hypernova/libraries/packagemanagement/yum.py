@@ -41,3 +41,23 @@ class PackageManager(PackageManagerBase):
 
     def uninstall(self, *pkgs):
         pass
+
+    def update(self, upgrade=False, *pkgs):
+        cmd = [self.__yum_path]
+
+        if upgrade:
+            cmd.append('upgrade')
+        else:
+            cmd.append('update')
+
+        cmd.append('--assumeyes')
+
+        if len(pkgs) > 0:
+            cmd.extend(pkgs)
+
+        status = super().exec_cmd(cmd, expected_statuses=[0])
+
+        if status == 0:
+            return True
+        else:
+            return False

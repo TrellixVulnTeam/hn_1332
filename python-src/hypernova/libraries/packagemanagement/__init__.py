@@ -49,11 +49,15 @@ class PackageManagerBase:
         Run a command via the package manager.
         """
 
+        if elevate:
+            cmd = elevate_cmd(cmd)
+
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE)
         status = proc.wait()
 
         if status not in expected_statuses:
+            print(str(proc.communicate()))
             raise PackageManagerError('Unexpected exit status %i' %(status))
 
         return status
@@ -84,7 +88,7 @@ class PackageManagerBase:
 
         pass
 
-    def update(self, *pkgs, upgrade=False):
+    def update(self, upgrade=False, *pkgs):
         """
         Update packages.
         """
