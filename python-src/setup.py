@@ -25,6 +25,7 @@ setup(
         'hypernova.agent',
         'hypernova.client',
         'hypernova.libraries',
+        'hypernova.libraries.packagemanagement',
         'hypernova.modules'
     ],
     install_requires = ['python-gnupg'],
