@@ -22,5 +22,13 @@ __pycache__
 /python-src/chroot/var/lib/hypernova/gpg/*
 /python-src/chroot/var/log/hypernova/*
 
+# virtualenv stuff
+/python-src/chroot/bin/activate*
+/python-src/chroot/bin/easy_install*
+/python-src/chroot/bin/pip*
+/python-src/chroot/bin/python*
+/python-src/chroot/include
+/python-src/chroot/lib*
+
 # OS temporary rubbish
 .DS_Store
