@@ -1,3 +1,6 @@
 [submodule "python-src/chroot/src/elevator"]
 	path = python-src/chroot/src/elevator
 	url = https://github.com/LukeCarrier/elevator.git
+[submodule "python-src/chroot/src/python-gnupg"]
+	path = python-src/chroot/src/python-gnupg
+	url = https://github.com/LukeCarrier/python-gnupg.git
