@@ -13,7 +13,20 @@ Distribute. We also depend on a few modules not shipped as part of the Python
 standard library:
 
     sudo python3.2 < <(curl -s http://python-distribute.org/distribute_setup.py)
-    sudo easy_install-3.2 python_gnupg
+
+Due to some bugs in the python-gnupg library used for authentication, in order
+to install and use HyperNova without any spurious key validation errors, you'll
+need to install our patched version:
+
+    # This doesn't work:
+    #sudo easy_install-3.2 python-gnupg
+
+    # This does work:
+    git submodule init
+    git submodule update
+    cd python-src/chroot/src/python-gnupg
+    python3.2 setup.py bdist_egg
+    sudo easy_install-3.2 dist/python_gnupg-VERSION-py3.2.egg
 
 Then generate an egg from our source code:
 
