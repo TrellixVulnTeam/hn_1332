@@ -84,5 +84,12 @@ class PackageManagerBase:
 
         pass
 
+    def update(self, *pkgs, upgrade=False):
+        """
+        Update packages.
+        """
+
+        pass
+
 class PackageManagerError(Exception):
     pass
