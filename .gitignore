@@ -14,21 +14,21 @@ __pycache__
 /python-src/build
 /python-src/dist
 /python-src/*.egg-info
-/python-src/chroot/bin/elevator
 
 # chroot environment stuff
-/python-src/chroot/etc/hypernova/agent/*
-/python-src/chroot/tmp/*
-/python-src/chroot/var/lib/hypernova/gpg/*
-/python-src/chroot/var/log/hypernova/*
+chroot/bin/elevator
+chroot/etc/hypernova/agent/local.ini
+chroot/tmp/*
+chroot/var/lib/hypernova/gpg/*
+chroot/var/log/hypernova/*
 
 # virtualenv stuff
-/python-src/chroot/bin/activate*
-/python-src/chroot/bin/easy_install*
-/python-src/chroot/bin/pip*
-/python-src/chroot/bin/python*
-/python-src/chroot/include
-/python-src/chroot/lib*
+chroot/bin/activate*
+chroot/bin/easy_install*
+chroot/bin/pip*
+chroot/bin/python*
+chroot/include
+chroot/lib*
 
 # OS temporary rubbish
 .DS_Store
