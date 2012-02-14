@@ -26,7 +26,17 @@ class PackageManager(PackageManagerBase):
         self.__yum_path = where_is('yum')
 
     def install(self, *pkgs):
-        pass
+        cmd = [self.__yum_path, 'install']
+        cmd.extend(*pkgs)
+
+        status = super().exec_cmd(cmd)
+
+        if status == 0:
+            status = True
+        else:
+            Status = False
+
+        return status
 
     def refresh(self):
         status = super().exec_cmd([self.__yum_path, 'check-update'],

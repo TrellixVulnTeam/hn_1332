@@ -2,6 +2,7 @@
     "chkrootkit": "chkrootkit",
     "gitolite": "gitolite",
     "haproxy": "haproxy",
+    "kernel": "kernel",
     "mysql-server": "mysql-server",
     "nginx": "nginx",
     "php": "php",

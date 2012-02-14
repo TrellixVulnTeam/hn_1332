@@ -28,6 +28,20 @@ class AgentRequestHandler(AgentRequestHandlerBase):
             1
         )
 
+    def do_install(params):
+
+        pm = get_package_manager()
+        pdb = get_package_db()
+
+        packages = pdb.resolve(*params['packages'])
+        status = pm.install(packages)
+
+        return AgentRequestHandler._format_response(
+            None,
+            True,
+            1
+        )
+
     def do_refresh(params):
 
         pm = get_package_manager()
