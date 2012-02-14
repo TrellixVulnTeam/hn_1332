@@ -107,7 +107,6 @@ class PackageManagerBase:
         status = proc.wait()
 
         if status not in expected_statuses:
-            print(str(proc.communicate()))
             raise PackageManagerError('Unexpected exit status %i' %(status))
 
         return status
