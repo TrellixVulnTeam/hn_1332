@@ -9,9 +9,10 @@
 #                    Luke Carrier <luke.carrier@tdm.info>
 #
 
-PYTHON='/usr/bin/python3.2'
+PYTHON='python3.2'
 HNROOT='/usr/lib/python3.2/site-packages/HyperNova-0.1.0-py3.2.egg/hypernova'
 
+[ -z "$BINDIR"  ] && BINDIR="/usr/bin"
 [ -z "$CONFDIR" ] && CONFDIR="/etc/hypernova"
 
-"$PYTHON" "$HNROOT/client/__init__.py" $@
+"$BINDIR/$PYTHON" "$HNROOT/client/__init__.py" $@
