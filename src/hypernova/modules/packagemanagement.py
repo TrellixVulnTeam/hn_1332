@@ -55,6 +55,20 @@ class AgentRequestHandler(AgentRequestHandlerBase):
             int(success)
         )
 
+    def do_uninstall(params):
+
+        pm = get_package_manager()
+        pdb = get_package_db()
+
+        packages = pdb.resolve(*params['packages'])
+        status = pm.uninstall(packages)
+
+        return AgentRequestHandler._format_response(
+            None,
+            True,
+            1
+        )
+
     def do_update(params):
 
         pm = get_package_manager()
