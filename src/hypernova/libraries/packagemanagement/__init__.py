@@ -77,7 +77,6 @@ class PackageDB:
         resolved = {}
 
         for pkg in pkgs:
-            print('Seeking %s in %s' %(pkg, str(self._db)))
             resolved[pkg] = self._db[pkg]
 
         return resolved
