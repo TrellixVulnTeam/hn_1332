@@ -9,10 +9,24 @@
 #                    Luke Carrier <luke.carrier@tdm.info>
 #
 
-from hypernova.libraries.packagemanagement import get_package_manager
+from hypernova.libraries.packagemanagement import get_package_db, \
+                                                  get_package_manager
 from hypernova.modules import AgentRequestHandlerBase
 
 class AgentRequestHandler(AgentRequestHandlerBase):
+
+    def do_get_package_names(params):
+
+        pdb = get_package_db()
+        package_names = pdb.resolve(*params['packages'])
+
+        return AgentRequestHandler._format_response(
+            {
+                'packages': package_names
+            },
+            True,
+            1
+        )
 
     def do_refresh(params):
 

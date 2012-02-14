@@ -9,9 +9,28 @@
 #                    Luke Carrier <luke.carrier@tdm.info>
 #
 
+import json
+import os
 import platform
 import subprocess
+from hypernova.libraries.configuration import ConfigurationFactory
 from hypernova.libraries.permissionelevation import elevate_cmd
+
+def get_package_db(pdb_name=None):
+    """
+    Get the system's associated package DB.
+    """
+
+    prof_dir = ConfigurationFactory.get('hn-agent')['platforms']['profile_dir']
+    pdb_fmt = os.path.join(prof_dir, '%s', 'packages.json')
+
+    if not pdb_name:
+        os_info = platform.dist()
+
+        if os_info[0].lower() in ('centos', 'fedora'):
+            pdb_name = 'rhel-6'
+
+    return PackageDB(pdb_fmt %(pdb_name))
 
 def get_package_manager(pm_info=None):
     """
@@ -30,6 +49,38 @@ def get_package_manager(pm_info=None):
         return module.PackageManager()
     except ImportError:
         return None
+
+class PackageDB:
+    """
+    Package database.
+
+    Provides a means of abstracting across package names on different Linux
+    distributions.
+    """
+
+    _db = None
+
+    def __init__(self, packagedb):
+        """
+        Prepare the package DB.
+        """
+
+        with open(packagedb, 'r') as f:
+            self._db = json.load(f)
+
+    def resolve(self, *pkgs):
+        """
+        Translate a set of package aliases into their platform-native
+        equivalents.
+        """
+
+        resolved = {}
+
+        for pkg in pkgs:
+            print('Seeking %s in %s' %(pkg, str(self._db)))
+            resolved[pkg] = self._db[pkg]
+
+        return resolved
 
 class PackageManagerBase:
     """

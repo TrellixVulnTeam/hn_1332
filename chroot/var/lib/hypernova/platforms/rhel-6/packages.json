@@ -1,0 +1,14 @@
+{
+    "chkrootkit": "chkrootkit",
+    "gitolite": "gitolite",
+    "haproxy": "haproxy",
+    "mysql-server": "mysql-server",
+    "nginx": "nginx",
+    "php": "php",
+    "postfix": "postfix",
+    "powerdns-authoritative-server": "pdns-static",
+    "powerdns-recursive-server": "pdns-recursor",
+    "sendmail": "sendmail",
+    "snmp": "snmpd",
+    "vsftpd": "vsftpd"
+}
