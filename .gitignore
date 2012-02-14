@@ -19,7 +19,8 @@ src/*.egg-info
 chroot/bin/elevator
 chroot/etc/hypernova/agent/local.ini
 chroot/tmp/*
-chroot/var
+chroot/var/lib/hypernova/gpg
+chroot/var/log
 
 # virtualenv stuff
 chroot/bin/activate*
