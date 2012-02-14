@@ -11,16 +11,15 @@ __pycache__
 *.pyc
 
 # Binary distributions
-/python-src/build
-/python-src/dist
-/python-src/*.egg-info
+src/build
+src/dist
+src/*.egg-info
 
 # chroot environment stuff
 chroot/bin/elevator
 chroot/etc/hypernova/agent/local.ini
 chroot/tmp/*
-chroot/var/lib/hypernova/gpg/*
-chroot/var/log/hypernova/*
+chroot/var
 
 # virtualenv stuff
 chroot/bin/activate*
