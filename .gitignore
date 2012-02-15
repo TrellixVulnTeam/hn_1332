@@ -30,5 +30,8 @@ chroot/bin/python*
 chroot/include
 chroot/lib*
 
+# Temporary build files
+install/build/*
+
 # OS temporary rubbish
 .DS_Store
