@@ -21,8 +21,8 @@ tar -cjf "$instroot/build/SOURCES/python-distribute.tar.bz2" python-distribute
 rm -rf distribute.tar.gz distribute-0.6.24
 popd
 
-pushd "$instroot/../src"
-tar --exclude-vcs -cjf "$instroot/build/SOURCES/hypernova.tar.bz2" hypernova
+pushd "$instroot/.."
+tar --exclude-vcs -cjf "$instroot/build/SOURCES/hypernova.tar.bz2" src
 popd
 
 pushd "$instroot/../deps"

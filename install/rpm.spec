@@ -96,23 +96,23 @@ data, and sign and verify messages.
 # dependencies, so in effect we're mirroring its structure.
 
 # HyperNova
-%setup -q -n hypernova
+%setup -q -n src
 mkdir deps
 
 # Python
-%setup -q -n hypernova -T -D -a 1
+%setup -q -n src -T -D -a 1
 mv Python-3.2.2 deps/python
 
 # Elevator
-%setup -q -n hypernova -T -D -a 2
+%setup -q -n src -T -D -a 2
 mv elevator deps
 
 # GnuPG
-%setup -q -n hypernova -T -D -a 3
+%setup -q -n src -T -D -a 3
 mv python-gnupg deps
 
 # Distribute
-%setup -q -n hypernova -T -D -a 4
+%setup -q -n src -T -D -a 4
 mv python-distribute deps
 
 
@@ -134,7 +134,6 @@ pushd deps/elevator
 make
 popd
 
-
 %install
 
 pushd deps/python
@@ -155,16 +154,20 @@ pushd deps/python-distribute
 popd
 
 pushd deps/python-gnupg
-"$RPM_BUILD_ROOT/usr/local/hypernova/bin/python3.2" setup.py bdist_egg
+"$RPM_BUILD_ROOT/usr/local/hypernova/bin/python3.2" setup.py install
 popd
+
+"$RPM_BUILD_ROOT/usr/local/hypernova/bin/python3.2" setup.py install
 
 
 %clean
+exit 255
 rm -rf "$RPM_BUILD_ROOT"
 
 
 %files
 %defattr(-, root, root, -)
+                                /usr/local/hypernova/lib/python*/site-packages/HyperNova-*.egg
 
 
 %files elevator
