@@ -72,13 +72,13 @@ class Client:
 
 if __name__ == '__main__':
     try:
-        print('Request: %s' %(sys.argv[1]))
+        print('Request:\n', sys.argv[1])
 
-        response = json.dumps(Client().query(sys.argv[1], sys.argv[2],
-                                             sys.argv[3]),
-                              sort_keys=True, indent=4)
+        response = Client().query(sys.argv[1], sys.argv[2], sys.argv[3])
+        pretty_response = json.dumps(response, sort_keys=True, indent=4)
 
-        print('Response: %s' %(response))
+        print('Raw response:\n', response)
+        print('Response:\n', pretty_response)
     except IndexError:
         print('%s <message> <client f/p> <server f/p>' %(sys.argv[0]))
         sys.exit(75)
