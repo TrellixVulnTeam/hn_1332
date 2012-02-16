@@ -40,6 +40,9 @@ Secure server management and site provisioning suite.
 Summary: user-locked permission elevation utility
 Group:   Applications/Security
 
+# Breaks the resulting RPMs by adding incoherent dependencies (#83)
+AutoReqProv: no
+
 
 %description elevator
 Elevator provides the ability for normal, non-privileged users to run system
@@ -49,6 +52,9 @@ applications under the privileges of an administrative user.
 %package python
 Summary: Locked down Python installation
 Group:   Development/Languages
+
+# Breaks the resulting RPMs by adding incoherent dependencies (#83)
+AutoReqProv: no
 
 
 %description python
@@ -67,6 +73,9 @@ open source license.
 Summary: Easily download, build, install, upgrade, and uninstall Python packages
 Group:   Development/Languages
 
+# Breaks the resulting RPMs by adding incoherent dependencies (#83)
+AutoReqProv: no
+
 Requires: hypernova-python
 
 
@@ -78,6 +87,9 @@ with Python module distributions.
 %package python-gnupg
 Summary: gnupg.py is a Python API which wraps the GNU Privacy Guard
 Group:   Development/Libraries
+
+# Breaks the resulting RPMs by adding incoherent dependencies (#83)
+AutoReqProv: no
 
 Requires: hypernova-python hypernova-python-distribute
 
