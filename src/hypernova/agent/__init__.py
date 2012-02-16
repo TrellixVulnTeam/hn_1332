@@ -279,20 +279,20 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
             #
             # Only when both criteria are met can we be sure that the request
             # came from an authorised machine.
-            clear = self._gpg.decrypt(raw)
-            if str(clear) == '':
-                self.log_error('decrypted request body seemed empty; potential authentication failure')
+            self.clear = self._gpg.decrypt(raw)
+            if str(self.clear) == '':
+                self.log_error('decrypted request body empty; potential authentication failure')
                 self.send_error(403, 'Access denied')
                 return
 
-            if not hasattr(clear, 'fingerprint'):
+            if not hasattr(self.clear, 'fingerprint'):
                 self.log_error('data unsigned or signing key not in local key store')
                 self.send_error(403, 'Access denied')
                 return
 
             # Decode the parameters
             try:
-                params = json.loads(str(clear))
+                params = json.loads(str(self.clear))
             except ValueError:
                 self.log_error('failed to interpret parameters as JSON')
                 self.send_error(400, 'Invalid parameters')
@@ -332,15 +332,10 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
             self.send_response(200, 'OK')
             self.end_headers()
 
-            result = method(params['parameters'])
-            encoded_result = modules.serialise_response(result)
-            encoded_result = str(self._gpg.encrypt(encoded_result,
-                                                   clear.fingerprint,
-                                                   sign=self._gpg._secret_key['fingerprint']))
-            self.wfile.write(bytes(encoded_result, 'UTF-8'))
-            self.wfile.flush()
+            response = method(params['parameters'])
+            response = modules.serialise_response(response)
 
-            self.log_message('processing complete')
+            self.send_preformatted_response(response)
 
         except socket.timeout as e:
             self.log_error('request timed out (%r)', e)
@@ -388,9 +383,19 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
         self.end_headers()
 
         response = modules.AgentRequestHandlerBase._format_response({}, False, code, '')
-        response = bytes(modules.serialise_response(response),
-                         'UTF-8')
-        self.wfile.write(response)
+
+        self.send_preformatted_response(response)
+
+    def send_preformatted_response(self, response):
+        """
+        Encrypt, encode and send a pre-formatted response.
+        """
+
+        response = modules.serialise_response(response)
+        response = self._gpg.encrypt(response,
+                                     self.clear.fingerprint,
+                                     sign=self._gpg._secret_key['fingerprint'])
+        self.wfile.write(bytes(str(response), 'UTF-8'))
 
 # Execute the agent application.
 #
