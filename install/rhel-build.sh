@@ -11,18 +11,29 @@
 instroot="$(readlink -fn "$(dirname "$0")")"
 mkdir -p "$instroot/build/SOURCES"
 
-wget -c 'http://python.org/ftp/python/3.2.2/Python-3.2.2.tar.bz2' -O "$instroot/build/SOURCES/python.tar.bz2"
+wget -c 'http://python.org/ftp/python/3.2.2/Python-3.2.2.tar.bz2' \
+     -O "$instroot/build/SOURCES/python.tar.bz2"
 
-pushd /tmp
+[ -d /tmp/hypernova ] && rm -rf /tmp/hypernova
+
+mkdir /tmp/hypernova
+pushd /tmp/hypernova
+
 wget -c 'http://pypi.python.org/packages/source/d/distribute/distribute-0.6.24.tar.gz' -O distribute.tar.gz
 tar -xzf distribute.tar.gz
 mv distribute-0.6.24 python-distribute
 tar -cjf "$instroot/build/SOURCES/python-distribute.tar.bz2" python-distribute
-rm -rf distribute.tar.gz distribute-0.6.24
-popd
+rm -rf *
 
-pushd "$instroot/.."
-tar --exclude-vcs -cjf "$instroot/build/SOURCES/hypernova.tar.bz2" src
+cp -r "$instroot/../chroot" "$instroot/../src" .
+rm -rf chroot/bin/{activate*,easy_install*,elevator,pip*,python*} \
+       chroot/{include,lib*,tmp}
+find 'chroot/etc' -name '*local*.ini' -type f -exec rm -f {} \;
+find 'chroot/var/lib/hypernova/gpg' -type f -exec rm -f {} \;
+find 'chroot/var/log' -type f -exec rm -f {} \;
+
+tar --exclude-vcs -cjf "$instroot/build/SOURCES/hypernova.tar.bz2" \
+    chroot src
 popd
 
 pushd "$instroot/../deps"
@@ -32,4 +43,5 @@ do
 done
 popd
 
+rm -rf /tmp/hypernova
 rpmbuild --define "_topdir $instroot/build" -ba "$instroot/rpm.spec"

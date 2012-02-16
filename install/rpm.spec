@@ -20,6 +20,9 @@ URL:       http://dev.ossservices.com/projects/cloudnova-hypernova
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 BuildRequires: bzip2, gcc, make, openssl-devel, pcre-devel, sed, tar, zlib-devel
 
+Requires: hypernova-elevator hypernova-python hypernova-python-distribute
+Requires: hypernova-python-gnupg
+
 Source0: hypernova.tar.bz2
 Source1: python.tar.bz2
 Source2: elevator.tar.bz2
@@ -61,6 +64,8 @@ open source license.
 Summary: Easily download, build, install, upgrade, and uninstall Python packages
 Group:   Development/Languages
 
+Requires: hypernova-python
+
 
 %description python-distribute
 Distribute is intended to replace Setuptools as the standard method for working
@@ -70,6 +75,8 @@ with Python module distributions.
 %package python-gnupg
 Summary: gnupg.py is a Python API which wraps the GNU Privacy Guard
 Group:   Development/Libraries
+
+Requires: hypernova-python hypernova-python-distribute
 
 
 %description python-gnupg
@@ -159,14 +166,20 @@ popd
 
 "$RPM_BUILD_ROOT/usr/local/hypernova/bin/python3.2" setup.py install
 
+pushd ../chroot
+cp -r * "$RPM_BUILD_ROOT/usr/local/hypernova"
+popd
+
 
 %clean
-exit 255
 rm -rf "$RPM_BUILD_ROOT"
 
 
 %files
 %defattr(-, root, root, -)
+                                /usr/local/hypernova/bin/hn-*
+%config(noreplace)              /usr/local/hypernova/etc/hypernova/agent/agent.ini
+%config(noreplace)              /usr/local/hypernova/var/lib/hypernova/platforms/*/packages.json
                                 /usr/local/hypernova/lib/python*/site-packages/HyperNova-*.egg
 
 
