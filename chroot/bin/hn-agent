@@ -11,8 +11,9 @@
 
 PYTHON='python3.2'
 
-[ -z "$BINDIR"  ] && BINDIR="/usr/local/hypernova/bin"
-[ -z "$CONFDIR" ] && CONFDIR="/usr/local/hypernova/etc/hypernova"
-[ -z "$HNDIR"   ] && HNDIR="/usr/local/hypernova/lib/python3.2/site-packages/HyperNova-0.1.0-py3.2.egg/hypernova"
+[ -z "$BINDIR"  ]   && BINDIR="/usr/local/hypernova/bin"
+[ -z "$CONFDIR" ]   && CONFDIR="/usr/local/hypernova/etc/hypernova"
+[ -z "$HNDIR"   ]   && HNDIR="/usr/local/hypernova/lib/python3.2/site-packages/HyperNova-0.1.0-py3.2.egg/hypernova"
+[ -z "$PYTHONPATH"] && PYTHONPATH="/usr/local/hypernova/lib/python3.2/site-packages/HyperNova-0.1.0-py3.2.egg:/usr/local/hypernova/lib/python3.2/site-packages/python_gnupg-0.2.8-py3.2.egg"
 
-"$BINDIR/$PYTHON" "$HNDIR/agent/__init__.py" "$CONFDIR"
+PYTHONPATH="$PYTHONPATH" $BINDIR/$PYTHON" "$HNDIR/agent/__init__.py" "$CONFDIR"

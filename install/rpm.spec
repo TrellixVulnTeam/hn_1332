@@ -183,6 +183,10 @@ popd
 
 pushd ../chroot
 cp -r * "$RPM_BUILD_ROOT/usr/local/hypernova"
+
+# Shhh, I know
+mkdir -p "$RPM_BUILD_ROOT/etc"
+mv "$RPM_BUILD_ROOT/usr/local/hypernova/etc/profile.d" "$RPM_BUILD_ROOT/etc"
 popd
 
 
@@ -192,6 +196,7 @@ rm -rf "$RPM_BUILD_ROOT"
 
 %files
 %defattr(-, root, root, -)
+                                /etc/profile.d/hypernova.sh
                                 /usr/local/hypernova/bin/hn-*
 %config(noreplace)              /usr/local/hypernova/etc/hypernova/agent/agent.ini
 %config(noreplace)              /usr/local/hypernova/var/lib/hypernova/platforms/*/packages.json
