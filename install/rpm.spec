@@ -20,6 +20,9 @@ URL:       http://dev.ossservices.com/projects/cloudnova-hypernova
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
 BuildRequires: bzip2, gcc, make, openssl-devel, pcre-devel, sed, tar, zlib-devel
 
+# Breaks the resulting RPMs by adding incoherent dependencies (#83)
+AutoReqProv: no
+
 Requires: hypernova-elevator hypernova-python hypernova-python-distribute
 Requires: hypernova-python-gnupg
 
