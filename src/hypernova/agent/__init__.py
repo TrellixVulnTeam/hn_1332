@@ -20,6 +20,10 @@ import socket
 from socketserver import ThreadingMixIn
 import sys
 
+# Log types, used within hypernova.agent.AgentRequestHandler
+LOG_MESSAGE = 1
+LOG_ERROR   = 2
+
 class Agent:
     """
     HyperNova agent.
@@ -33,12 +37,15 @@ class Agent:
 
     _server = None
 
-    _main_main_log      = None
+    _main_log           = None
     _main_log_formatter = None
     _main_log_handler   = None
     _req_main_log       = None
     _req_log_formatter  = None
     _req_log_handler    = None
+    _err_log            = None
+    _err_log_formatter  = None
+    _err_log_handler    = None
 
     _gpg = None
 
@@ -140,6 +147,9 @@ class Agent:
         self._req_log = logging.getLogger('hn-request')
         self._req_log.setLevel(logging.DEBUG)
 
+        self._err_log = logging.getLogger('hn-error')
+        self._err_log.setLevel(logging.DEBUG)
+
         self._main_log.info('initialised logging')
 
     def _config_logging(self):
@@ -151,6 +161,7 @@ class Agent:
         """
 
         self._main_log.info('redirecting logging output to files')
+
         self._main_log_handler = logging.handlers.RotatingFileHandler(
             self._config['logging']['main_log'], mode='a')
         self._main_log_handler.setFormatter(self._main_log_formatter)
@@ -160,6 +171,11 @@ class Agent:
             self._config['logging']['request_log'], mode='a')
         self._req_log_handler.setFormatter(self._main_log_formatter)
         self._req_log.addHandler(self._req_log_handler)
+
+        self._err_log_handler = logging.handlers.RotatingFileHandler(
+            self._config['logging']['error_log'], mode='a')
+        self._err_log_handler.setFormatter(self._main_log_formatter)
+        self._err_log.addHandler(self._err_log_handler)
 
     def _init_modules(self):
         """
@@ -206,6 +222,7 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
     """
 
     _log = None
+    _err = None
 
     def __init__(self, request, client_address, server):
         """
@@ -221,6 +238,8 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
         # This override enables logging to our dedicated request log.
 
         self._log = logging.getLogger('hn-request')
+        self._err = logging.getLogger('hn-error')
+
         self._gpg = GPG.get_gpg(instancename='hn-agent')
 
         super().__init__(request, client_address, server)
@@ -331,18 +350,41 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
 
             self.send_response(200, 'OK')
 
+            # Handle all exceptions
+            #
+            # http://wiki.python.org/moin/HandlingExceptions#line-26
             try:
                 response = method(params['parameters'])
-            except Exception:
+                self.send_preformatted_response(response)
+            except:
                 self.send_error(500, 'Module execution failure')
-
-            self.end_headers()
-            self.send_preformatted_response(response)
 
         except socket.timeout as e:
             self.log_error('request timed out (%r)', e)
             self.close_connection = 1
             return
+
+    def log_error(self, format, *args):
+        """
+        Write an error to the log.
+        """
+
+        # Overridden from BaseHTTPRequestHandler
+        #
+        # Implement logging to a different place, since the Python standard
+        # library edition doesn't seem to support it.
+
+        msg = format %(args)
+        self._err.error('[%s:%d] %s' %(self.client_address[0],
+                                       self.client_address[1], msg))
+
+    def log_exception(self, exc):
+        """
+        Write an exception to the log.
+        """
+
+        self._err.exception('[%s:%d] exception:' %(self.client_address[0],
+                                                   self.client_address[1]))
 
     def log_message(self, format, *args):
         """
@@ -356,10 +398,10 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
         # socket, which would otherwise be discarded.
 
         msg = format %(args)
-        self._log.info('[%s:%d] %s'
-            %(self.client_address[0], self.client_address[1], msg))
+        self._log.info('[%s:%d] %s' %(self.client_address[0],
+                                      self.client_address[1], msg))
 
-    def send_error(self, code, message=None):
+    def send_error(self, code, message=None, exception=None):
 
         # Overridden from BaseHTTPRequestHandler
         #
@@ -377,7 +419,11 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
 
         explain = longmsg
 
+        if not exception:
+            exception = sys.exc_info()
+
         self.log_error('returning %d: %s', code, message)
+        self.log_exception(exception)
 
         self.send_response(code, message)
         self.send_header('Content-Type', self.error_content_type)
@@ -393,11 +439,13 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
         Encrypt, encode and send a pre-formatted response.
         """
 
+        self.end_headers()
         response = modules.serialise_response(response)
         response = self._gpg.encrypt(response,
                                      self.clear.fingerprint,
                                      sign=self._gpg._secret_key['fingerprint'])
         self.wfile.write(bytes(str(response), 'UTF-8'))
+        self.wfile.flush()
 
 # Execute the agent application.
 #
