@@ -89,12 +89,12 @@ class Agent:
 
         See __init__() for more information.
         """
-        
+
         self._main_log.info('loading configuration from directory %s'
                             %(config_root_dir))
         self._config = ConfigurationFactory.get('hn-agent', config_root_dir,
                                                 self._main_log)
-        
+
         if not self._config:
             self._main_log.critical('loading configuration failed')
             sys.exit(78)
@@ -160,18 +160,18 @@ class Agent:
             self._config['logging']['request_log'], mode='a')
         self._req_log_handler.setFormatter(self._main_log_formatter)
         self._req_log.addHandler(self._req_log_handler)
-    
+
     def _init_modules(self):
         """
         Allow modules a chance to initialise (if necessary).
-        
+
         Some modules may require specialised configuration in order to function.
         here, the agent passes the configuration it has loaded to the
         initialisation methods of each of the modules it has loaded. This
         facilitates loading custom configuration directly from the configuration
         files.
         """
-        
+
         for module_name in modules.__all__:
             self._main_log.info('initialising module %s' %(module_name))
             module = getattr(modules, module_name)
@@ -307,7 +307,10 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
             # Submodule support is not yet part of the agent, but is likely to
             # be incorporated very soon and will enable cleaner namespacing of
             # actions.
-            (module_name, action) = params['action'].rsplit('.', 1)
+            try:
+                (module_name, action) = params['action'].rsplit('.', 1)
+            except ValueError:
+                self.send_error(400, 'Action not namespaced')
 
             try:
                 module = getattr(modules, module_name)
