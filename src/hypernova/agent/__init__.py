@@ -333,7 +333,6 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
             self.end_headers()
 
             response = method(params['parameters'])
-            response = modules.serialise_response(response)
 
             self.send_preformatted_response(response)
 
