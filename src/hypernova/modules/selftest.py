@@ -59,3 +59,7 @@ class AgentRequestHandler(AgentRequestHandlerBase):
             "successful": isinstance(vhost_repr, str)
         }
         return AgentRequestHandlerBase._format_response(**result)
+
+    def do_raise(params):
+
+        raise Exception('testing exception handling')
