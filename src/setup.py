@@ -25,6 +25,8 @@ setup(
         'hypernova.agent',
         'hypernova.client',
         'hypernova.libraries',
+        'hypernova.libraries.appconfig',
+        'hypernova.libraries.appconfig.httpserver',
         'hypernova.libraries.packagemanagement',
         'hypernova.modules'
     ],

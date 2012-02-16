@@ -10,6 +10,7 @@
 #
 
 from hypernova.modules import AgentRequestHandlerBase
+from hypernova.libraries.appconfig.httpserver.nginx import HttpServerConfig
 from hypernova.libraries.configuration import ConfigurationFactory
 from hypernova.libraries.environment import where_is
 from hypernova.libraries.permissionelevation import elevate_cmd
@@ -35,5 +36,26 @@ class AgentRequestHandler(AgentRequestHandlerBase):
         result = {
             "response": status,
             "successful": status,
+        }
+        return AgentRequestHandlerBase._format_response(**result)
+
+    def do_httpserver_nginx_vhost(params):
+
+        conf = HttpServerConfig()
+        vhost = conf.get_virtualhost()
+
+        vhost.listen_socket = ['0.0.0.0', 80]
+        vhost.server_names  = ['google.com']
+        vhost.document_root = '/var/www/html'
+        vhost.indexes       = ['index.php']
+        vhost.auto_index    = True
+
+        vhost_repr = str(vhost)
+
+        result = {
+            "response": {
+                "translated": vhost_repr
+            },
+            "successful": isinstance(vhost_repr, str)
         }
         return AgentRequestHandlerBase._format_response(**result)
