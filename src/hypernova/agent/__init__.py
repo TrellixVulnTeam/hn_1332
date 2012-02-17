@@ -15,6 +15,7 @@ import json
 import logging
 import logging.handlers
 from hypernova.libraries.configuration import ConfigurationFactory
+from hypernova.libraries.proc import daemonise
 import os
 import socket
 from socketserver import ThreadingMixIn
@@ -81,6 +82,10 @@ class Agent:
 
         self._init_gpg()
         self._config_logging()
+
+        if self._config.getboolean('server', 'daemon'):
+            daemonise()
+
         self._init_modules()
 
         addr = (self._config['server']['address'],
