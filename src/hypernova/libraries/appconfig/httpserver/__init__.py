@@ -41,3 +41,8 @@ class VirtualHostBase(AppConfigBase):
 
     # Automatically index directory contents?
     auto_index = False
+
+    # Dynamic languages
+    #
+    # ['php'] = True|False
+    dynamic_langs = {}

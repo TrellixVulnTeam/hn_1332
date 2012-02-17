@@ -35,6 +35,8 @@ server {
 
     index %s;
     auto_index %s;
+
+    %s
 }
 """
 
@@ -44,7 +46,8 @@ server {
                               ' '.join(self.server_names),
                               self.document_root,
                               ' '.join(self.indexes),
-                              self.__to_nginx_bool(self.auto_index))
+                              self.__to_nginx_bool(self.auto_index),
+                              self.__to_nginx_includes(self.dynamic_langs))
 
     def __to_nginx_bool(self, bool_val):
         """
@@ -58,3 +61,19 @@ server {
             return 'on'
         else:
             return 'off'
+
+    def __to_nginx_includes(self, dynamic_langs):
+        """
+        Convert the dynamic languages dictionary into nginx configuration file
+        includes.
+        """
+
+        opts = []
+
+        if not 'php' in dynamic_langs:
+            dynamic_langs = False
+
+        if dynamic_langs['php']:
+            opts.append('   include enable_php;');
+
+        return '\n'.join(opts)

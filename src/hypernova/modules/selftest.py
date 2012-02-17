@@ -50,6 +50,8 @@ class AgentRequestHandler(AgentRequestHandlerBase):
         vhost.indexes       = ['index.php']
         vhost.auto_index    = True
 
+        vhost.dynamic_langs['php'] = True
+
         vhost_repr = str(vhost)
 
         result = {
