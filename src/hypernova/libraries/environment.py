@@ -9,7 +9,46 @@
 #                    Luke Carrier <luke.carrier@tdm.info>
 #
 
+from hypernova.libraries.permissionelevation import elevate_cmd
 import os
+import subprocess
+
+CTL_START   = 'start'
+CTL_STOP    = 'stop'
+CTL_RESTART = 'restart'
+CTL_RELOAD  = 'reload'
+
+def service_ctl(service, action, require_elevation=True, raise_exc=True):
+    """
+    Perform a service control action.
+
+    Tolerant of both RHEL and Debian-style configurations.
+    """
+
+    try:
+        service_util = where_is('service')
+    except UtilityNotFoundError:
+        try:
+            service_util = where_is('invoke-rc.d')
+        except UtilityNotFoundError:
+            service_util = None
+
+    if service_util:
+        cmd = [service_util, service, action]
+    else:
+        cmd = ['/etc/init.d/%s' %(service), action]
+
+    if require_elevation:
+        cmd = elevate_cmd(cmd)
+
+    result = subprocess.check_call(cmd)
+
+    if result == 0:
+        return True
+
+    if raise_exc:
+        raise ServiceControlError(service, action)
+
 
 def where_is(binary, raise_exc=True, path=None):
     """
@@ -21,6 +60,7 @@ def where_is(binary, raise_exc=True, path=None):
 
     Returns the path to the binary on success, None if it cannot be found.
     """
+
     if not path:
         path = os.getenv('PATH', '/bin:/usr/bin')
     paths = path.split(':')
@@ -36,6 +76,18 @@ def where_is(binary, raise_exc=True, path=None):
 
     return None
 
+class ServiceControlError(Exception):
+
+    service = None
+    action  = None
+
+    def __init__(self, service, action):
+        self.service = service
+        self.action  = action
+
+        self.value = 'Action "%s" on service "%s" failed'
+
+
 class UtilityNotFoundError(Exception):
 
     utility = None
@@ -46,6 +98,3 @@ class UtilityNotFoundError(Exception):
         self.paths   = ', '.join(paths)
 
         self.value = 'Unable to find "%s" in %s' %(utility, paths)
-
-    def __str__(self):
-        return repr(self.value)
