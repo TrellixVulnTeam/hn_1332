@@ -23,10 +23,15 @@ def elevate_cmd(cmd):
     If the object is of any other type, a TypeError will be thrown.
     """
 
-    config = ConfigurationFactory.get('hypernova')['elevation']
-
-    if config['method'] == 'elevator':
-        prefix = [config['binary']]
+    try:
+        config = ConfigurationFactory.get('hypernova')['elevation']
+        if config['method'] == 'elevator':
+            prefix = [config['binary']]
+    except KeyError:
+        prefix = None
+    finally:
+        if not prefix:
+            return cmd
 
     if isinstance(cmd, list):
         prefix.extend(cmd)
