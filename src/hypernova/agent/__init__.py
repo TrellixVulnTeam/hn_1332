@@ -48,6 +48,8 @@ class Agent:
     _err_log_formatter  = None
     _err_log_handler    = None
 
+    _config = None
+
     _gpg = None
 
     def __init__(self, config_root_dir):
@@ -104,7 +106,7 @@ class Agent:
 
         self._main_log.info('loading configuration from directory %s'
                             %(config_root_dir))
-        self._config = ConfigurationFactory.get('hn-agent', config_root_dir,
+        self._config = ConfigurationFactory.get('hypernova', config_root_dir,
                                                 self._main_log)
 
         if not self._config:
