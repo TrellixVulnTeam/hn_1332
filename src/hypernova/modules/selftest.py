@@ -10,7 +10,8 @@
 #
 
 from hypernova.modules import AgentRequestHandlerBase
-from hypernova.libraries.appconfig.httpserver.nginx import HttpServerConfig
+from hypernova.libraries.appconfig.snmpd import AppConfig as SnmpdConfig
+from hypernova.libraries.appconfig.httpserver.nginx import AppConfig
 from hypernova.libraries.configuration import ConfigurationFactory
 from hypernova.libraries.environment import where_is
 from hypernova.libraries.permissionelevation import elevate_cmd
@@ -21,7 +22,7 @@ class AgentRequestHandler(AgentRequestHandlerBase):
     def do_elevation(params):
 
         cmd    = elevate_cmd([where_is('whoami')])
-        target = ConfigurationFactory.get('hn-agent')['elevation']['target']
+        target = ConfigurationFactory.get('hypernova')['elevation']['target']
 
         try:
             elevated_user = str(subprocess.check_output(cmd), 'UTF-8').strip('\n')
@@ -41,7 +42,7 @@ class AgentRequestHandler(AgentRequestHandlerBase):
 
     def do_httpserver_nginx_vhost(params):
 
-        conf = HttpServerConfig()
+        conf = AppConfig()
         vhost = conf.get_virtualhost()
 
         vhost.listen_socket = ['0.0.0.0', 80]
@@ -59,6 +60,29 @@ class AgentRequestHandler(AgentRequestHandlerBase):
                 "translated": vhost_repr
             },
             "successful": isinstance(vhost_repr, str)
+        }
+        return AgentRequestHandlerBase._format_response(**result)
+
+    def do_snmpd_conf(params):
+
+        conf = SnmpdConfig()
+        conf.sys_contact = 'Joe Bloggs <joe@bloggs.host.name>'
+        conf.sys_location = 'HyperNova Project <hypernova.org>'
+        conf.rw_communities = [
+            ['communityname', 'arbitrary.host.name']
+        ]
+        conf.load = (1.0, 0.9, 0.8)
+        conf.disks = [
+            ('/', 10)
+        ]
+
+        conf_repr = str(conf)
+
+        result = {
+            "response": {
+                "translated": conf_repr
+            },
+            "successful": isinstance(conf_repr, str)
         }
         return AgentRequestHandlerBase._format_response(**result)
 
