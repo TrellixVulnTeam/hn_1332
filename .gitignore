@@ -17,7 +17,7 @@ src/*.egg-info
 
 # chroot environment stuff
 chroot/bin/elevator
-chroot/etc/hypernova/agent/local.ini
+chroot/etc/hypernova/*/local.ini
 chroot/tmp/*
 chroot/var/lib/hypernova/gpg
 chroot/var/log
