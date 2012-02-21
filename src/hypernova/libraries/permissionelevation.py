@@ -22,9 +22,9 @@ def elevate_cmd(cmd):
 
     If the object is of any other type, a TypeError will be thrown.
     """
-    
-    config = ConfigurationFactory.get('hn-agent')['elevation']
-    
+
+    config = ConfigurationFactory.get('hypernova')['elevation']
+
     if config['method'] == 'elevator':
         prefix = [config['binary']]
 
