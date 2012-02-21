@@ -60,11 +60,6 @@ then
     popd
 fi
 
-# Update working copy and initialise submodules (elevator, gnupg, etc.)
-git pull origin master
-git submodule init
-git submodule update
-
 # Set up virtualenv
 pushd chroot
 [ ! -f "bin/activate" ] && virtualenv --no-site-packages .

@@ -21,7 +21,7 @@ def get_package_db(pdb_name=None):
     Get the system's associated package DB.
     """
 
-    prof_dir = ConfigurationFactory.get('hn-agent')['platforms']['profile_dir']
+    prof_dir = ConfigurationFactory.get('hypernova')['platforms']['profile_dir']
     pdb_fmt = os.path.join(prof_dir, '%s', 'packages.json')
 
     if not pdb_name:
