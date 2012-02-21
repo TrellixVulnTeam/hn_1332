@@ -110,7 +110,7 @@ class PackageManagerBase:
         if status not in expected_statuses:
             raise PackageManagerError(status, stderr)
 
-        return status
+        return (status, stdout, stderr)
 
     def install(self, *pkgs):
         """

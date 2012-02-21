@@ -13,6 +13,7 @@ from hypernova.libraries.packagemanagement import PackageManagerBase, \
                                                   PackageManagerError
 from hypernova.libraries.environment import where_is
 from hypernova.libraries.permissionelevation import elevate_cmd
+import re
 import subprocess
 
 class PackageManager(PackageManagerBase):
@@ -29,18 +30,22 @@ class PackageManager(PackageManagerBase):
         cmd = [self.__yum_path, '--assumeyes', 'install']
         cmd.extend(*pkgs)
 
-        status = super().exec_cmd(cmd, [0, 1])
+        (status, stdout, stderr) = super().exec_cmd(cmd, [0, 1])
 
-        if status in (0, 1):
+        if status == 0:
             status = True
-        else:
-            Status = False
+        elif status == 1:
+            print(stderr)
+            if re.search('nothing to do', str(stderr, 'UTF-8'), re.I):
+                status = True
+            else:
+                status = False
 
         return status
 
     def refresh(self):
-        status = super().exec_cmd([self.__yum_path, 'check-update'],
-                                  expected_statuses=[0, 100])
+        (status, stdin, stderr) = super().exec_cmd([self.__yum_path, 'check-update'],
+                                                    expected_statuses=[0, 100])
 
         if status == 0:
             status = (True, False)
@@ -53,7 +58,7 @@ class PackageManager(PackageManagerBase):
         cmd = [self.__yum_path, '--assumeyes', 'remove']
         cmd.extend(*pkgs)
 
-        status = super().exec_cmd(cmd)
+        (status, stdout, stderr) = super().exec_cmd(cmd)
 
         if status == 0:
             status = True
@@ -73,7 +78,7 @@ class PackageManager(PackageManagerBase):
         if len(pkgs) > 0:
             cmd.extend(pkgs)
 
-        status = super().exec_cmd(cmd, expected_statuses=[0])
+        (status, stdout, stderr) = super().exec_cmd(cmd, expected_statuses=[0])
 
         if status == 0:
             return True
