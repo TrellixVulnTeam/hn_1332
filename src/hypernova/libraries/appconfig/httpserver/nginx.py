@@ -12,7 +12,7 @@
 from hypernova.libraries.appconfig.httpserver import HttpServerConfigBase, \
                                                      VirtualHostBase
 
-class HttpServerConfig(HttpServerConfigBase):
+class AppConfig(HttpServerConfigBase):
     """
     nginx configurator.
     """
