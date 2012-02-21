@@ -105,9 +105,10 @@ class PackageManagerBase:
         proc = subprocess.Popen(cmd, stdout=subprocess.PIPE,
                                 stderr=subprocess.PIPE)
         status = proc.wait()
+        (stdout, stderr) = proc.communicate()
 
         if status not in expected_statuses:
-            raise PackageManagerError('Unexpected exit status %i' %(status))
+            raise PackageManagerError(status, stderr)
 
         return status
 
@@ -145,4 +146,11 @@ class PackageManagerBase:
         pass
 
 class PackageManagerError(Exception):
-    pass
+
+    def __init__(self, status, output):
+        self.value = 'Unexpected exit status %i:\n%s' %(status, output)
+
+    def __repr__(self):
+        return self.value
+
+    __str__ = __repr__
