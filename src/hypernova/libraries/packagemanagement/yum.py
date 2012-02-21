@@ -29,9 +29,9 @@ class PackageManager(PackageManagerBase):
         cmd = [self.__yum_path, '--assumeyes', 'install']
         cmd.extend(*pkgs)
 
-        status = super().exec_cmd(cmd)
+        status = super().exec_cmd(cmd, [0, 1])
 
-        if status == 0:
+        if status in (0, 1):
             status = True
         else:
             Status = False
