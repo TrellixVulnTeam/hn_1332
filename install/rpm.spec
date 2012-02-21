@@ -10,7 +10,7 @@
 
 Name:    hypernova
 Version: 0.1.0
-Release: 1%{?dist}
+Release: 2%{?dist}
 Summary: Secure server management and site provisioning suite
 
 Group:     Applications/Internet
@@ -198,7 +198,7 @@ rm -rf "$RPM_BUILD_ROOT"
 %defattr(-, root, root, -)
                                 /etc/profile.d/hypernova.sh
                                 /usr/local/hypernova/bin/hn-*
-%config(noreplace)              /usr/local/hypernova/etc/hypernova/agent/agent.ini
+%config(noreplace)              /usr/local/hypernova/etc/hypernova/*/base.ini
 %config(noreplace)              /usr/local/hypernova/var/lib/hypernova/platforms/*/packages.json
                                 /usr/local/hypernova/lib/python*/site-packages/HyperNova-*.egg
 
