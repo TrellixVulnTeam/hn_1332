@@ -39,7 +39,8 @@ class Client:
 
     def _init_gpg(self):
 
-        self._gpg = GPG.get_gpg(gnupghome=os.path.join(os.getenv('HOME'), '.gnupg'))
+        self._gpg = GPG.get_gpg(gnupghome=os.path.join(os.getenv('HOME'),
+                                                       '.gnupg'))
 
     def query(self, params, client_fp, server_fp):
 
@@ -62,7 +63,6 @@ class Client:
 
         response_data = self._gpg.decrypt(response_data)
         if response_data.fingerprint != server_fp:
-            print(server_fp, '  ', response_data.fingerprint)
             raise ValueError('Response was not signed')
 
         self._connection.close()
@@ -71,14 +71,20 @@ class Client:
 
 
 if __name__ == '__main__':
+
+    try:
+        (server, sep, port) = sys.argv[4].partition(':')
+    except IndexError:
+        (server, port) = ('localhost', 8080)
+
     try:
         print('Request:\n', sys.argv[1], '\n')
 
-        response = Client().query(sys.argv[1], sys.argv[2], sys.argv[3])
+        response = Client(server, port).query(sys.argv[1], sys.argv[2], sys.argv[3])
         pretty_response = json.dumps(response, sort_keys=True, indent=4)
 
         print('Raw response:\n', response, '\n')
         print('Response:\n', pretty_response, '\n')
     except IndexError:
-        print('%s <message> <client f/p> <server f/p>' %(sys.argv[0]))
+        print('%s <message> <client f/p> <server f/p> [server:port]' %(sys.argv[0]))
         sys.exit(75)
