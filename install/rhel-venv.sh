@@ -73,6 +73,13 @@ rm -rfv build/ dist/
 "$srcroot/chroot/bin/easy_install-3.2" dist/python_gnupg-*-py3.2.egg
 popd
 
+# Set up oursql
+pushd deps/python-oursql
+rm -rfv build/ dist/
+"$srcroot/chroot/bin/python3.2" setup.py bdist_egg
+"$srcroot/chroot/bin/easy_install-3.2" dist/oursql-*-py3.2-linux-x86_64.egg
+popd
+
 # Install HyperNova
 pushd src
 rm -rfv build/ dist/
