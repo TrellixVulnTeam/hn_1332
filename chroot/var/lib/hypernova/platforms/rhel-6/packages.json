@@ -10,6 +10,6 @@
     "powerdns-authoritative-server": "pdns-static",
     "powerdns-recursive-server": "pdns-recursor",
     "sendmail": "sendmail",
-    "snmp": "net-snmp-utils",
+    "snmpd": "net-snmp-utils",
     "vsftpd": "vsftpd"
 }
