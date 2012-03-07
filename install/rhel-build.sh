@@ -11,7 +11,7 @@
 instroot="$(readlink -fn "$(dirname "$0")")"
 mkdir -p "$instroot/build/SOURCES"
 
-wget -c 'http://python.org/ftp/python/3.2.2/Python-3.2.2.tar.bz2' \
+wget 'http://python.org/ftp/python/3.2.2/Python-3.2.2.tar.bz2' \
      -O "$instroot/build/SOURCES/python.tar.bz2"
 
 [ -d /tmp/hypernova ] && rm -rf /tmp/hypernova

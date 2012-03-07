@@ -18,7 +18,7 @@ License:   TDM Internal
 URL:       http://dev.ossservices.com/projects/cloudnova-hypernova
 
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
-BuildRequires: bzip2, gcc, make, openssl-devel, pcre-devel, sed, tar, zlib-devel
+BuildRequires: bzip2, findutils, gcc, make, openssl-devel, pcre-devel, sed, tar, zlib-devel
 
 # Breaks the resulting RPMs by adding incoherent dependencies (#83)
 AutoReqProv: no
@@ -31,6 +31,7 @@ Source1: python.tar.bz2
 Source2: elevator.tar.bz2
 Source3: python-gnupg.tar.bz2
 Source4: python-distribute.tar.bz2
+Source5: python-oursql.tar.bz2
 
 %description
 Secure server management and site provisioning suite.
@@ -104,6 +105,20 @@ details and allows its users to generate and manage keys, encrypt and decrypt
 data, and sign and verify messages.
 
 
+%package python-oursql
+Summary: MySQL bindings for Python
+Group:   Development/Libraries
+
+# Breaks the resulting RPMs by adding incoherent dependencies (#83)
+AutoReqProv: no
+
+
+%description python-oursql
+oursql is a set of MySQL bindings for python 2.4+ with a focus on wrapping the MYSQL_STMT API to provide real parameterization and real server-side cursors. MySQL 4.1.2 or better is required.
+
+There's extensive documentation available online at http://packages.python.org/oursql/.
+
+
 %prep
 
 # Extract the source files
@@ -136,6 +151,11 @@ mv python-gnupg deps
 # Distribute
 %setup -q -n src -T -D -a 4
 mv python-distribute deps
+
+
+# OurSQL
+%setup -q -n src -T -D -a 5
+mv python-oursql deps
 
 
 %build
@@ -179,14 +199,18 @@ pushd deps/python-gnupg
 "$RPM_BUILD_ROOT/usr/local/hypernova/bin/python3.2" setup.py install
 popd
 
+pushd deps/python-oursql
+"$RPM_BUILD_ROOT/usr/local/hypernova/bin/python3.2" setup.py install
+popd
+
 "$RPM_BUILD_ROOT/usr/local/hypernova/bin/python3.2" setup.py install
 
 pushd ../chroot
 cp -r * "$RPM_BUILD_ROOT/usr/local/hypernova"
 
 # Shhh, I know
-mkdir -p "$RPM_BUILD_ROOT/etc"
-mv "$RPM_BUILD_ROOT/usr/local/hypernova/etc/profile.d" "$RPM_BUILD_ROOT/etc"
+mkdir -p "$RPM_BUILD_ROOT/etc/profile.d"
+find "$RPM_BUILD_ROOT/usr/local/hypernova/etc/profile.d" -type f -exec mv {} "$RPM_BUILD_ROOT/etc/profile.d" \;
 popd
 
 
@@ -230,4 +254,9 @@ rm -rf "$RPM_BUILD_ROOT"
 
 %files python-gnupg
 %defattr(-, root, root, -)
-                                /usr/local/hypernova/lib/python*/site-packages/python_gnupg*.egg
+                                /usr/local/hypernova/lib/python*/site-packages/python_gnupg-*.egg
+
+
+%files python-oursql
+%defattr(-, root, root, -)
+                                /usr/local/hypernova/lib/python*/site-packages/oursql-*.egg
