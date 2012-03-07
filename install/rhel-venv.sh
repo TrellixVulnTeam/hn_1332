@@ -80,6 +80,9 @@ rm -rfv build/ dist/
 "$srcroot/chroot/bin/easy_install-3.2" dist/oursql-*-py3.2-linux-x86_64.egg
 popd
 
+# Set up sqlalchemy
+easy_install-3.2 SQLAlchemy
+
 # Install HyperNova
 pushd src
 rm -rfv build/ dist/
