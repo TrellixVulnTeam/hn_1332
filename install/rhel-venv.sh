@@ -9,7 +9,16 @@
 #                    Luke Carrier <luke.carrier@tdm.info>
 #
 
-# Exit cleanly on error
+# Check whether an array contains a given value
+#   $1 = arr
+#   $2 = str
+in_array() {
+    for e in "${@:2}"; do
+        [ "$e" == "$1" ] && break
+    done;
+}
+
+# Exit the running script with an error status and clear warning
 error_trap() {
     echo " "
     echo "$0: an error occurred during the execution of an action; aborting"
@@ -17,6 +26,17 @@ error_trap() {
     exit 69
 }
 
+# Establish what we need to do before initiating error trapping, since we have
+# to return error exit statuses in in_array
+FORCE=0
+in_array '--force' "${@}"
+[ "$?" == 0 ] && FORCE=1
+
+SKIPDEPS=0
+in_array '--skip-deps' "${@}"
+[ "$?" == 0 ] && SKIPDEPS=1
+
+# Don't risk screwing the system up; exit early
 trap error_trap 1 2 3 15 ERR
 
 # Root of the source tree
@@ -24,7 +44,7 @@ srcroot="$(readlink -fn "$(dirname "$0")/..")"
 cd $srcroot
 
 # If forced, remove all the things
-if [ "$1" == "--force" ] || [ "$2" == "--force" ]
+if [ "$FORCE" == 1 ]
 then
     rm -rf bin/{activate*,easy_install*,pip*,python*} \
            include/ lib/ lib64
@@ -33,8 +53,7 @@ fi
 # Prepare the system
 #   For convenience, these can be skipped when you're running them from your
 #   IDE, so you won't need to stay elevated or keep bashing out your password!
-if [ "$1" != "--skip-deps" ] && [ "$2" != "--skip-deps" ]
-then
+if [ "$SKIPDEPS" != 1 ]; then
     # Install system packages
     sudo yum -y install bash curl git python3
 
@@ -61,27 +80,32 @@ then
 fi
 
 # Set up virtualenv
-pushd chroot
-[ ! -f "bin/activate" ] && virtualenv --no-site-packages .
-. bin/activate
-popd
+if [ "$FORCE" == 1 ] || [ -f bin/activate ]; then
+    pushd chroot
+    [ ! -f "bin/activate" ] && virtualenv --no-site-packages .
+    . bin/activate
+    popd
+fi
 
-# Set up gnupg
-pushd deps/python-gnupg
-rm -rfv build/ dist/
-"$srcroot/chroot/bin/python3.2" setup.py bdist_egg
-"$srcroot/chroot/bin/easy_install-3.2" dist/python_gnupg-*-py3.2.egg
-popd
+# Install Python dependencies
+if [ "$SKIPDEPS" != 1 ]; then
+    # Set up gnupg
+    pushd deps/python-gnupg
+    rm -rfv build/ dist/
+    "$srcroot/chroot/bin/python3.2" setup.py bdist_egg
+    "$srcroot/chroot/bin/easy_install-3.2" dist/python_gnupg-*-py3.2.egg
+    popd
 
-# Set up oursql
-pushd deps/python-oursql
-rm -rfv build/ dist/
-"$srcroot/chroot/bin/python3.2" setup.py bdist_egg
-"$srcroot/chroot/bin/easy_install-3.2" dist/oursql-*-py3.2-linux-x86_64.egg
-popd
+    # Set up oursql
+    pushd deps/python-oursql
+    rm -rfv build/ dist/
+    "$srcroot/chroot/bin/python3.2" setup.py bdist_egg
+    "$srcroot/chroot/bin/easy_install-3.2" dist/oursql-*-py3.2-linux-x86_64.egg
+    popd
 
-# Set up sqlalchemy
-easy_install-3.2 SQLAlchemy
+    # Set up sqlalchemy
+    easy_install-3.2 SQLAlchemy
+fi
 
 # Install HyperNova
 pushd src
