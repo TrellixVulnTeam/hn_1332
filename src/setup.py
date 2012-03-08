@@ -23,8 +23,6 @@ setup(
     packages         = [
         'hypernova',
 
-        'hypernova.agent',
-        'hypernova.client',
         'hypernova.provisioner',
 
         'hypernova.libraries',
