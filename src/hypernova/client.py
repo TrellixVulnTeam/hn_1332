@@ -136,6 +136,16 @@ class ClientConfigAction(ClientActionBase):
                     print('Failed: a node with the specified name already exists', file=sys.stderr)
                     sys.exit(64)
 
+            elif self._args.config_node_action == 'list':
+                for (name, node) in self._config.items():
+                    if name == 'DEFAULT':
+                        continue
+                    
+                    print(name)
+                    print('    Address:', node.get('addr'))
+                    print('Fingerprint:', node.get('pubkey'))
+                    print(' ')
+
             elif self._args.config_node_action == 'rm':
                 if not self._config.remove_section(self._args.name):
                     print('Failed: no server exists with the specified name')
@@ -152,6 +162,7 @@ class ClientConfigAction(ClientActionBase):
 
         node_subparser_factory = ClientConfigAction._arg_parsers['config_node'].add_subparsers(dest='config_node_action')
         ClientConfigAction._arg_parsers['config_node_add'] = node_subparser_factory.add_parser('add')
+        ClientConfigAction._arg_parsers['config_node_list'] = node_subparser_factory.add_parser('list')
         ClientConfigAction._arg_parsers['config_node_rm']  = node_subparser_factory.add_parser('rm')
 
         ClientConfigAction._arg_parsers['config_node_add'].add_argument('name')
