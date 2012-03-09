@@ -85,6 +85,12 @@ if [ "$FORCE" == 1 ] || [ -f bin/activate ]; then
     [ ! -f "bin/activate" ] && virtualenv --no-site-packages .
     . bin/activate
     popd
+
+    # Patch virtualenv activation file
+    echo "
+    export BINDIR="$srcroot/chroot/bin"
+    export CONFDIR="$srcroot/chroot/etc/hypernova"
+    " >> "$srcroot/chroot/bin/activate"
 fi
 
 # Install Python dependencies
@@ -113,9 +119,3 @@ rm -rfv build/ dist/
 "$srcroot/chroot/bin/python3.2" setup.py bdist_egg
 "$srcroot/chroot/bin/easy_install-3.2" dist/HyperNova-*-py3.2.egg
 popd
-
-# Patch virtualenv activation file
-echo "
-export BINDIR="$srcroot/chroot/bin"
-export CONFDIR="$srcroot/chroot/etc/hypernova"
-" >> "$srcroot/chroot/bin/activate"
