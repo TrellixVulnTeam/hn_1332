@@ -140,7 +140,7 @@ class ClientConfigAction(ClientActionBase):
                 for (name, node) in self._config.items():
                     if name == 'DEFAULT':
                         continue
-                    
+
                     print(name)
                     print('    Address:', node.get('addr'))
                     print('Fingerprint:', node.get('pubkey'))
@@ -148,6 +148,16 @@ class ClientConfigAction(ClientActionBase):
 
             elif self._args.config_node_action == 'rm':
                 if not self._config.remove_section(self._args.name):
+                    print('Failed: no server exists with the specified name')
+                    sys.exit(64)
+
+            elif self._args.config_node_action == 'show':
+                try:
+                    node = self._config[self._args.name]
+                    print(self._args.name)
+                    print('    Address:', node['addr'])
+                    print('Fingerprint:', node['pubkey'])
+                except IndexError:
                     print('Failed: no server exists with the specified name')
                     sys.exit(64)
 
@@ -164,12 +174,15 @@ class ClientConfigAction(ClientActionBase):
         ClientConfigAction._arg_parsers['config_node_add'] = node_subparser_factory.add_parser('add')
         ClientConfigAction._arg_parsers['config_node_list'] = node_subparser_factory.add_parser('list')
         ClientConfigAction._arg_parsers['config_node_rm']  = node_subparser_factory.add_parser('rm')
+        ClientConfigAction._arg_parsers['config_node_show']  = node_subparser_factory.add_parser('show')
 
         ClientConfigAction._arg_parsers['config_node_add'].add_argument('name')
         ClientConfigAction._arg_parsers['config_node_add'].add_argument('addr')
         ClientConfigAction._arg_parsers['config_node_add'].add_argument('pubkey')
 
         ClientConfigAction._arg_parsers['config_node_rm'].add_argument('name')
+
+        ClientConfigAction._arg_parsers['config_node_show'].add_argument('name')
 
         return subparser
 
