@@ -16,34 +16,41 @@ class ConfigurationFactory():
     """
     Initialise a ConfigParser object from files in a specified directory.
     """
-    
+
     configs = {}
-    
+
     def get(name, root_dir=None, log=None):
-        
+
         if name not in ConfigurationFactory.configs:
             config = ConfigParser()
-            
+
             try:
                 config_files = os.listdir(root_dir)
                 config_files.sort()
             except OSError:
-                if log:
-                    log.error('directory does not exist')
-                return None
-        
+                if os.path.isfile(root_dir):
+                    config_files = [root_dir]
+                else:
+                    if log:
+                        log.error('directory does not exist')
+
+                    raise LoadError
+
             for config_file in config_files:
-        
+
                 # Skip dotfiles
                 if config_file.startswith('.'):
                     continue
-        
+
                 if log:
                     log.info('loading configuration file %s' %(config_file))
-                
+
                 config_file = os.path.join(root_dir, config_file)
                 config.read_file(open(config_file, 'r'))
-                
+
             ConfigurationFactory.configs[name] = config
-                
+
         return ConfigurationFactory.configs[name]
+
+class LoadError(Exception):
+    pass
