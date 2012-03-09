@@ -106,8 +106,9 @@ class Agent:
 
         self._main_log.info('loading configuration from directory %s'
                             %(config_root_dir))
-        self._config = ConfigurationFactory.get('hypernova', config_root_dir,
-                                                self._main_log)
+        self._config = ConfigurationFactory.get('hypernova',
+                                                root_dir=config_root_dir,
+                                                log=self._main_log)
 
         if not self._config:
             self._main_log.critical('loading configuration failed')
