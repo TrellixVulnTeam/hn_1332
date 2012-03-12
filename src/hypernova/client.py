@@ -113,7 +113,23 @@ class ClientConfigAction(ClientActionBase):
 
         super().__init__(cli_args, config_dir)
 
-        if self._args.config_action == 'node':
+        if self._args.config_action == 'key':
+            try:
+                with open(self._args.privkey, 'rb') as key:
+                    key_blob = key.read()
+            except IOError:
+                    print('Failed: the specified private key does not exist',
+                          file=sys.stderr)
+                    sys.exit(64)
+
+            gpg = GPG(gnupghome=os.path.join(config_dir, 'gpg'))
+            result = gpg.import_keys(key_blob)
+            try:
+                key_fingerprint = result.fingerprints[0]
+            except IndexError:
+                print('Failed: the specified private key is invalid')
+
+        elif self._args.config_action == 'node':
             if self._args.config_node_action == 'add':
 
                 try:
@@ -171,8 +187,11 @@ class ClientConfigAction(ClientActionBase):
 
         ClientConfigAction._arg_parsers['config'] = subparser
         subparser_factory = subparser.add_subparsers(dest='config_action')
-        ClientConfigAction._arg_parsers['config_node'] = subparser_factory.add_parser('node')
 
+        ClientConfigAction._arg_parsers['config_key'] = subparser_factory.add_parser('key')
+        ClientConfigAction._arg_parsers['config_key'].add_argument('privkey')
+
+        ClientConfigAction._arg_parsers['config_node'] = subparser_factory.add_parser('node')
         node_subparser_factory = ClientConfigAction._arg_parsers['config_node'].add_subparsers(dest='config_node_action')
 
         # Subparsers for actions
