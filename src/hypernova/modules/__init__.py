@@ -29,7 +29,11 @@ class AgentRequestHandlerBase:
 
 
 
-def serialise_response(native_response):
+
+def serialise(native_response):
+    """
+    Serialise a request or response as JSON.
+    """
 
     return json.dumps(native_response)
 

@@ -448,7 +448,7 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
         """
 
         self.end_headers()
-        response = modules.serialise_response(response)
+        response = modules.serialise(response)
         response = self._gpg.encrypt(response,
                                      self.clear.fingerprint,
                                      sign=self._gpg._secret_key['fingerprint'])
