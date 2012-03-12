@@ -73,9 +73,16 @@ class ClientConfigAction(ClientActionBase):
             gpg = GPG(gnupghome=os.path.join(config_dir, 'gpg'))
             result = gpg.import_keys(key_blob)
             try:
-                key_fingerprint = result.fingerprints[0]
+                if not self._config.has_section('client'):
+                    self._config.add_section('client')
+                self._config['client']['privkey'] = result.fingerprints[0]
+
             except IndexError:
                 print('Failed: the specified private key is invalid')
+
+
+            with open(os.path.join(config_dir, 'client.ini'), 'w') as c:
+                self._config.write(c)
 
         elif self._args.config_action == 'node':
             if self._args.config_node_action == 'add':
