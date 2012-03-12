@@ -10,6 +10,7 @@
 #
 
 from hypernova.modules import AgentRequestHandlerBase, ClientQueryInterfaceBase
+import os
 import subprocess
 
 class AgentRequestHandler(AgentRequestHandlerBase):
@@ -17,18 +18,15 @@ class AgentRequestHandler(AgentRequestHandlerBase):
     def do_load_averages(params):
 
         try:
-            with open('/proc/loadavg', 'r') as f:
-                raw = f.read()
-        except IOError as e:
+            avgs = os.getloadavg()
+        except OSError as e:
             return AgentRequestHandler._format_response(False, 1)
-
-        parts = raw.split(' ')
 
         return AgentRequestHandler._format_response(
             {
-                '1m':  float(parts[0]),
-                '5m':  float(parts[1]),
-                '15m': float(parts[2])
+                '1m':  float(avgs[0]),
+                '5m':  float(avgs[1]),
+                '15m': float(avgs[2])
             },
             True,
             200
