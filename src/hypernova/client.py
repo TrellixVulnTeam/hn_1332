@@ -11,11 +11,9 @@
 
 import argparse
 import configparser
-from http.client import HTTPConnection
 from hypernova import GPG
 from hypernova.libraries.client import Client
 from hypernova.libraries.configuration import ConfigurationFactory, LoadError
-import json
 import os
 import sys
 

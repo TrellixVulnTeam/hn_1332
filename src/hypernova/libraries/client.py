@@ -9,9 +9,14 @@
 #                    Luke Carrier <luke.carrier@tdm.info>
 #
 
+from http.client import HTTPConnection
+from hypernova import GPG
+import json
+import os
+
 class Client:
 
-    addr = None
+    host = None
     port = None
 
     connection = None
@@ -21,7 +26,7 @@ class Client:
 
     def __init__(self, host='127.0.0.1', port=8080):
 
-        self.addr = addr
+        self.host = host
         self.port = port
 
         self._init_connection()
@@ -29,7 +34,7 @@ class Client:
 
     def _init_connection(self):
 
-        self._connection = HTTPConnection(self.addr, self.port)
+        self._connection = HTTPConnection(self.host, self.port)
 
     def _init_gpg(self):
 
