@@ -52,5 +52,6 @@ class ConfigurationFactory():
 
         return ConfigurationFactory.configs[name]
 
+
 class LoadError(Exception):
     pass

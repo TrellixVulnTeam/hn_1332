@@ -92,7 +92,7 @@ class ClientConfigAction(ClientActionBase):
                 try:
                     key_fingerprint = result.fingerprints[0]
                 except IndexError:
-                    print('Failed: the specified public key was not a valid public key', file=sys.stderr)
+                    print('Failed: the specified public key is invalid', file=sys.stderr)
                     sys.exit(64)
 
                 try:

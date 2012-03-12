@@ -24,7 +24,7 @@ class AgentRequestHandlerBase:
                 'message': message,
                 'explanation': explanation
             },
-            'response': response
+            'response': response,
         }
 
 
@@ -36,6 +36,7 @@ def serialise(native_response):
     """
 
     return json.dumps(native_response)
+
 
 # Import submodules
 #
