@@ -14,6 +14,7 @@ import configparser
 from hypernova import GPG
 from hypernova.libraries.client import Client
 from hypernova.libraries.configuration import ConfigurationFactory, LoadError
+from hypernova import modules
 import os
 import sys
 
@@ -163,7 +164,52 @@ class ClientConfigAction(ClientActionBase):
 
 class ClientRequestAction(ClientActionBase):
     """
+    Request action handler.
     """
+
+    def __init__(self, cli_args, config_dir):
+
+        super().__init__(cli_args, config_dir)
+
+        try:
+            node = self._servers[cli_args.node]
+        except KeyError:
+            print('Failed: no server exists with the specified name',
+                  file=sys.stderr)
+            sys.exit(64)
+
+        (host, sep, port) = node['addr'].partition(':')
+        client = Client(host, port)
+
+        module = getattr(modules, cli_args.request_module)
+        Klass  = getattr(module, 'ClientQueryInterface')
+        func   = getattr(Klass, 'do_' + cli_args.request_action)
+
+        request = func(cli_args, client)
+        client.query(request, self._config['client']['privkey'], node['pubkey'])
+
+    def init_subparser(subparser):
+
+        subparser.add_argument('node')
+
+        subparser_factory = subparser.add_subparsers(dest='request_module')
+
+        for module in modules.__all__:
+            pymodule = getattr(modules, module)
+
+            try:
+                Klass = getattr(pymodule, 'ClientQueryInterface')
+                ClientRequestAction._arg_parsers['request_' + module] = \
+                    module_subparser = subparser_factory.add_parser(module)
+                module_subparser_factory = \
+                        module_subparser.add_subparsers(dest='request_action')
+                Klass.init_subparser(module_subparser, module_subparser_factory)
+
+            except AttributeError:
+                print('Error: module %s contains no interface definition'
+                      %(module), file=sys.stderr)
+
+        return subparser
 
 
 class SimpleClientInterface:
