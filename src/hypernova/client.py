@@ -27,7 +27,8 @@ class ClientActionBase:
     _arg_parsers = {}
     _args        = None
 
-    _config = None
+    _config  = None
+    _servers = None
 
     def __init__(self, cli_args, config_dir):
         """
@@ -38,6 +39,7 @@ class ClientActionBase:
 
         self._config_dir = config_dir
         self._config     = ConfigurationFactory.get('hypernova')
+        self._servers    = ConfigurationFactory.get('hypernova.servers')
 
     def init_subparser(subparser):
         """
@@ -94,15 +96,15 @@ class ClientConfigAction(ClientActionBase):
                     sys.exit(64)
 
                 try:
-                    self._config.add_section(self._args.name)
-                    self._config.set(self._args.name, 'addr',   self._args.addr)
-                    self._config.set(self._args.name, 'pubkey', key_fingerprint)
+                    self._servers.add_section(self._args.name)
+                    self._servers.set(self._args.name, 'addr',   self._args.addr)
+                    self._servers.set(self._args.name, 'pubkey', key_fingerprint)
                 except configparser.DuplicateSectionError:
                     print('Failed: a node with the specified name already exists', file=sys.stderr)
                     sys.exit(64)
 
             elif self._args.config_node_action == 'list':
-                for (name, node) in self._config.items():
+                for (name, node) in self._servers.items():
                     if name == 'DEFAULT':
                         continue
 
@@ -112,13 +114,13 @@ class ClientConfigAction(ClientActionBase):
                     print(' ')
 
             elif self._args.config_node_action == 'rm':
-                if not self._config.remove_section(self._args.name):
+                if not self._servers.remove_section(self._args.name):
                     print('Failed: no server exists with the specified name')
                     sys.exit(64)
 
             elif self._args.config_node_action == 'show':
                 try:
-                    node = self._config[self._args.name]
+                    node = self._servers[self._args.name]
                     print(self._args.name)
                     print('    Address:', node['addr'])
                     print('Fingerprint:', node['pubkey'])
@@ -127,7 +129,7 @@ class ClientConfigAction(ClientActionBase):
                     sys.exit(64)
 
             with open(os.path.join(self._config_dir, 'servers.ini'), 'w') as f:
-                self._config.write(f)
+                self._servers.write(f)
 
     def init_subparser(subparser):
 
@@ -171,7 +173,11 @@ class SimpleClientInterface:
 
     _arg_parsers = {}
 
-    _config = None
+    _config  = None
+    _servers = None
+
+    _config_file  = ''
+    _servers_file = ''
 
     def __init__(self):
         """
@@ -193,18 +199,20 @@ class SimpleClientInterface:
         Load the client's configuration.
         """
 
-        self._config_dir  = os.path.join(os.getenv('HOME'), '.hypernova')
-        self._config_file = os.path.join(self._config_dir, 'servers.ini')
+        self._config_dir   = os.path.join(os.getenv('HOME'), '.hypernova')
+        self._config_file  = os.path.join(self._config_dir, 'client.ini')
+        self._servers_file = os.path.join(self._config_dir, 'servers.ini')
 
         try:
-            self._config = ConfigurationFactory.get('hypernova',
-                                                    root_dir=self._config_file)
-        except:
+            os.listdir(self._config_dir)
+        except OSError:
             print('Creating configuration in %s' %(self._config_dir), file=sys.stderr)
             self._init_config_runonce(self._config_dir)
-
+        finally:
             self._config = ConfigurationFactory.get('hypernova',
                                                     root_dir=self._config_file)
+            self._servers = ConfigurationFactory.get('hypernova.servers',
+                                                     root_dir=self._servers_file)
 
     def _init_config_runonce(self, conf_dir):
         """
@@ -215,7 +223,7 @@ class SimpleClientInterface:
         """
 
         dirs  = ['gpg']
-        files = ['servers.ini']
+        files = ['client.ini', 'servers.ini']
 
         os.mkdir(conf_dir, 0o0700)
 
