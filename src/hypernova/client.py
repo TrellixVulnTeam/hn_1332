@@ -107,6 +107,9 @@ class ClientConfigAction(ClientActionBase):
     """
 
     def __init__(self, cli_args, config_dir):
+        """
+        TODO: break this stupidly huge method down
+        """
 
         super().__init__(cli_args, config_dir)
 
@@ -161,8 +164,8 @@ class ClientConfigAction(ClientActionBase):
                     print('Failed: no server exists with the specified name')
                     sys.exit(64)
 
-            with open(os.path.join(self._config_dir, 'servers.ini'), 'w') as config_file:
-                self._config.write(config_file)
+            with open(os.path.join(self._config_dir, 'servers.ini'), 'w') as f:
+                self._config.write(f)
 
     def init_subparser(subparser):
 
@@ -171,17 +174,16 @@ class ClientConfigAction(ClientActionBase):
         ClientConfigAction._arg_parsers['config_node'] = subparser_factory.add_parser('node')
 
         node_subparser_factory = ClientConfigAction._arg_parsers['config_node'].add_subparsers(dest='config_node_action')
-        ClientConfigAction._arg_parsers['config_node_add'] = node_subparser_factory.add_parser('add')
-        ClientConfigAction._arg_parsers['config_node_list'] = node_subparser_factory.add_parser('list')
-        ClientConfigAction._arg_parsers['config_node_rm']  = node_subparser_factory.add_parser('rm')
-        ClientConfigAction._arg_parsers['config_node_show']  = node_subparser_factory.add_parser('show')
 
-        ClientConfigAction._arg_parsers['config_node_add'].add_argument('name')
-        ClientConfigAction._arg_parsers['config_node_add'].add_argument('addr')
-        ClientConfigAction._arg_parsers['config_node_add'].add_argument('pubkey')
+        # Subparsers for actions
+        for sp in ['add', 'list', 'rm', 'show']:
+            ClientConfigAction._arg_parsers['config_node_' + sp] = \
+                    node_subparser_factory.add_parser(sp)
 
+        # Arguments for the above subparsers
+        for spa in ['name', 'addr', 'pubkey']:
+            ClientConfigAction._arg_parsers['config_node_add'].add_argument(spa)
         ClientConfigAction._arg_parsers['config_node_rm'].add_argument('name')
-
         ClientConfigAction._arg_parsers['config_node_show'].add_argument('name')
 
         return subparser
