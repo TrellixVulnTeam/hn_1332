@@ -10,7 +10,7 @@
 #
 
 from hypernova.libraries.appconfig import snmpd
-from hypernova.modules import AgentRequestHandlerBase
+from hypernova.modules import AgentRequestHandlerBase, ClientQueryInterfaceBase
 
 class AgentRequestHandler(AgentRequestHandlerBase):
 
@@ -37,3 +37,7 @@ class AgentRequestHandler(AgentRequestHandlerBase):
             False,
             500
         )
+
+
+class ClientQueryInterface(ClientQueryInterfaceBase):
+    pass
