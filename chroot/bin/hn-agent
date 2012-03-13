@@ -15,4 +15,4 @@ PYTHON='python3.2'
 [ -z "$CONFDIR" ]   && CONFDIR="/usr/local/hypernova/etc/hypernova"
 [ -z "$PYTHONPATH"] && PYTHONPATH="/usr/local/hypernova/lib/python3.2/site-packages/HyperNova-0.1.0-py3.2.egg:/usr/local/hypernova/lib/python3.2/site-packages/python_gnupg-0.2.8-py3.2.egg"
 
-PYTHONPATH="$PYTHONPATH" "$BINDIR/$PYTHON" -m hypernova.agent "$CONFDIR/agent"
+PYTHONPATH="$PYTHONPATH" "$BINDIR/$PYTHON" -m hypernova.agent "$CONFDIR"
