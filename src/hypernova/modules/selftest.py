@@ -9,7 +9,9 @@
 #                    Luke Carrier <luke.carrier@tdm.info>
 #
 
-from hypernova.modules import AgentRequestHandlerBase, ClientRequestBuilderBase
+from hypernova.modules import AgentRequestHandlerBase, \
+                              ClientRequestBuilderBase, \
+                              ClientResponseFormatterBase
 from hypernova.libraries.appconfig.snmpd import AppConfig as SnmpdConfig
 from hypernova.libraries.appconfig.httpserver.nginx import AppConfig
 from hypernova.libraries.configuration import ConfigurationFactory

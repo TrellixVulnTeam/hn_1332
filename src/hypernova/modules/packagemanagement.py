@@ -11,7 +11,9 @@
 
 from hypernova.libraries.packagemanagement import get_package_db, \
                                                   get_package_manager
-from hypernova.modules import AgentRequestHandlerBase, ClientRequestBuilderBase
+from hypernova.modules import AgentRequestHandlerBase, \
+                              ClientRequestBuilderBase, \
+                              ClientResponseFormatterBase
 
 class AgentRequestHandler(AgentRequestHandlerBase):
 

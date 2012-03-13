@@ -10,7 +10,9 @@
 #
 
 from hypernova.libraries.appconfig import snmpd
-from hypernova.modules import AgentRequestHandlerBase, ClientRequestBuilderBase
+from hypernova.modules import AgentRequestHandlerBase, \
+                              ClientRequestBuilderBase, \
+                              ClientResponseFormatterBase
 
 class AgentRequestHandler(AgentRequestHandlerBase):
 

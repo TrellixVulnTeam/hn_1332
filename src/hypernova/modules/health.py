@@ -9,7 +9,9 @@
 #                    Luke Carrier <luke.carrier@tdm.info>
 #
 
-from hypernova.modules import AgentRequestHandlerBase, ClientRequestBuilderBase
+from hypernova.modules import AgentRequestHandlerBase, \
+                              ClientRequestBuilderBase, \
+                              ClientResponseFormatterBase
 import os
 import subprocess
 
@@ -34,4 +36,8 @@ class AgentRequestHandler(AgentRequestHandlerBase):
 
 
 class ClientRequestBuilder(ClientRequestBuilderBase):
+    pass
+
+
+class ClientResponseFormatter(ClientResponseFormatterBase):
     pass

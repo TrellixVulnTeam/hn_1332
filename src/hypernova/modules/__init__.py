@@ -61,13 +61,28 @@ class ClientRequestBuilderBase:
         return subparser
 
 
-def serialise(native_response):
+class ClientResponseFormatterBase:
+    """
+    Base class for response formatters.
+
+    Response formatter classes produce "beautified", human-readable output of
+    the JSON structures returned by the agent.
+    """
+
+
+def serialise(native):
     """
     Serialise a request or response as JSON.
     """
 
-    return json.dumps(native_response)
+    return json.dumps(native)
 
+def unserialise(serialised):
+    """
+    Unserialise a request or response from JSON.
+    """
+
+    return json.loads(serialised)
 
 # Import submodules
 #

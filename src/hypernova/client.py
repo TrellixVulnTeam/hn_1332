@@ -181,13 +181,19 @@ class ClientRequestAction(ClientActionBase):
         (host, sep, port) = node['addr'].partition(':')
         client = Client(host, port)
 
-        module = getattr(modules, cli_args.request_module)
-        Klass  = getattr(module, 'ClientRequestBuilder')
-        func   = getattr(Klass, 'do_' + cli_args.request_action)
+        module             = getattr(modules, cli_args.request_module)
+        RequestBuilder     = getattr(module, 'ClientRequestBuilder')
+        request_builder    = getattr(RequestBuilder,
+                                     'do_' + cli_args.request_action)
+        ResponseFormatter  = getattr(module, 'ClientResponseFormatter')
+        response_formatter = getattr(ResponseFormatter,
+                                     'do_' + cli_args.request_action)
 
-        request  = func(cli_args, client)
+        request  = request_builder(cli_args, client)
         keys     = (self._config['client']['privkey'], node['pubkey'])
         response = client.query(request, *keys)
+        print(response_formatter(cli_args, response))
+
 
     def init_subparser(subparser):
 
