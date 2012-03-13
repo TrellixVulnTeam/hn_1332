@@ -10,7 +10,7 @@
 
 Name:    hypernova
 Version: 0.1.0
-Release: 2%{?dist}
+Release: 3%{?dist}
 Summary: Secure server management and site provisioning suite
 
 Group:     Applications/Internet
@@ -33,6 +33,7 @@ Source3: python-gnupg.tar.bz2
 Source4: python-distribute.tar.bz2
 Source5: python-oursql.tar.bz2
 Source6: python-sqlalchemy.tar.bz2
+Source7: python-pyrg.tar.bz2
 
 
 %description
@@ -135,6 +136,15 @@ SQLAlchemy is the Python SQL toolkit and Object Relational Mapper that gives app
 It provides a full suite of well known enterprise-level persistence patterns, designed for efficient and high-performing database access, adapted into a simple and Pythonic domain language.
 
 
+%package python-pyrg
+Summary: Colours unittest output
+Group:   Development/Libraries
+
+
+%description python-pyrg
+This script is colourised to Python's UnitTest Result.
+
+
 %prep
 
 # Extract the source files
@@ -175,6 +185,10 @@ mv python-oursql deps
 # SQLAlchemy
 %setup -q -n src -T -D -a 6
 mv python-sqlalchemy deps
+
+# pyrg
+%setup -q -n src -T -D -a 7
+mv python-pyrg deps
 
 
 %build
@@ -226,6 +240,10 @@ pushd deps/python-sqlalchemy
 "$RPM_BUILD_ROOT/usr/local/hypernova/bin/python3.2" setup.py install
 popd
 
+pushd deps/python-pyrg
+"$RPM_BUILD_ROOT/usr/local/hypernova/bin/python3.2" setup.py install
+popd
+
 "$RPM_BUILD_ROOT/usr/local/hypernova/bin/python3.2" setup.py install
 
 pushd ../chroot
@@ -233,7 +251,8 @@ cp -r * "$RPM_BUILD_ROOT/usr/local/hypernova"
 
 # Shhh, I know
 mkdir -p "$RPM_BUILD_ROOT/etc/profile.d"
-find "$RPM_BUILD_ROOT/usr/local/hypernova/etc/profile.d" -type f -exec mv {} "$RPM_BUILD_ROOT/etc/profile.d" \;
+find "$RPM_BUILD_ROOT/usr/local/hypernova/etc/profile.d" -type f \
+     -exec mv {} "$RPM_BUILD_ROOT/etc/profile.d" \;
 popd
 
 
@@ -288,3 +307,9 @@ rm -rf "$RPM_BUILD_ROOT"
 %files python-sqlalchemy
 %defattr(-, root, root, -)
                                 /usr/local/hypernova/lib/python*/site-packages/SQLAlchemy-*.egg
+
+
+%files python-pyrg
+%defattr(-, root, root, -)
+                                /usr/local/hypernova/bin/pyrg
+                                /usr/local/hypernova/lib/python*/site-packages/pyrg-*.egg

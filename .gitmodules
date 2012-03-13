@@ -7,3 +7,6 @@
 [submodule "deps/python-oursql"]
 	path = deps/python-oursql
 	url = https://github.com/LukeCarrier/py3k-oursql.git
+[submodule "deps/python-pyrg"]
+	path = deps/python-pyrg
+	url = https://github.com/LukeCarrier/py3k-pyrg.git

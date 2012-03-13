@@ -106,7 +106,14 @@ if [ "$SKIPDEPS" != 1 ]; then
     pushd deps/python-oursql
     rm -rfv build/ dist/
     "$srcroot/chroot/bin/python3.2" setup.py bdist_egg
-    "$srcroot/chroot/bin/easy_install-3.2" dist/oursql-*-py3.2-linux-x86_64.egg
+    "$srcroot/chroot/bin/easy_install-3.2" dist/oursql-*-py3.2-linux-$(arch).egg
+    popd
+
+    # Set up pyrg
+    pushd deps/python-pyrg
+    rm -rfv build/ dist/
+    "$srcroot/chroot/bin/python3.2" setup.py bdist_egg
+    "$srcroot/chroot/bin/easy_install-3.2" dist/pyrg-*-py3.2.egg
     popd
 
     # Set up sqlalchemy
