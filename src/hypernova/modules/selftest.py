@@ -9,7 +9,7 @@
 #                    Luke Carrier <luke.carrier@tdm.info>
 #
 
-from hypernova.modules import AgentRequestHandlerBase, ClientQueryInterfaceBase
+from hypernova.modules import AgentRequestHandlerBase, ClientRequestBuilderBase
 from hypernova.libraries.appconfig.snmpd import AppConfig as SnmpdConfig
 from hypernova.libraries.appconfig.httpserver.nginx import AppConfig
 from hypernova.libraries.configuration import ConfigurationFactory
@@ -91,5 +91,5 @@ class AgentRequestHandler(AgentRequestHandlerBase):
         raise Exception('testing exception handling')
 
 
-class ClientQueryInterface(ClientQueryInterfaceBase):
+class ClientRequestBuilder(ClientRequestBuilderBase):
     pass

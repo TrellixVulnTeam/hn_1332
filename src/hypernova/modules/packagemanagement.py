@@ -11,7 +11,7 @@
 
 from hypernova.libraries.packagemanagement import get_package_db, \
                                                   get_package_manager
-from hypernova.modules import AgentRequestHandlerBase, ClientQueryInterfaceBase
+from hypernova.modules import AgentRequestHandlerBase, ClientRequestBuilderBase
 
 class AgentRequestHandler(AgentRequestHandlerBase):
 
@@ -87,5 +87,5 @@ class AgentRequestHandler(AgentRequestHandlerBase):
         )
 
 
-class ClientQueryInterface(ClientQueryInterfaceBase):
+class ClientRequestBuilder(ClientRequestBuilderBase):
     pass

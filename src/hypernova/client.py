@@ -182,11 +182,12 @@ class ClientRequestAction(ClientActionBase):
         client = Client(host, port)
 
         module = getattr(modules, cli_args.request_module)
-        Klass  = getattr(module, 'ClientQueryInterface')
+        Klass  = getattr(module, 'ClientRequestBuilder')
         func   = getattr(Klass, 'do_' + cli_args.request_action)
 
-        request = func(cli_args, client)
-        client.query(request, self._config['client']['privkey'], node['pubkey'])
+        request  = func(cli_args, client)
+        keys     = (self._config['client']['privkey'], node['pubkey'])
+        response = client.query(request, *keys)
 
     def init_subparser(subparser):
 
@@ -198,7 +199,7 @@ class ClientRequestAction(ClientActionBase):
             pymodule = getattr(modules, module)
 
             try:
-                Klass = getattr(pymodule, 'ClientQueryInterface')
+                Klass = getattr(pymodule, 'ClientRequestBuilder')
                 ClientRequestAction._arg_parsers['request_' + module] = \
                     module_subparser = subparser_factory.add_parser(module)
                 module_subparser_factory = \

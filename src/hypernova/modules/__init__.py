@@ -35,7 +35,7 @@ class AgentRequestHandlerBase:
         }
 
 
-class ClientQueryInterfaceBase:
+class ClientRequestBuilderBase:
     """
     Client query interface base class.
 
