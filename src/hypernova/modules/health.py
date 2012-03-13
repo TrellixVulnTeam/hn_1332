@@ -36,8 +36,23 @@ class AgentRequestHandler(AgentRequestHandlerBase):
 
 
 class ClientRequestBuilder(ClientRequestBuilderBase):
-    pass
+
+    def init_subparser(subparser, subparser_factory):
+        subparser_factory.add_parser('load_averages')
+        return subparser
+
+    def do_load_averages(cli_args, client):
+        return ClientRequestBuilderBase._format_request(
+            ['health', 'load_averages']
+        )
 
 
 class ClientResponseFormatter(ClientResponseFormatterBase):
-    pass
+
+    def do_load_averages(cli_args, response):
+
+        result = ''
+        for pair in response['response'].items():
+            result += "\n%s: %s" %pair
+
+        return result[1:]
