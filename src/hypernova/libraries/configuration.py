@@ -46,7 +46,8 @@ class ConfigurationFactory():
                     log.info('loading configuration file %s' %(config_file))
 
                 config_file = os.path.join(root_dir, config_file)
-                config.read_file(open(config_file, 'r'))
+                with open(config_file, 'r') as f:
+                    config.read_file(f)
 
             ConfigurationFactory.configs[name] = config
 
