@@ -237,10 +237,15 @@ class SimpleClientInterface:
     _config_file  = ''
     _servers_file = ''
 
-    def __init__(self):
+    def __init__(self, config_dir=None):
         """
         Perform the action.
         """
+
+        if config_dir:
+            self._config_dir = os.path.abspath(config_dir)
+        else:
+            self._config_dir = os.path.join(os.getenv('HOME'), '.hypernova')
 
         self._init_config()
         self._parse_args()
@@ -257,7 +262,6 @@ class SimpleClientInterface:
         Load the client's configuration.
         """
 
-        self._config_dir   = os.path.join(os.getenv('HOME'), '.hypernova')
         self._config_file  = os.path.join(self._config_dir, 'client.ini')
         self._servers_file = os.path.join(self._config_dir, 'servers.ini')
 
@@ -311,4 +315,9 @@ class SimpleClientInterface:
 
 
 if __name__ == '__main__':
-    SimpleClientInterface().execute()
+    try:
+        config_dir = os.getenv('CONFDIR')
+    except KeyError:
+        config_dir = None
+
+    SimpleClientInterface(config_dir).execute()
