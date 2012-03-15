@@ -9,12 +9,12 @@
 #                    Luke Carrier <luke.carrier@tdm.info>
 #
 
-from configparser import ConfigParser
+from configparser import SafeConfigParser
 import os
 
 class ConfigurationFactory():
     """
-    Initialise a ConfigParser object from files in a specified directory.
+    Initialise a SafeConfigParser object from files in a specified directory.
     """
 
     configs = {}
@@ -22,14 +22,14 @@ class ConfigurationFactory():
     def get(name, root_dir=None, log=None):
 
         if name not in ConfigurationFactory.configs:
-            config = ConfigParser()
+            config = SafeConfigParser()
 
             try:
                 config_files = os.listdir(root_dir)
                 config_files.sort()
             except OSError:
                 if os.path.isfile(root_dir):
-                    config_files = [root_dir]
+                    config_files = [root_dir,]
                 else:
                     if log:
                         log.error('directory does not exist')
@@ -38,8 +38,11 @@ class ConfigurationFactory():
 
             for config_file in config_files:
 
-                # Skip dotfiles
-                if config_file.startswith('.'):
+                # Skip dotfiles and directories
+                if config_file.startswith('.') or not os.path.isfile(config_file):
+                    if log:
+                        log.warn('skipping hidden or non-file item %s' %(config_file))
+
                     continue
 
                 if log:
