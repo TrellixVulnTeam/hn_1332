@@ -84,6 +84,11 @@ class ModuleFunctionalTestCase(unittest.TestCase):
         """
 
         if not os.path.exists(self.client_env['CONFDIR']):
+
+            # Don't waste time and entropy on keys if we can't write configuration
+            # files -- that's a very distressing experience.
+            assert len(sys.argv) == 2
+
             # Prepare two GPG keypairs; one for the agent, one for the client
             agent_gpg_dir  = os.path.join(self.client_env['CONFDIR'], 'agent_gpg')
             agent_gpg      = GPG(gnupghome=agent_gpg_dir)
@@ -94,9 +99,11 @@ class ModuleFunctionalTestCase(unittest.TestCase):
 
             # Export both public keys; import them into the opposing side
             agent_key_blob  = agent_gpg.export_keys(agent_key.fingerprint)
-            client_key_blob = client_gpg.export_keys(client_key.fingerprint)
             client_gpg.import_keys(agent_key_blob)
+            client_gpg.sign_key(agent_key.fingerprint)
+            client_key_blob = client_gpg.export_keys(client_key.fingerprint)
             agent_gpg.import_keys(client_key_blob)
+            agent_gpg.sign_key(client_key.fingerprint)
 
             # Configure the agent to run in a development-safe configuration.
             #
