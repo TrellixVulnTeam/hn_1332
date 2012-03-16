@@ -10,3 +10,6 @@
 [submodule "deps/python-pyrg"]
 	path = deps/python-pyrg
 	url = https://github.com/LukeCarrier/py3k-pyrg.git
+[submodule "deps/python-pexpect"]
+	path = deps/python-pexpect
+	url = https://github.com/LukeCarrier/py3k-pexpect.git

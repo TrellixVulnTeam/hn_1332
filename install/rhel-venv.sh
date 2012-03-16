@@ -95,6 +95,13 @@ fi
 
 # Install Python dependencies
 if [ "$SKIPDEPS" != 1 ]; then
+    # Set up pexpect
+    pushd deps/python-pexpect
+    rm -rfv build/ dist/
+    "$srcroot/chroot/bin/python3.2" setup.py bdist_egg
+    "$srcroot/chroot/bin/easy_install-3.2" dist/pexpect-*-py3.2.egg
+    popd
+
     # Set up gnupg
     pushd deps/python-gnupg
     rm -rfv build/ dist/

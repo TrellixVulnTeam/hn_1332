@@ -34,6 +34,7 @@ Source4: python-distribute.tar.bz2
 Source5: python-oursql.tar.bz2
 Source6: python-sqlalchemy.tar.bz2
 Source7: python-pyrg.tar.bz2
+Source8: python-pexpect.tar.bz2
 
 
 %description
@@ -145,6 +146,15 @@ Group:   Development/Libraries
 This script is colourised to Python's UnitTest Result.
 
 
+%package python-pexpect
+Summary: Expect-like interface to interactive process I/O
+Group:   Development/Libraries
+
+
+%description python-pexpect
+Pexpect is a pure Python module that makes Python a better tool for controlling and automating other programs. Pexpect is similar to the Don Libes `Expect` system, but Pexpect as a different interface that is easier to understand. Pexpect is basically a pattern matching system. It runs programs and watches output. When output matches a given pattern Pexpect can respond as if a human were typing responses. Pexpect can be used for automation, testing, and screen scraping. Pexpect can be used for automating interactive console applications such as ssh, ftp, passwd, telnet, etc. It can also be used to control web applications via `lynx`, `w3m`, or some other text-based web browser.
+
+
 %prep
 
 # Extract the source files
@@ -189,6 +199,10 @@ mv python-sqlalchemy deps
 # pyrg
 %setup -q -n src -T -D -a 7
 mv python-pyrg deps
+
+# pexpect
+%setup -q -n src -T -D -a 8
+mv python-pexpect deps
 
 
 %build
@@ -241,6 +255,10 @@ pushd deps/python-sqlalchemy
 popd
 
 pushd deps/python-pyrg
+"$RPM_BUILD_ROOT/usr/local/hypernova/bin/python3.2" setup.py install
+popd
+
+pushd deps/python-pexpect
 "$RPM_BUILD_ROOT/usr/local/hypernova/bin/python3.2" setup.py install
 popd
 
@@ -313,3 +331,8 @@ rm -rf "$RPM_BUILD_ROOT"
 %defattr(-, root, root, -)
                                 /usr/local/hypernova/bin/pyrg
                                 /usr/local/hypernova/lib/python*/site-packages/pyrg-*.egg
+
+
+%files python-pexpect
+%defattr(-, root, root, -)
+                                /usr/local/hypernova/lib/python*/site-packages/pexpect-*-py3.2.egg
