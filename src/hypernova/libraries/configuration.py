@@ -27,29 +27,31 @@ class ConfigurationFactory():
             try:
                 config_files = os.listdir(root_dir)
                 config_files.sort()
+
+                for config_file in config_files:
+
+                    # Skip dotfiles and directories
+                    if config_file.startswith('.') or not os.path.isfile(config_file):
+                        if log:
+                            log.warn('skipping hidden or non-file item %s' %(config_file))
+
+                        continue
+
+                    if log:
+                        log.info('loading configuration file %s' %(config_file))
+
+                    config_file = os.path.join(root_dir, config_file)
+                    with open(config_file, 'r') as f:
+                        config.read_file(f)
+
             except OSError:
-                if os.path.isfile(root_dir):
-                    config_files = [root_dir,]
-                else:
+                if not os.path.isfile(root_dir):
                     if log:
                         log.error('directory does not exist')
 
                     raise LoadError
 
-            for config_file in config_files:
-
-                # Skip dotfiles and directories
-                if config_file.startswith('.') or not os.path.isfile(config_file):
-                    if log:
-                        log.warn('skipping hidden or non-file item %s' %(config_file))
-
-                    continue
-
-                if log:
-                    log.info('loading configuration file %s' %(config_file))
-
-                config_file = os.path.join(root_dir, config_file)
-                with open(config_file, 'r') as f:
+                with open(root_dir, 'r') as f:
                     config.read_file(f)
 
             ConfigurationFactory.configs[name] = config
