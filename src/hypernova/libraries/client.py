@@ -24,10 +24,14 @@ class Client:
     M_GET  = 'GET'
     M_POST = 'POST'
 
-    def __init__(self, host='127.0.0.1', port=8080):
+    def __init__(self, host='127.0.0.1', port=8080, gpg_dir=None):
 
         self.host = host
         self.port = port
+        self.gpg_dir = gpg_dir
+
+        if not self.gpg_dir:
+            self.gpg_dir = os.path.join(os.getenv('HOME'), '.gnupg')
 
         self._init_connection()
         self._init_gpg()
@@ -38,8 +42,7 @@ class Client:
 
     def _init_gpg(self):
 
-        self._gpg = GPG.get_gpg(gnupghome=os.path.join(os.getenv('HOME'),
-                                                       '.gnupg'))
+        self._gpg = GPG.get_gpg(gnupghome=self.gpg_dir)
 
     def query(self, params, client_fp, server_fp):
 

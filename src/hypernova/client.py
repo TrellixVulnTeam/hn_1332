@@ -179,7 +179,7 @@ class ClientRequestAction(ClientActionBase):
             sys.exit(64)
 
         (host, sep, port) = node['addr'].partition(':')
-        client = Client(host, port)
+        client = Client(host, port, cli_args.gpg_dir)
 
         module             = getattr(modules, cli_args.request_module)
         RequestBuilder     = getattr(module, 'ClientRequestBuilder')
@@ -197,6 +197,7 @@ class ClientRequestAction(ClientActionBase):
 
     def init_subparser(subparser):
 
+        subparser.add_argument('--gpg-dir', dest='gpg_dir', default=None)
         subparser.add_argument('node')
 
         subparser_factory = subparser.add_subparsers(dest='request_module')
