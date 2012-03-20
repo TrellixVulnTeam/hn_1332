@@ -228,7 +228,8 @@ class ModuleFunctionalTestCase(unittest.TestCase):
                                                           stderr=subprocess.PIPE)
         proc.wait()
 
-        self.last_result = (proc.returncode, proc.stdout, proc.stderr)
+        self.last_result = (proc.returncode, str(proc.stdout.read(), 'UTF-8'),
+                                             str(proc.stderr.read(), 'UTF-8'))
         return self.last_result
 
     def assertZeroLength(self, s):
@@ -255,8 +256,8 @@ class ModuleFunctionalTestCase(unittest.TestCase):
         if self.last_result and not outcome.success:
             last_result = (
                 self.last_result[0],
-                str(self.last_result[1].read(), 'UTF-8'),
-                str(self.last_result[2].read(), 'UTF-8'),
+                self.last_result[1],
+                self.last_result[2],
             )
 
             # Prevent useless repetition
