@@ -111,18 +111,22 @@ class ModuleFunctionalTestCase(unittest.TestCase):
             # as the default. All other configuration will be ignored for the
             # purposes of the test run, since this is outside of our scope.
             with open(self.agent_env['CONFDIR'], 'w') as f:
+                l = os.path.join(self.client_env['CONFDIR'], 'agent_%s.log')
                 agent_cfg = ConfigurationFactory.get('hypernova.agent',
-                                                     sys.argv[1])
-                agent_cfg.set('server', 'address',     self.agent_addr[0])
-                agent_cfg.set('server', 'port',        self.agent_addr[1])
-                agent_cfg.set('server', 'daemon',      'false')
-                agent_cfg.set('gpg',    'key_store',   agent_gpg_dir)
-                agent_cfg.set('gpg',    'fingerprint', agent_key.fingerprint)
+                                                     root_dir=sys.argv[1])
+                agent_cfg.set('server',  'address',     self.agent_addr[0])
+                agent_cfg.set('server',  'port',        self.agent_addr[1])
+                agent_cfg.set('server',  'daemon',      'false')
+                agent_cfg.set('gpg',     'key_store',   agent_gpg_dir)
+                agent_cfg.set('gpg',     'fingerprint', agent_key.fingerprint)
+                agent_cfg.set('logging', 'main_log',    l %('main'))
+                agent_cfg.set('logging', 'request_log', l %('request'))
+                agent_cfg.set('logging', 'error_log',   l %('error'))
                 agent_cfg.write(f)
 
             # The client has to use two different configuration files, both in
             # the same directory.
-            client_cfg_dir  = self.client_env['CONFDIR']
+            client_cfg_dir = self.client_env['CONFDIR']
 
             # Configure the client to use its temporary key.
             #
@@ -154,11 +158,18 @@ class ModuleFunctionalTestCase(unittest.TestCase):
         # TODO: instead of lazily and unreliably falling asleep on the job,
         #       we should probably use a regular expression to check the output.
         #       Time is of the essence, though!
-        self.agent_proc = subprocess.Popen(['hn-agent'], env=self.agent_env,
+        #       No, we'll use pexpect instead, since it's now shipped as a py3k
+        #       dependency.
+        agent_cmd = [
+            'hn-agent',
+            self.agent_env['CONFDIR']
+        ]
+        self.agent_proc = subprocess.Popen(agent_cmd, env=self.agent_env,
                                            stdin=subprocess.PIPE,
                                            stdout=subprocess.PIPE,
                                            stderr=subprocess.PIPE)
         time.sleep(self.agent_init_time)
+
 
     def tearDown(self):
         """
@@ -202,7 +213,14 @@ class ModuleFunctionalTestCase(unittest.TestCase):
         and standard error output.
         """
 
-        cmd = ['hn-client', 'request', 'local', module, action]
+        cmd = [
+            'hn-client',
+            'request',
+            '--gpg-dir', os.path.join(self.client_env['CONFDIR'], 'client_gpg'),
+            'local',
+            module,
+            action
+        ]
         cmd.extend(params)
 
         proc = subprocess.Popen(cmd, env=self.client_env, stdin=subprocess.PIPE,
