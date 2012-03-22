@@ -7,8 +7,7 @@
     "nginx": "nginx",
     "php": "php",
     "postfix": "postfix",
-    "powerdns-authoritative-server": "pdns-static",
-    "powerdns-recursive-server": "pdns-recursor",
+    "powerdns-authoritative": "powerdns-authoritative",
     "sendmail": "sendmail",
     "snmpd": "net-snmp-utils",
     "vsftpd": "vsftpd"
