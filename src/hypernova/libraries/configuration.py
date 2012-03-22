@@ -31,9 +31,9 @@ class ConfigurationFactory():
                 for config_file in config_files:
 
                     # Skip dotfiles and directories
-                    if config_file.startswith('.') or not os.path.isfile(config_file):
+                    if config_file.startswith('.'):
                         if log:
-                            log.warn('skipping hidden or non-file item %s' %(config_file))
+                            log.warn('skipping hidden item %s' %(config_file))
 
                         continue
 
@@ -41,8 +41,13 @@ class ConfigurationFactory():
                         log.info('loading configuration file %s' %(config_file))
 
                     config_file = os.path.join(root_dir, config_file)
-                    with open(config_file, 'r') as f:
-                        config.read_file(f)
+                    try:
+                        with open(config_file, 'r') as f:
+                            config.read_file(f)
+                    except IOError:
+                        if log:
+                            log.warn('failed to load file %s; is it a directory?'
+                                     %(config_file))
 
             except OSError:
                 if not os.path.isfile(root_dir):
