@@ -30,8 +30,8 @@ class AgentRequestHandler(AgentRequestHandlerBase):
                 '5m':  float(avgs[1]),
                 '15m': float(avgs[2])
             },
-            True,
-            200
+            successful=True,
+            error_code=0
         )
 
 
@@ -50,7 +50,6 @@ class ClientRequestBuilder(ClientRequestBuilderBase):
 class ClientResponseFormatter(ClientResponseFormatterBase):
 
     def do_load_averages(cli_args, response):
-
         result = ''
         for pair in response['response'].items():
             result += "\n%s: %s" %pair
