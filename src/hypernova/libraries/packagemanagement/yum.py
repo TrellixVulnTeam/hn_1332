@@ -35,7 +35,6 @@ class PackageManager(PackageManagerBase):
         if status == 0:
             status = True
         elif status == 1:
-            print(stderr)
             if re.search('nothing to do', str(stderr, 'UTF-8'), re.I):
                 status = True
             else:
