@@ -217,7 +217,6 @@ def get_authoritative_server(adapter, kwargs):
 
     kwargs = dict(kwargs)
     kwargs.pop('adapter')
-    print(str(kwargs))
 
     module_name = "hypernova.libraries.appconfig.dnsserver.%s" %(adapter)
     module = __import__(module_name, fromlist=['AuthoritativeServer'])
