@@ -54,7 +54,7 @@ class AgentRequestHandler(AgentRequestHandlerBase):
             try:
                 successful = True
                 result     = {
-                    'zone': server.get_zone(params['zone']).to_encodable(),
+                    'zone': server.get_zone(params['domain']).to_encodable(),
                 }
             except NonexistentZoneError:
                 successful = False
@@ -86,7 +86,7 @@ class ClientRequestBuilder(ClientRequestBuilderBase):
         return ClientRequestBuilderBase._format_request(
             ['dns', 'get_zone'],
             {
-                'zone': cli_args.zone
+                'domain': cli_args.domain
             }
         )
 
@@ -104,6 +104,7 @@ class ClientResponseFormatter(ClientResponseFormatterBase):
     errors = {
         'NonexistentZone': 'the specified zone does not exist',
         'ServerCommunication': 'could not communicate with the DNS server',
+        'UnknownError': 'an unknown error occurred within the agent',
     }
 
     directives_fmt = "Directives:\n* Domain: %s\n* TTL: %s\n* Origin: %s"
@@ -144,7 +145,11 @@ class ClientResponseFormatter(ClientResponseFormatterBase):
 
             result = "%s\n\n%s\n\n%s" %(directives, soa_record, records)
         else:
-            result = result %(ClientResponseFormatter.errors[response['response']['error']])
+            try:
+                seeking = response['response']['error']
+            except KeyError:
+                seeking = 'UnknownError'
+            result = result %(ClientResponseFormatter.errors[seeking])
 
         return result
 
