@@ -11,7 +11,6 @@
 
 from functionals import ModuleFunctionalTestCase
 import re
-import subprocess
 
 class TestLoadAverages(ModuleFunctionalTestCase):
     """
@@ -26,9 +25,11 @@ class TestLoadAverages(ModuleFunctionalTestCase):
         result = self.doRequest('health', 'load_averages')
         self.assertZero(result[0])
 
-        regex = re.compile('(1|5|15)m: ([0-9]).([0-9])*')
         avgs = result[1].split("\n")
-        avgs.remove('')
-        for avg in avgs:
-            regex.match(avg)
+        for entry in ['', 'Load averages:']:
+            avgs.remove(entry)
 
+        regex = re.compile('^\* (1|5|15)m: ([0-9])*.([0-9])*$')
+
+        for avg in avgs:
+            self.assertIsNotNone(regex.match(avg))
