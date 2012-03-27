@@ -246,6 +246,13 @@ class ModuleFunctionalTestCase(unittest.TestCase):
 
         self.assertEqual(n, 0)
 
+    def assertNonZero(self, n):
+        """
+        Assert a number to be anything other than zero.
+        """
+
+        self.assertNotEqual(n, 0)
+
     def _executeTestPart(self, function, outcome, isTest=False):
         """
         Trap failures to display debugging aids.
