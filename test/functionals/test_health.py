@@ -13,14 +13,8 @@ from functionals import ModuleFunctionalTestCase
 import re
 
 class TestLoadAverages(ModuleFunctionalTestCase):
-    """
-    Health module unit test case.
-    """
 
-    def test_load_averages(self):
-        """
-        Test the health.load_averages action.
-        """
+    def test_with_no_parameters(self):
 
         result = self.doRequest('health', 'load_averages')
         self.assertZero(result[0])
