@@ -50,8 +50,8 @@ class ClientRequestBuilder(ClientRequestBuilderBase):
 class ClientResponseFormatter(ClientResponseFormatterBase):
 
     def do_load_averages(cli_args, response):
-        result = ''
+        result = 'Load averages:'
         for pair in response['response'].items():
-            result += "\n%s: %s" %pair
+            result += "\n* %s: %s" %pair
 
-        return result[1:]
+        return result
