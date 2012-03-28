@@ -30,7 +30,3 @@ class TestGetZone(ModuleFunctionalTestCase):
         })
 
         self.assertNonZero(result[0])
-
-    def test_with_valid_domain(self):
-
-        
