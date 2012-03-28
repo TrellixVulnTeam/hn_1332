@@ -25,20 +25,10 @@ class AgentRequestHandler(AgentRequestHandlerBase):
     DNS management component for the agent.
     """
 
-    def do_install(params):
+    def do_add_zone(params):
         """
-        Install a DNS server.
+        Add a zone.
         """
-
-        pm  = get_package_manager()
-        pdb = get_package_db()
-
-        status = pm.install(pdb.resolve('powerdns-authoritative'))
-
-        return AgentRequestHandler._format_response(
-            successful=status,
-            error_code=0
-        )
 
     def do_get_zone(params):
         """
@@ -69,6 +59,21 @@ class AgentRequestHandler(AgentRequestHandlerBase):
             error_code=0
         )
 
+    def do_install(params):
+        """
+        Install a DNS server.
+        """
+
+        pm  = get_package_manager()
+        pdb = get_package_db()
+
+        status = pm.install(pdb.resolve('powerdns-authoritative'))
+
+        return AgentRequestHandler._format_response(
+            successful=status,
+            error_code=0
+        )
+
 
 class ClientRequestBuilder(ClientRequestBuilderBase):
     """
@@ -76,11 +81,21 @@ class ClientRequestBuilder(ClientRequestBuilderBase):
     """
 
     def init_subparser(subparser, subparser_factory):
+        sp = subparser_factory.add_parser('add_zone')
+        sp.add_argument('domain')
         sp = subparser_factory.add_parser('get_zone')
-        sp.add_argument('zone')
+        sp.add_argument('domain')
 
         subparser_factory.add_parser('install')
         return subparser
+
+    def do_add_zone(cli_args, client):
+        return ClientRequestBuilderBase._format_request(
+            ['dns', 'add_zone'],
+            {
+
+            }
+        )
 
     def do_get_zone(cli_args, client):
         return ClientRequestBuilderBase._format_request(
@@ -143,15 +158,14 @@ class ClientResponseFormatter(ClientResponseFormatterBase):
                                             record['priority'],
                                             record['ttl'])
 
-            result = "%s\n\n%s\n\n%s" %(directives, soa_record, records)
+            return "%s\n\n%s\n\n%s" %(directives, soa_record, records)
         else:
             try:
                 seeking = response['response']['error']
             except KeyError:
                 seeking = 'UnknownError'
-            result = result %(ClientResponseFormatter.errors[seeking])
 
-        return result
+            return (69, result %(ClientResponseFormatter.errors[seeking]))
 
     def do_install(cli_args, response):
         result = 'Failed: package installation unsuccessful'
