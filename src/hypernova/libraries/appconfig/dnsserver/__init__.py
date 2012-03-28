@@ -178,7 +178,7 @@ class SoaRecord:
 
         return {
             'primary_ns':         self.primary_ns,
-            'responsible_person': self.responsible_name,
+            'responsible_person': self.responsible_person,
             'serial':             self.serial,
             'refresh':            self.refresh,
             'retry':              self.retry,
