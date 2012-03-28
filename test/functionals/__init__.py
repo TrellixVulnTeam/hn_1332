@@ -270,5 +270,5 @@ class ModuleFunctionalTestCase(unittest.TestCase):
             # Prevent useless repetition
             self.last_result = ()
 
-            msg = 'Exit status: %s\n\nOutput:\n%s\n\nErrors:\n%s'
+            msg = "\n\nExit status: %s\n\nOutput:\n%s\n\nErrors:\n%s"
             print(msg %last_result)
