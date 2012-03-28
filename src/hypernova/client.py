@@ -192,7 +192,19 @@ class ClientRequestAction(ClientActionBase):
         request  = request_builder(cli_args, client)
         keys     = (self._config['client']['privkey'], node['pubkey'])
         response = client.query(request, *keys)
-        print(response_formatter(cli_args, response))
+
+        result = response_formatter(cli_args, response)
+        items  = len(result)
+        if isinstance(result, str) or items == 1:
+            print(result)
+            sys.exit(0)
+        elif items == 2:
+            print(result[1])
+            sys.exit(result[0])
+        else:
+            print("Failed: the response formatter in module '%s' returned " \
+                  "an unexpected result" %(cli_args.request_module))
+            sys.exit(69)
 
 
     def init_subparser(subparser):
