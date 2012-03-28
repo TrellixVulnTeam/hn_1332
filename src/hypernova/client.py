@@ -167,6 +167,9 @@ class ClientRequestAction(ClientActionBase):
     Request action handler.
     """
 
+    RESPONSE_FORMATTER_ERROR = "Failed: the response formatter in module '%s'" \
+                               " returned an unexpected result"
+
     def __init__(self, cli_args, config_dir):
 
         super().__init__(cli_args, config_dir)
@@ -194,7 +197,14 @@ class ClientRequestAction(ClientActionBase):
         response = client.query(request, *keys)
 
         result = response_formatter(cli_args, response)
-        items  = len(result)
+
+        # len() raises TypeErrors on NoneType descendants
+        try:
+            items  = len(result)
+        except TypeError:
+            print(self.RESPONSE_FORMATTER_ERROR %(cli_args.request_module))
+            sys.exit(69)
+
         if isinstance(result, str) or items == 1:
             print(result)
             sys.exit(0)
@@ -202,8 +212,7 @@ class ClientRequestAction(ClientActionBase):
             print(result[1])
             sys.exit(result[0])
         else:
-            print("Failed: the response formatter in module '%s' returned " \
-                  "an unexpected result" %(cli_args.request_module))
+            print(self.RESPONSE_FORMATTER_ERROR %(cli_args.request_module))
             sys.exit(69)
 
 
