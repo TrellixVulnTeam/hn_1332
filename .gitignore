@@ -24,6 +24,7 @@ chroot/var/lib/hypernova/gpg
 chroot/var/log
 
 # virtualenv stuff
+chroot/bin/2to3*
 chroot/bin/activate*
 chroot/bin/easy_install*
 chroot/bin/pip*
