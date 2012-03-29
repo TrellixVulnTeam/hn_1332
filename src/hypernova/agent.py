@@ -366,6 +366,7 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
                 self.send_preformatted_response(response)
             except:
                 self.send_error(500, 'Module execution failure')
+                return
 
         except socket.timeout as e:
             self.log_error('request timed out (%r)', e)
