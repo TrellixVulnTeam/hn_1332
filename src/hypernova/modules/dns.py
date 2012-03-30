@@ -99,8 +99,7 @@ class ClientRequestBuilder(ClientRequestBuilderBase):
 
     def do_get_zone(cli_args, client):
         return ClientRequestBuilderBase._format_request(
-            ['dns', 'get_zone'],
-            {
+            ['dns', 'get_zone'], {
                 'domain': cli_args.domain
             }
         )
@@ -172,6 +171,20 @@ class ClientResponseFormatter(ClientResponseFormatterBase):
             result += "\n* %s" %(ClientResponseFormatter._format_record(r))
 
         return result
+
+    def _format_zone(zone):
+        """
+        Format an entire zone for outputting.
+        """
+
+        return "\n\n".join([
+            ClientResponseFormatter._format_directives(zone['domain'],
+                                                       zone['ttl'],
+                                                       zone['origin']),
+            ClientResponseFormatter._format_soa_record(zone['soa_record']),
+            ClientResponseFormatter._format_records(zone['records']),
+        ])
+
     def do_get_zone(cli_args, response):
         """
         Retrieve a zone.
@@ -182,13 +195,7 @@ class ClientResponseFormatter(ClientResponseFormatterBase):
         if response['status']['successful']:
             zone = response['response']['zone']
 
-            return "\n\n".join([
-                ClientResponseFormatter._format_directives(zone['domain'],
-                                                           zone['ttl'],
-                                                           zone['origin']),
-                ClientResponseFormatter._format_soa_record(zone['soa_record']),
-                ClientResponseFormatter._format_records(zone['records']),
-            ])
+            return ClientResponseFormatter._format_zone(zone)
         else:
             try:
                 seeking = response['response']['error']
