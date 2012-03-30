@@ -37,6 +37,13 @@ class AuthoritativeServerBase(ServerBase):
     Authoritative DNS server.
     """
 
+    def add_zone(self, domain):
+        """
+        Add a zone.
+        """
+
+        self._not_implemented()
+
 
 class Zone:
     """
@@ -110,7 +117,8 @@ class Record:
     # MX records only
     priority = None
 
-    def __init__(self, name='', rtype=None, content=None, ttl=0, priority=None):
+    def __init__(self, new_name='', new_rtype=None, new_content=None, new_ttl=0,
+                 new_priority=None):
         """
         Initialise values.
         """
@@ -118,11 +126,11 @@ class Record:
         if isinstance(rtype, str):
             rtype = Record.RECORD_TYPES.index(rtype.lower())
 
-        self.name     = name
-        self.rtype    = rtype
-        self.content  = content
-        self.ttl      = 0
-        self.priority = priority
+        self.name     = new_name
+        self.rtype    = new_rtype
+        self.content  = new_content
+        self.ttl      = new_ttl
+        self.priority = new_priority
 
     def to_encodable(self):
         """
@@ -163,20 +171,21 @@ class SoaRecord:
     expire  = 0
     min_ttl = 0
 
-    def __init__(self, primary_ns='', responsible_person='', serial=0,
-                 refresh=0, retry=0, expire=0, min_ttl=0):
+    def __init__(self, new_primary_ns='', new_responsible_person='',
+                 new_serial=0, new_refresh=0, new_retry=0, new_expire=0,
+                 new_min_ttl=0):
         """
         Initialise values.
         """
 
-        self.primary_ns         = primary_ns
-        self.responsible_person = responsible_person
+        self.primary_ns         = new_primary_ns
+        self.responsible_person = new_responsible_person
 
-        self.serial  = serial
-        self.refresh = refresh
-        self.retry   = retry
-        self.expire  = expire
-        self.min_ttl = min_ttl
+        self.serial  = new_serial
+        self.refresh = new_refresh
+        self.retry   = new_retry
+        self.expire  = new_expire
+        self.min_ttl = new_min_ttl
 
     def to_encodable(self):
         """
@@ -192,6 +201,10 @@ class SoaRecord:
             'expire':             self.expire,
             'min_ttl':            self.min_ttl,
         }
+
+
+class InvalidZoneError(Exception):
+    pass
 
 
 class NonexistentZoneError(Exception):
