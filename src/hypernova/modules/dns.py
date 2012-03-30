@@ -128,37 +128,67 @@ class ClientResponseFormatter(ClientResponseFormatterBase):
                      "* Retry: %s\n* Expire: %s\n* Minimum TTL: %s"
     record_fmt     = "%s IN %s %s (MX priority %s; TTL %s)"
 
+    def _format_directives(domain, ttl, origin):
+        """
+        Prepare directives for printing.
+        """
+
+        directives = ClientResponseFormatter.directives_fmt
+        return directives %(domain, ttl, origin)
+
+    def _format_soa_record(soa_record):
+        """
+        Prepare SOA record for printing.
+        """
+
+        result = ClientResponseFormatter.soa_record_fmt
+        return result %(soa_record['primary_ns'],
+                        soa_record['responsible_person'],
+                        soa_record['serial'],
+                        soa_record['refresh'],
+                        soa_record['retry'],
+                        soa_record['expire'],
+                        soa_record['min_ttl'])
+
+    def _format_record(record):
+        """
+        Format a single record for printing.
+        """
+
+        result = ClientResponseFormatter.record_fmt
+        return result %(record['name'],
+                        Record.RECORD_TYPES[record['rtype']].upper(),
+                        record['content'],
+                        record['priority'],
+                        record['ttl'])
+
+    def _format_records(records):
+        """
+        Format a set of records.
+        """
+
+        result = 'Records:'
+        for r in records:
+            result += "\n* %s" %(ClientResponseFormatter._format_record(r))
+
+        return result
     def do_get_zone(cli_args, response):
-        result = 'Failed: %s'
+        """
+        Retrieve a zone.
+        """
+
+        result = "Failed: %s"
 
         if response['status']['successful']:
             zone = response['response']['zone']
 
-            directives = ClientResponseFormatter.directives_fmt
-            directives = directives %(zone['domain'],
-                                      zone['ttl'],
-                                      zone['origin'])
-
-            soa_record = ClientResponseFormatter.soa_record_fmt
-            soa_record = soa_record %(zone['soa_record']['primary_ns'],
-                                      zone['soa_record']['responsible_person'],
-                                      zone['soa_record']['serial'],
-                                      zone['soa_record']['refresh'],
-                                      zone['soa_record']['retry'],
-                                      zone['soa_record']['expire'],
-                                      zone['soa_record']['min_ttl'])
-
-            records = 'Records:'
-            record_content = ClientResponseFormatter.record_fmt
-            for record in zone['records']:
-                records += "\n* "
-                records += record_content %(record['name'],
-                                            Record.RECORD_TYPES[record['rtype']].upper(),
-                                            record['content'],
-                                            record['priority'],
-                                            record['ttl'])
-
-            return "%s\n\n%s\n\n%s" %(directives, soa_record, records)
+            return "\n\n".join([
+                ClientResponseFormatter._format_directives(zone['domain'],
+                                                           zone['ttl'],
+                                                           zone['origin']),
+                ClientResponseFormatter._format_soa_record(zone['soa_record']),
+                ClientResponseFormatter._format_records(zone['records']),
+            ])
         else:
             try:
                 seeking = response['response']['error']
@@ -168,6 +198,10 @@ class ClientResponseFormatter(ClientResponseFormatterBase):
             return (69, result %(ClientResponseFormatter.errors[seeking]))
 
     def do_install(cli_args, response):
+        """
+        Install a DNS server (just PowerDNS...for now).
+        """
+
         result = 'Failed: package installation unsuccessful'
 
         if response['status']['successful']:

@@ -16,10 +16,9 @@ class AuthoritativeServer(dns.AuthoritativeServerBase):
 
     credentials = {}
 
-    SELECT_ZONE = "SELECT z.id, d.name " \
-                  "FROM zones z, domains d " \
+    SELECT_ZONE = "SELECT d.id, d.name " \
+                  "FROM domains d " \
                   "WHERE d.name = ? " \
-                  "AND z.domain_id = d.id " \
                   "LIMIT 1"
 
     SELECT_ZONE_RECORDS = "SELECT r.name, r.type, r.content, r.ttl, r.prio " \
@@ -47,6 +46,9 @@ class AuthoritativeServer(dns.AuthoritativeServerBase):
           * PowerDNS doesn't support directives, as implemented by BIND. As a
             result, the ttl and origin fields of each zone are always set to
             None.
+          * The comment field PowerDNS adds to records is _not_ supported by
+            this libary. Inserted rows won't contain this field, and there's a
+            chance that modifications will alter it.
         """
 
         db = oursql.connect(**self.credentials)
