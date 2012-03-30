@@ -37,9 +37,31 @@ class AuthoritativeServerBase(ServerBase):
     Authoritative DNS server.
     """
 
-    def add_zone(self, domain):
+    def commit_record(self, zone, record):
         """
-        Add a zone.
+        Add or modify a record.
+
+        Note: SOA records must be updated with the dedicated commit_soa_record()
+        method, which ensures valid structure and data. Attempting to commit an
+        SOA record with this method will raise an exception.
+        """
+
+        self._not_implemented()
+
+    def commit_soa_record(self, zone, soa_record):
+        """
+        Add or modify an SOA record.
+        """
+
+        self._not_implemented()
+
+    def commit_zone(self, zone):
+        """
+        Add or modify a zone.
+
+        Beware that modifications take effect only upon the zone; any changed
+        records will _not_ be implicitly updated. For this, you should use the
+        commit_record() commit_soa_record() methods.
         """
 
         self._not_implemented()
