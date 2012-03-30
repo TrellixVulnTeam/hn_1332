@@ -19,7 +19,8 @@ class AuthoritativeServer(dns.AuthoritativeServerBase):
     SELECT_ZONE = "SELECT z.id, d.name " \
                   "FROM zones z, domains d " \
                   "WHERE d.name = ? " \
-                  "AND z.domain_id = d.id"
+                  "AND z.domain_id = d.id " \
+                  "LIMIT 1"
 
     SELECT_ZONE_RECORDS = "SELECT r.name, r.type, r.content, r.ttl, r.prio " \
                           "FROM records r " \

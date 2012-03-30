@@ -37,17 +37,17 @@ class Zone:
     """
 
     # Domain name
-    domain = None
+    #domain = None
 
     # Directives
-    ttl    = None
-    origin = None
+    #ttl    = None
+    #origin = None
 
     # SOA
-    soa_record = None
+    #soa_record = None
 
     # Resource records
-    records = []
+    #records = []
 
     def __init__(self, domain=None, ttl=None, origin=None, soa_record=None,
                  records=[]):
