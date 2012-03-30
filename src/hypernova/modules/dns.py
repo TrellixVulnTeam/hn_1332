@@ -121,18 +121,18 @@ class ClientResponseFormatter(ClientResponseFormatterBase):
         'UnknownError': 'an unknown error occurred within the agent',
     }
 
-    directives_fmt = "Directives:\n* Domain: %s\n* TTL: %s\n* Origin: %s"
-    soa_record_fmt = "SOA record:\n* Primary nameserver: %s\n" \
+    DIRECTIVES_FMT = "Directives:\n* Domain: %s\n* TTL: %s\n* Origin: %s"
+    SOA_RECORD_FMT = "SOA record:\n* Primary nameserver: %s\n" \
                      "* Responsible person: %s\n* Serial: %s\n* Refresh: %s\n" \
                      "* Retry: %s\n* Expire: %s\n* Minimum TTL: %s"
-    record_fmt     = "%s IN %s %s (MX priority %s; TTL %s)"
+    RECORD_FMT     = "%s IN %s %s (MX priority %s; TTL %s)"
 
     def _format_directives(domain, ttl, origin):
         """
         Prepare directives for printing.
         """
 
-        directives = ClientResponseFormatter.directives_fmt
+        directives = ClientResponseFormatter.DIRECTIVES_FMT
         return directives %(domain, ttl, origin)
 
     def _format_soa_record(soa_record):
@@ -140,7 +140,7 @@ class ClientResponseFormatter(ClientResponseFormatterBase):
         Prepare SOA record for printing.
         """
 
-        result = ClientResponseFormatter.soa_record_fmt
+        result = ClientResponseFormatter.SOA_RECORD_FMT
         return result %(soa_record['primary_ns'],
                         soa_record['responsible_person'],
                         soa_record['serial'],
@@ -154,7 +154,7 @@ class ClientResponseFormatter(ClientResponseFormatterBase):
         Format a single record for printing.
         """
 
-        result = ClientResponseFormatter.record_fmt
+        result = ClientResponseFormatter.RECORD_FMT
         return result %(record['name'],
                         Record.RECORD_TYPES[record['rtype']].upper(),
                         record['content'],
