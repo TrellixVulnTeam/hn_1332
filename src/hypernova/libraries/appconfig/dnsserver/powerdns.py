@@ -60,7 +60,10 @@ class AuthoritativeServer(dns.AuthoritativeServerBase):
             cursor.close()
 
             cursor = db.cursor()
-            cursor.execute(self.SELECT_ZONE_RECORDS, [zone_meta['id'],])
+            try:
+                cursor.execute(self.SELECT_ZONE_RECORDS, [zone_meta['id'],])
+            except TypeError:
+                raise dns.NonexistentZoneError()
 
             records = []
             for r in cursor:
