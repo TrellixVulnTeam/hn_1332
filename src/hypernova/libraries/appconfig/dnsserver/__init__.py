@@ -74,7 +74,7 @@ class Zone:
             'domain':     self.domain,
             'ttl':        self.ttl,
             'origin':     self.origin,
-            'soa_record': self.soa_record.__dict__,
+            'soa_record': self.soa_record.to_encodable(),
             'records':    [r.to_encodable() for r in self.records],
         }
 
