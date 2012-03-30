@@ -25,12 +25,6 @@ mv distribute-0.6.24 python-distribute
 tar -cjf "$instroot/build/SOURCES/python-distribute.tar.bz2" python-distribute
 rm -rf *
 
-wget -c 'http://pypi.python.org/packages/source/S/SQLAlchemy/SQLAlchemy-0.7.5.tar.gz' -O sqlalchemy.tar.gz
-tar -xzf sqlalchemy.tar.gz
-mv SQLAlchemy-0.7.5 python-sqlalchemy
-tar -cjf "$instroot/build/SOURCES/python-sqlalchemy.tar.bz2" python-sqlalchemy
-rm -rf *
-
 cp -r "$instroot/../chroot" "$instroot/../src" .
 rm -rf chroot/bin/{activate*,easy_install*,elevator,pip*,python*} \
        chroot/{include,lib*,tmp}

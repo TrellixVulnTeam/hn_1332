@@ -122,9 +122,6 @@ if [ "$SKIPDEPS" != 1 ]; then
     "$srcroot/chroot/bin/python3.2" setup.py bdist_egg
     "$srcroot/chroot/bin/easy_install-3.2" dist/pyrg-*-py3.2.egg
     popd
-
-    # Set up sqlalchemy
-    easy_install-3.2 SQLAlchemy
 fi
 
 # Install HyperNova

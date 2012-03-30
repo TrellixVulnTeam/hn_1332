@@ -32,9 +32,8 @@ Source2: elevator.tar.bz2
 Source3: python-gnupg.tar.bz2
 Source4: python-distribute.tar.bz2
 Source5: python-oursql.tar.bz2
-Source6: python-sqlalchemy.tar.bz2
-Source7: python-pyrg.tar.bz2
-Source8: python-pexpect.tar.bz2
+Source6: python-pyrg.tar.bz2
+Source7: python-pexpect.tar.bz2
 
 
 %description
@@ -123,20 +122,6 @@ oursql is a set of MySQL bindings for python 2.4+ with a focus on wrapping the M
 There's extensive documentation available online at http://packages.python.org/oursql/.
 
 
-%package python-sqlalchemy
-Summary: ORM and SQL abstraction library
-Group:   Development/Libraries
-
-# Breaks the resulting RPMs by adding incoherent dependencies (#83)
-AutoReqProv: no
-
-
-%description python-sqlalchemy
-SQLAlchemy is the Python SQL toolkit and Object Relational Mapper that gives application developers the full power and flexibility of SQL.
-
-It provides a full suite of well known enterprise-level persistence patterns, designed for efficient and high-performing database access, adapted into a simple and Pythonic domain language.
-
-
 %package python-pyrg
 Summary: Colours unittest output
 Group:   Development/Libraries
@@ -192,16 +177,12 @@ mv python-distribute deps
 %setup -q -n src -T -D -a 5
 mv python-oursql deps
 
-# SQLAlchemy
-%setup -q -n src -T -D -a 6
-mv python-sqlalchemy deps
-
 # pyrg
-%setup -q -n src -T -D -a 7
+%setup -q -n src -T -D -a 6
 mv python-pyrg deps
 
 # pexpect
-%setup -q -n src -T -D -a 8
+%setup -q -n src -T -D -a 7
 mv python-pexpect deps
 
 
@@ -247,10 +228,6 @@ pushd deps/python-gnupg
 popd
 
 pushd deps/python-oursql
-"$RPM_BUILD_ROOT/usr/local/hypernova/bin/python3.2" setup.py install
-popd
-
-pushd deps/python-sqlalchemy
 "$RPM_BUILD_ROOT/usr/local/hypernova/bin/python3.2" setup.py install
 popd
 
@@ -320,11 +297,6 @@ rm -rf "$RPM_BUILD_ROOT"
 %files python-oursql
 %defattr(-, root, root, -)
                                 /usr/local/hypernova/lib/python*/site-packages/oursql-*.egg
-
-
-%files python-sqlalchemy
-%defattr(-, root, root, -)
-                                /usr/local/hypernova/lib/python*/site-packages/SQLAlchemy-*.egg
 
 
 %files python-pyrg
