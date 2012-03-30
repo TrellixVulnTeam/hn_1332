@@ -14,12 +14,19 @@ class ServerBase:
     DNS server base class.
     """
 
-    def get_zone(domain):
+    def get_zone(self, domain):
         """
         Find a zone within the server.
 
         Should return a Zone object with the records attribute populated with
         all corresponding records.
+        """
+
+        self._not_implemented()
+
+    def _not_implemented(self):
+        """
+        Feature not implemented.
         """
 
         raise NotImplementedError
@@ -37,29 +44,29 @@ class Zone:
     """
 
     # Domain name
-    #domain = None
+    domain = None
 
     # Directives
-    #ttl    = None
-    #origin = None
+    ttl    = None
+    origin = None
 
     # SOA
-    #soa_record = None
+    soa_record = None
 
     # Resource records
-    #records = []
+    records = []
 
-    def __init__(self, domain=None, ttl=None, origin=None, soa_record=None,
-                 records=[]):
+    def __init__(self, new_domain=None, new_ttl=None, new_origin=None,
+                 new_soa_record=None, new_records=[]):
         """
         Initialise values.
         """
 
-        self.domain     = domain
-        self.ttl        = ttl
-        self.origin     = origin
-        self.soa_record = soa_record
-        self.records    = records
+        self.domain     = new_domain
+        self.ttl        = new_ttl
+        self.origin     = new_origin
+        self.soa_record = new_soa_record
+        self.records    = new_records
 
     def to_encodable(self):
         """

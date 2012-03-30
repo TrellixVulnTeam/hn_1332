@@ -57,19 +57,19 @@ class AuthoritativeServer(dns.AuthoritativeServerBase):
             zone_meta = cursor.fetchone()
             cursor.close()
 
-            zone = dns.Zone(zone_meta['name'])
-
             cursor = db.cursor()
             cursor.execute(self.SELECT_ZONE_RECORDS, [zone_meta['id'],])
 
+            records = []
             for r in cursor:
                 if r[1].lower() == 'soa':
-                    zone.soa_record = dns.SoaRecord(*r[2].split())
+                    soa_record = dns.SoaRecord(*r[2].split())
                 else:
-                    zone.records.append(dns.Record(*r))
+                    records.append(dns.Record(*r))
             cursor.close()
 
         finally:
             db.close()
 
-        return zone
+        return dns.Zone(zone_meta['name'],
+                        new_soa_record=soa_record, new_records=records)
