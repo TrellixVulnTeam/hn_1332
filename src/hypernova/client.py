@@ -65,9 +65,9 @@ class ClientConfigAction(ClientActionBase):
                 with open(self._args.privkey, 'rb') as key:
                     key_blob = key.read()
             except IOError:
-                    print('Failed: the specified private key does not exist',
-                          file=sys.stderr)
-                    sys.exit(64)
+                print('Failed: the specified private key does not exist',
+                      file=sys.stderr)
+                sys.exit(64)
 
             gpg = GPG(gnupghome=os.path.join(config_dir, 'gpg'))
             result = gpg.import_keys(key_blob)
@@ -218,7 +218,9 @@ class ClientRequestAction(ClientActionBase):
 
     def init_subparser(subparser):
 
-        subparser.add_argument('--gpg-dir', dest='gpg_dir', default=None)
+        gpg_dir = os.path.join(os.getenv('HOME'), '.hypernova', 'gpg')
+        subparser.add_argument('--gpg-dir', dest='gpg_dir', default=gpg_dir)
+
         subparser.add_argument('node')
 
         subparser_factory = subparser.add_subparsers(dest='request_module')
@@ -289,7 +291,7 @@ class SimpleClientInterface:
 
         try:
             os.listdir(self._config_dir)
-        except OSError:
+        except (LoadError, OSError):
             print('Creating configuration in %s' %(self._config_dir), file=sys.stderr)
             self._init_config_runonce(self._config_dir)
         finally:
