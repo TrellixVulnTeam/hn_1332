@@ -121,14 +121,14 @@ class Record:
     """
 
     # Resource record types
-    RECORD_TYPES = (
+    RECORD_TYPES = [
         'a',
         'aaaa',
         'cname',
         'mx',
         'soa',
         'txt',
-    )
+    ]
 
     # All records
     name    = ''
@@ -145,8 +145,8 @@ class Record:
         Initialise values.
         """
 
-        if isinstance(rtype, str):
-            rtype = Record.RECORD_TYPES.index(rtype.lower())
+        if isinstance(new_rtype, str):
+            rtype = Record.RECORD_TYPES.index(new_rtype.lower())
 
         self.name     = new_name
         self.rtype    = new_rtype

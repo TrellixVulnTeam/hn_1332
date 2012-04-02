@@ -67,7 +67,12 @@ class AuthoritativeServer(dns.AuthoritativeServerBase):
 
             records = []
             for r in cursor:
-                if r[1].lower() == 'soa':
+                # Normalise the record type with a numerical value for easier
+                # processing later
+                r = list(r)
+                r[1] = dns.Record.RECORD_TYPES.index(r[1].lower())
+
+                if r[1] == dns.Record.RECORD_TYPES.index('soa'):
                     soa_record = dns.SoaRecord(*r[2].split())
                 else:
                     records.append(dns.Record(*r))
