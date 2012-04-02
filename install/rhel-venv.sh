@@ -46,8 +46,7 @@ cd $srcroot
 # If forced, remove all the things
 if [ "$FORCE" == 1 ]
 then
-    rm -rf bin/{activate*,easy_install*,pip*,python*} \
-           include/ lib/ lib64
+    rm -rf $srcroot/chroot/bin/{activate*,easy_install*,pip*,py*}
 fi
 
 # Prepare the system
