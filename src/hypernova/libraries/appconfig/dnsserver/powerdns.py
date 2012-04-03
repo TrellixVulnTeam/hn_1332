@@ -9,6 +9,16 @@
 #                    Luke Carrier <luke.carrier@tdm.info>
 #
 
+"""
+A few things:
+ * PowerDNS is a bit strange and refers to DNS zones as "domains". Don't confuse
+   the PowerAdmin "zones" table with actual zones; it just expresses ownership
+   over domains!
+ * Unlike most DNS servers, where resource records can use @ to represent the
+   domain they belong to, PowerDNS uses the domain itself and doesn't suffix
+   the domains with a full stop, as is considered standard.
+"""
+
 from hypernova.libraries.appconfig import dnsserver as dns
 import oursql
 
