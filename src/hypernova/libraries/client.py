@@ -31,7 +31,7 @@ class Client:
         self.gpg_dir = gpg_dir
 
         if not self.gpg_dir:
-            self.gpg_dir = os.path.join(os.getenv('HOME'), '.gnupg')
+            self.gpg_dir = os.path.join(os.getenv('HOME'), '.hypernova', 'gpg')
 
         self._init_connection()
         self._init_gpg()
