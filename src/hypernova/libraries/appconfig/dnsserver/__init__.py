@@ -37,9 +37,9 @@ class AuthoritativeServerBase(ServerBase):
     Authoritative DNS server.
     """
 
-    def commit_record(self, zone, record):
+    def add_record(self, zone, record):
         """
-        Add or modify a record.
+        Add a record.
 
         Note: SOA records must be updated with the dedicated commit_soa_record()
         method, which ensures valid structure and data. Attempting to commit an
@@ -48,20 +48,41 @@ class AuthoritativeServerBase(ServerBase):
 
         self._not_implemented()
 
-    def commit_soa_record(self, zone, soa_record):
+    def add_soa_record(self, zone, soa_record):
         """
-        Add or modify an SOA record.
+        Add an SOA record.
         """
 
         self._not_implemented()
 
-    def commit_zone(self, zone):
+    def add_zone(self, zone):
         """
-        Add or modify a zone.
+        Add a zone.
 
         Beware that modifications take effect only upon the zone; any changed
         records will _not_ be implicitly updated. For this, you should use the
         commit_record() commit_soa_record() methods.
+        """
+
+        self._not_implemented()
+
+    def edit_record(self, zone, record):
+        """
+        Edit a record.
+        """
+
+        self._not_implemented()
+
+    def edit_soa_record(self, zone, soa_record):
+        """
+        Edit an SOA record.
+        """
+
+        self._not_implemented()
+
+    def edit_zone(self, zone):
+        """
+        Edit a zone.
         """
 
         self._not_implemented()
@@ -225,7 +246,24 @@ class SoaRecord:
         }
 
 
+class DuplicateZoneError(Exception):
+    """
+    Duplicate zone error.
+
+    Thrown whenever an attempt to create a zone fails because a zone with the
+    same domain already exists.
+    """
+
+    pass
+
+
 class InvalidZoneError(Exception):
+    """
+    Invalid zone error.
+
+    Thrown when a zone fails validation checks.
+    """
+
     pass
 
 
