@@ -22,16 +22,14 @@ setup(
     url              = hn.__url__,
     packages         = [
         'hypernova',
-
         'hypernova.provisioner',
-
         'hypernova.libraries',
         'hypernova.libraries.appconfig',
         'hypernova.libraries.appconfig.dnsserver',
         'hypernova.libraries.appconfig.httpserver',
+        'hypernova.libraries.siteconfig',
         'hypernova.libraries.packagemanagement',
-
-        'hypernova.modules'
+        'hypernova.modules',
     ],
     install_requires = ['python-gnupg'],
     classifiers      = [
