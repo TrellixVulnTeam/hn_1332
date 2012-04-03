@@ -11,12 +11,15 @@
 
 """
 A few things:
- * PowerDNS is a bit strange and refers to DNS zones as "domains". Don't confuse
-   the PowerAdmin "zones" table with actual zones; it just expresses ownership
-   over domains!
- * Unlike most DNS servers, where resource records can use @ to represent the
-   domain they belong to, PowerDNS uses the domain itself and doesn't suffix
-   the domains with a full stop, as is considered standard.
+
+  * PowerDNS is a bit strange and refers to DNS zones as "domains". Don't confuse
+    the PowerAdmin "zones" table with actual zones; it just expresses ownership
+    over domains!
+  * Unlike most DNS servers, where resource records can use @ to represent the
+    domain they belong to, PowerDNS uses the domain itself and doesn't suffix
+    the domains with a full stop, as is considered standard.
+  * Duplicate records are considered acceptable by this adapter. This is
+    more than likely a bad thing that should be rectified in the future.
 """
 
 from hypernova.libraries.appconfig import dnsserver as dns
@@ -83,7 +86,7 @@ class AuthoritativeServer(dns.AuthoritativeServerBase):
             with db as cursor:
                 cursor.execute(self.INSERT_RECORD, (zone.id,
                                                     record.name,
-                                                    record.rtype,
+                                                    record.rtype.upper(),
                                                     record.content,
                                                     record.ttl,
                                                     record.priority))
