@@ -55,7 +55,8 @@ class AgentRequestHandler(AgentRequestHandlerBase):
 
         return AgentRequestHandler._format_response(
             result,
-            successful
+            successful=successful
+        )
         )
 
     def do_add_zone(params):

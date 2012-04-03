@@ -183,5 +183,8 @@ class AuthoritativeServer(dns.AuthoritativeServerBase):
         finally:
             db.close()
 
-        return dns.Zone(zone_meta['name'],
+        zone = dns.Zone(zone_meta['name'],
                         new_soa_record=soa_record, new_records=records)
+        zone.id = zone_meta['id']
+
+        return zone
