@@ -66,20 +66,6 @@ class AuthoritativeServerBase(ServerBase):
 
         self._not_implemented()
 
-    def edit_record(self, zone, record):
-        """
-        Edit a record.
-        """
-
-        self._not_implemented()
-
-    def edit_soa_record(self, zone, soa_record):
-        """
-        Edit an SOA record.
-        """
-
-        self._not_implemented()
-
     def rm_record(self, zone, record):
         """
         Remove a record.
@@ -87,12 +73,15 @@ class AuthoritativeServerBase(ServerBase):
 
         self._not_implemented()
 
-    def edit_zone(self, zone):
+    def rm_soa_record(self, zone, record):
         """
-        Edit a zone.
+        Remove an SOA record.
         """
 
-        self._not_implemented()
+    def rm_zone(self, zone):
+        """
+        Remove a zone.
+        """
 
 class Zone:
     """
