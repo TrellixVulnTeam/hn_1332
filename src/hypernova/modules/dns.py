@@ -34,7 +34,6 @@ class AgentRequestHandler(AgentRequestHandlerBase):
         """
 
         config = ConfigurationFactory.get('hypernova')
-
         server = get_authoritative_server(config['dns']['adapter'],
                                           config['dns'])
 
@@ -57,6 +56,40 @@ class AgentRequestHandler(AgentRequestHandlerBase):
             result,
             successful=successful
         )
+
+    def do_rm_record(params):
+        """
+        Remove a record.
+        """
+
+        config = ConfigurationFactory.get('hypernova')
+        server = get_authoritative_server(config['dns']['adapter'],
+                                          config['dns'])
+
+        result = {'records': []}
+
+        try:
+            zone = server.get_zone(params['zone'])
+            params['rtype'] = params['record'].pop('type')
+
+            records = zone.filter_records_for(params['record'])
+            for r in records:
+                result['records'].append(r.to_encodable())
+                server.rm_record(zone, r)
+
+            successful = True
+
+            if len(result['records']) == 0:
+                successful = False
+                result['error'] = 'NoMatchingRecords'
+
+        except NonexistentZoneError:
+            successful = False
+            result = {'error': 'NonexistentZoneError'}
+
+        return AgentRequestHandler._format_response(
+            result,
+            successful=successful
         )
 
     def do_add_zone(params):
@@ -162,6 +195,10 @@ class ClientRequestBuilder(ClientRequestBuilderBase):
         for a in ClientRequestBuilder.RECORD_ATTR:
             sp.add_argument(a)
 
+        sp = subparser_factory.add_parser('rm_record')
+        for a in ClientRequestBuilder.RECORD_ATTR[:-2]:
+            sp.add_argument(a)
+
         sp = subparser_factory.add_parser('add_zone')
         for a in (ClientRequestBuilder.ZONE_ATTR_STR +
                   ClientRequestBuilder.ZONE_ATTR_INT):
@@ -198,6 +235,24 @@ class ClientRequestBuilder(ClientRequestBuilderBase):
 
         return ClientRequestBuilderBase._format_request(
             ['dns', 'add_record'], args
+        )
+
+    def do_rm_record(cli_args, client):
+        """
+        Remove a record.
+        """
+
+        args = {
+            'zone': cli_args.zone,
+            'record': {
+                'name':    cli_args.name,
+                'type':    cli_args.type,
+                'content': cli_args.content,
+            },
+        }
+
+        return ClientRequestBuilderBase._format_request(
+            ['dns', 'rm_record'], args
         )
 
     def do_add_zone(cli_args, client):
@@ -352,6 +407,19 @@ class ClientResponseFormatter(ClientResponseFormatterBase):
                 seeking = 'UnknownError'
 
             return (69, result %(ClientResponseFormatter.errors[seeking]))
+
+        return result
+
+    def do_rm_record(cli_args, response):
+        """
+        Remove a record.
+        """
+
+        result = "Failed: no records to delete or nonexistent zone"
+
+        if response['status']['successful']:
+            result = ClientResponseFormatter._format_records(
+                     response['response']['records'])
 
         return result
 

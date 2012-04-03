@@ -29,20 +29,26 @@ class AuthoritativeServer(dns.AuthoritativeServerBase):
 
     credentials = {}
 
-    SELECT_ZONE = "SELECT d.id, d.name " \
-                  "FROM domains d " \
-                  "WHERE d.name = ? " \
+    SELECT_ZONE = "SELECT `id`, `name` " \
+                  "FROM domains " \
+                  "WHERE `name` = ? " \
                   "LIMIT 1"
 
-    SELECT_ZONE_RECORDS = "SELECT r.name, r.type, r.content, r.ttl, r.prio " \
-                          "FROM records r " \
-                          "WHERE r.domain_id = ?"
+    SELECT_ZONE_RECORDS = "SELECT `name`, `type`, `content`, `ttl`, `prio` " \
+                          "FROM records " \
+                          "WHERE `domain_id` = ?"
 
-    INSERT_RECORD = "INSERT INTO records (domain_id, name, type, content, ttl, prio) " \
+    INSERT_RECORD = "INSERT INTO records (`domain_id`, `name`, `type`, `content`, `ttl`, `prio`) " \
                     "VALUES (?, ?, ?, ?, ?, ?)"
 
-    INSERT_ZONE = "INSERT INTO domains (name, type) " \
+    INSERT_ZONE = "INSERT INTO `domains` (`name`, `type`) " \
                   "VALUES (?, ?)"
+
+    DELETE_RECORD = "DELETE FROM `records` " \
+                    "WHERE `domain_id` = ? " \
+                    "AND `name` = ? " \
+                    "AND `type` = ? " \
+                    "AND `content` = ?"
 
     def __init__(self, host, username, password, db):
         """
@@ -53,7 +59,7 @@ class AuthoritativeServer(dns.AuthoritativeServerBase):
             'host':   host,
             'user':   username,
             'passwd': password,
-            'db':     db
+            'db':     db,
         }
 
     def _soa_content(self, soa_record):
@@ -116,6 +122,30 @@ class AuthoritativeServer(dns.AuthoritativeServerBase):
                                                     self._soa_content(soa_record),
                                                     None,
                                                     None))
+        finally:
+            db.close()
+
+    def rm_record(self, zone, record):
+        """
+        See the documentation for AuthoritativeServerBase.rm_record() for
+        details.
+        """
+
+        db = oursql.connect(**self.credentials)
+
+        try:
+            if not hasattr(zone, 'id'):
+                with db as cursor:
+                    cursor.execute(self.SELECT_ZONE, (zone.domain,))
+                    zone.id = cursor.fetchone()[0]
+
+            rtype = dns.Record.RECORD_TYPES[record.rtype]
+            with db as cursor:
+                cursor.execute(self.DELETE_RECORD, (zone.id,
+                                                    record.name,
+                                                    rtype,
+                                                    record.content))
+
         finally:
             db.close()
 

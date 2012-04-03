@@ -80,13 +80,19 @@ class AuthoritativeServerBase(ServerBase):
 
         self._not_implemented()
 
+    def rm_record(self, zone, record):
+        """
+        Remove a record.
+        """
+
+        self._not_implemented()
+
     def edit_zone(self, zone):
         """
         Edit a zone.
         """
 
         self._not_implemented()
-
 
 class Zone:
     """
@@ -117,6 +123,22 @@ class Zone:
         self.origin     = new_origin
         self.soa_record = new_soa_record
         self.records    = new_records
+
+    def filter_records_for(self, filters):
+        """
+        Filter associated records for matches.
+        """
+
+        def matches(record):
+            for key, value in filters.items():
+                if getattr(record, key) != value:
+                    return False
+
+            return True
+
+        matches.filters = filters
+
+        return list(r for r in self.records if matches(r))
 
     def to_encodable(self):
         """
