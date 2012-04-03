@@ -28,6 +28,36 @@ class AgentRequestHandler(AgentRequestHandlerBase):
     DNS management component for the agent.
     """
 
+    def do_add_record(params):
+        """
+        Add a record to an existing zone.
+        """
+
+        config = ConfigurationFactory.get('hypernova')
+
+        server = get_authoritative_server(config['dns']['adapter'],
+                                          config['dns'])
+
+        try:
+            zone = server.get_zone(params['zone'])
+            record = Record(params['record']['name'],
+                            params['record']['type'],
+                            params['record']['content'],
+                            params['record']['ttl'],
+                            params['record']['priority'])
+            server.add_record(zone, record)
+
+            successful = True
+            result = {'record': record.to_encodable()}
+        except NonexistentZoneError:
+            successful = False
+            result = {'error': 'NonexistentZone'}
+
+        return AgentRequestHandler._format_response(
+            result,
+            successful
+        )
+
     def do_add_zone(params):
         """
         Add a zone.
@@ -124,10 +154,14 @@ class ClientRequestBuilder(ClientRequestBuilderBase):
     ZONE_ATTR_STR = ['domain']
     SOA_ATTR_INT  = ['serial', 'refresh', 'retry', 'expire', 'min_ttl']
     SOA_ATTR_STR  = ['primary_ns', 'responsible_person']
+    RECORD_ATTR   = ['zone', 'name', 'type', 'content', 'ttl', 'priority']
 
     def init_subparser(subparser, subparser_factory):
-        sp = subparser_factory.add_parser('add_zone')
+        sp = subparser_factory.add_parser('add_record')
+        for a in ClientRequestBuilder.RECORD_ATTR:
+            sp.add_argument(a)
 
+        sp = subparser_factory.add_parser('add_zone')
         for a in (ClientRequestBuilder.ZONE_ATTR_STR +
                   ClientRequestBuilder.ZONE_ATTR_INT):
             sp.add_argument(a)
@@ -142,12 +176,35 @@ class ClientRequestBuilder(ClientRequestBuilderBase):
 
         return subparser
 
+    def do_add_record(cli_args, client):
+        """
+        Add a record to an existing zone.
+        """
+
+        args = {
+            'zone': cli_args.zone,
+            'record': {
+                'name':     cli_args.name,
+                'type':     cli_args.type,
+                'content':  cli_args.content,
+                'ttl':      int(cli_args.ttl),
+                'priority': int(cli_args.priority),
+            },
+        }
+
+        if args['record']['priority'] == -1:
+            args['record']['priority'] = None
+
+        return ClientRequestBuilderBase._format_request(
+            ['dns', 'add_record'], args
+        )
+
     def do_add_zone(cli_args, client):
         """
         Add a zone.
         """
 
-        args = { 'zone': {}, 'soa': {} }
+        args = {'zone': {}, 'soa': {}}
 
         for a in ClientRequestBuilder.ZONE_ATTR_INT:
             args['zone'][a] = int(getattr(cli_args, a))
@@ -264,6 +321,18 @@ class ClientResponseFormatter(ClientResponseFormatterBase):
             ClientResponseFormatter._format_soa_record(zone['soa_record']),
             ClientResponseFormatter._format_records(zone['records']),
         ])
+
+    def do_add_record(cli_args, response):
+        """
+        Add a record to an existing zone.
+        """
+
+        result = "Failed: an error occurred processing the request"
+
+        if response['status']['successful']:
+            result = ''
+
+        return result
 
     def do_add_zone(cli_args, response):
         """

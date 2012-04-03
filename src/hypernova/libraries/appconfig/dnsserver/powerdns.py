@@ -65,6 +65,33 @@ class AuthoritativeServer(dns.AuthoritativeServerBase):
                          str(soa_record.retry),
                          str(soa_record.expire),
                          str(soa_record.min_ttl)))
+
+    def add_record(self, zone, record):
+        """
+        See the documentation for AuthoritativeServerBase.add_record() for
+        details.
+        """
+
+        db = oursql.connect(**self.credentials)
+
+        try:
+            if not hasattr(zone, 'id'):
+                with db as cursor:
+                    cursor.execute(self.SELECT_ZONE, (zone.domain,))
+                    zone.id = cursor.fetchone()[0]
+
+            with db as cursor:
+                cursor.execute(self.INSERT_RECORD, (zone.id,
+                                                    record.name,
+                                                    record.rtype,
+                                                    record.content,
+                                                    record.ttl,
+                                                    record.priority))
+        finally:
+            db.close()
+
+        return cursor.lastrowid
+
     def add_soa_record(self, zone, soa_record):
         """
         See the documentation for AuthoritativeServerBase.add_soa_record() for
