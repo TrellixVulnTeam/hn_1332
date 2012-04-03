@@ -35,6 +35,12 @@ class AuthoritativeServer(dns.AuthoritativeServerBase):
                           "FROM records r " \
                           "WHERE r.domain_id = ?"
 
+    INSERT_RECORD = "INSERT INTO records (domain_id, name, type, content, ttl, prio) " \
+                    "VALUES (?, ?, ?, ?, ?, ?)"
+
+    INSERT_ZONE = "INSERT INTO domains (name, type) " \
+                  "VALUES (?, ?)"
+
     def __init__(self, host, username, password, db):
         """
         Initialise the connection.
@@ -47,6 +53,62 @@ class AuthoritativeServer(dns.AuthoritativeServerBase):
             'db':     db
         }
 
+    def _soa_content(self, soa_record):
+        """
+        Concatenate the attributes of an SOA record.
+        """
+
+        return ' '.join((soa_record.primary_ns,
+                         soa_record.responsible_person,
+                         str(soa_record.serial),
+                         str(soa_record.refresh),
+                         str(soa_record.retry),
+                         str(soa_record.expire),
+                         str(soa_record.min_ttl)))
+    def add_soa_record(self, zone, soa_record):
+        """
+        See the documentation for AuthoritativeServerBase.add_soa_record() for
+        details.
+        """
+
+        db = oursql.connect(**self.credentials)
+
+        try:
+            if not hasattr(zone, 'id'):
+                with db as cursor:
+                    cursor.execute(self.SELECT_ZONE, (zone.domain,))
+                    zone.id = cursor.fetchone()[0]
+
+            with db as cursor:
+                cursor.execute(self.INSERT_RECORD, (zone.id,
+                                                    zone.domain,
+                                                    'SOA',
+                                                    self._soa_content(soa_record),
+                                                    None,
+                                                    None))
+        finally:
+            db.close()
+
+    def add_zone(self, zone):
+        """
+        See the documentation for AuthoritativeServerBase.add_zone() for
+        details.
+        """
+
+        db = oursql.connect(**self.credentials)
+
+        try:
+            with db as cursor:
+                cursor.execute(self.INSERT_ZONE, (zone.domain, 'NATIVE'))
+        except oursql.IntegrityError:
+            raise dns.DuplicateZoneError()
+        finally:
+            db.close()
+
+        self.add_soa_record(zone, zone.soa_record)
+
+        zone.id = cursor.lastrowid
+        return cursor.lastrowid
     def get_zone(self, main_domain):
         """
         See the documentation for ServerBase.get_zone() for details.
