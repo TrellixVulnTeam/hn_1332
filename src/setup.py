@@ -22,7 +22,6 @@ setup(
     url              = hn.__url__,
     packages         = [
         'hypernova',
-        'hypernova.provisioner',
         'hypernova.libraries',
         'hypernova.libraries.appconfig',
         'hypernova.libraries.appconfig.dnsserver',

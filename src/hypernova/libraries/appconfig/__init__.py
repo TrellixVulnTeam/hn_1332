@@ -43,11 +43,14 @@ class AppProvisionerBase:
         sys.executable,
         realpath(join(dirname(dirname(sys.argv[0])), 'provisioner',
                       '__init__.py')),
+        'app',
     ]
 
     _packages = None
 
-    def __init__(self, *args):
+    proc = None
+
+    def __init__(self, **args):
         """
         Initialise the provisioner.
         """

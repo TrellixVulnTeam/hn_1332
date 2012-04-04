@@ -14,8 +14,10 @@ import json
 import logging
 import sys
 
-APPCONFIG_PACKAGE = 'hypernova.libraries.appconfig'
-APPCONFIG_CLASS   = 'AppProvisioner'
+CONFIG_META = {
+    'app':  ('hypernova.libraries.appconfig',  'AppProvisioner'),
+    'site': ('hypernova.libraries.siteconfig', 'SiteProvisioner'),
+}
 
 class Provisioner:
     """
@@ -41,15 +43,16 @@ class Provisioner:
     _main_log_formatter = None
     _main_log_handler   = None
 
-    def __init__(self, config_root_dir, module_name, *params):
+    def __init__(self, run_type, config_root_dir, module_name, *params):
         """
         Initialise the configuration parameters.
         """
 
+        self._run_type    = run_type
         self._module_name = module_name
         self._parameters  = params
 
-        self._init_logging();
+        self._init_logging()
         self._init_config(config_root_dir)
 
     def _init_config(self, config_root_dir):
@@ -85,14 +88,12 @@ class Provisioner:
         Perform the provisioning operation.
         """
 
-        global_vars = globals()
-        appconfig_pkg = global_vars['APPCONFIG_PACKAGE']
-        appconfig_cls = global_vars['APPCONFIG_CLASS']
+        (config_package, ConfigClass) = globals()['CONFIG_META'][self._run_type]
 
-        module_name = '%s.%s' %(appconfig_pkg, self._module_name)
+        module_name = '%s.%s' %(config_package, self._module_name)
 
-        app_module = __import__(module_name, fromlist=[appconfig_cls])
-        app_provisioner = app_module.AppProvisioner()
+        app_module = __import__(module_name, fromlist=[ConfigClass])
+        app_provisioner = getattr(app_module, ConfigClass)()
         app_provisioner.do_provision(*self._parameters)
 
 
