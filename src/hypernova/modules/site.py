@@ -79,7 +79,9 @@ class ClientResponseFormatter(ClientResponseFormatterBase):
         result = "Failed: %s"
 
         if response['status']['successful']:
-            result = str(response) #''
+            result = 'Warning: the site is now being provisioned. Depending ' \
+                     'on the selected profile, this process could take a few ' \
+                     'minutes.'
         else:
             result = result %(
                 ClientResponseFormatter.errors[response['response']['error']])
