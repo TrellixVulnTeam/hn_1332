@@ -326,8 +326,7 @@ class SiteProvisioner(SiteProvisionerBase):
     module_name = 'wordpress'
 
     __source_url        = 'http://wordpress.org/wordpress-%s.tar.gz'
-    #__latest_source_url = 'http://wordpress.org/latest.tar.gz'
-    __latest_source_url = 'http://mirror.hypernova.org.local/wordpress/latest.tar.gz'
+    __latest_source_url = 'http://wordpress.org/latest.tar.gz'
 
     source_url = None
 
