@@ -9,18 +9,21 @@
 #                    Luke Carrier <luke.carrier@tdm.info>
 #
 
-"""
-Super-handy documentation on WordPress's configuration files:
+import re
+from hypernova.libraries.siteconfig import SiteConfigBase, SiteProvisionerBase
 
-  * The WordPress Codex page on wp-config.php:
-    http://codex.wordpress.org/Editing_wp-config.php
-"""
-
-from hypernova.libraries.siteconfig import SiteConfigBase
-
-class SiteConfig():
+class SiteConfig(SiteConfigBase):
     """
     WordPress site configuration.
+
+    This file represents a standard wp-config.php file. Its __str__() method
+    converts into such.
+
+    When making changes to this file, be sure to carefully examine the
+    appropriate documentation before hand to ensure you fully understand the
+    effects of your changes! This is usually a good place to start research:
+
+        http://codex.wordpress.org/Editing_wp-config.php
     """
 
     # Support DB character sets; UTF-8 only for now
@@ -242,6 +245,47 @@ if (defined('TABLE_PREFIX'))
         'ftp_password':             'FTP_PASS',
     }
 
+    # Booleans that actually make sense
+    __bools = [
+        'db_auto_repair',
+        'debug_server',
+        'debug_server_display',
+        'debug_server_log',
+        'debug_db',
+        'debug_client',
+        'concatenate_admin_js',
+        'cache',
+        'cron_alternative',
+    ]
+
+    # Booleans that start with disable/don't
+    __reverse_bools = [
+        'content_enable_modifications',
+        'cron_enable',
+        'upgrade_global_db_tables',
+    ]
+
+    __ints = [
+
+    ]
+
+    def __php_boolean(self, value):
+        """
+        Format a Python boolean into a PHP one.
+        """
+
+        if value:
+            return 'true'
+
+        return 'false'
+
+    def __php_str(self, value):
+        """
+        Format a Python string as a PHP one.
+        """
+
+        return '\'' + re.sub(r'[\\\']', r'\\\\\'', value) + '\''
+
     def __init__(self):
         """
         Initialise defaults.
@@ -258,6 +302,14 @@ if (defined('TABLE_PREFIX'))
         options = []
         for abstract, actual in self.__mapping.items():
             value = getattr(self, abstract)
+
+            if abstract in self.__bools:
+                value = self.__php_boolean(value)
+            elif abstract in self.__reverse_bools:
+                value = self.__php_boolean(not value)
+            else:
+                value = self.__php_str(str(value))
+
             options.append(self.__templ_option %(actual, value))
 
         return "\n".join([
@@ -265,3 +317,34 @@ if (defined('TABLE_PREFIX'))
             "\n".join(options),
             self.__file_post,
         ])
+
+class SiteProvisioner(SiteProvisionerBase):
+    """
+    """
+
+    _module_name = 'wordpress'
+
+    __source_url        = 'http://wordpress.org/wordpress-%s.tar.gz'
+    __latest_source_url = 'http://wordpress.org/latest.tar.gz'
+
+    source_url = None
+
+    def __init__(self, **args):
+        """
+        Initialise the provisioner.
+
+        If version is None (the default), the provisioner will fall back on
+        using the latest available release of the application.
+        """
+
+        super().__init__(**args)
+
+        self.source_url = self.__latest_source_url
+        if 'version' in self.parameters.keys():
+            self.source_url = self.__source_url %(self.parameters['version'])
+
+    def do_provision(self):
+        """
+        """
+
+        source = self.download_url(self.source_url)
