@@ -85,7 +85,7 @@ class SiteProvisionerBase:
               handles the initialisation of the provisioner utility.
         """
 
-        self._provision(*args)
+        self._provision()
 
     def provision(self):
         """
