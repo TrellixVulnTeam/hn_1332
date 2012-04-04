@@ -115,7 +115,7 @@ class SiteProvisionerBase:
         self.cmd.append(self.module_name)
         [self.cmd.append(o) for o in self.parameters.values()]
 
-        self.proc = subprocess.Popen(elevate_cmd(cmd))
+        self.proc = subprocess.Popen(elevate_cmd(self.cmd))
 
 
 def get_provisioner(profile_name):
