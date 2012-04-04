@@ -49,7 +49,7 @@ class Provisioner:
         """
 
         self._run_type    = run_type
-        self._module_name = module_name
+        self.module_name  = module_name
         self._parameters  = params
 
         self._init_logging()
@@ -88,12 +88,12 @@ class Provisioner:
         Perform the provisioning operation.
         """
 
-        (config_package, ConfigClass) = globals()['CONFIG_META'][self._run_type]
+        (config_package, config_class) = globals()['CONFIG_META'][self._run_type]
 
-        module_name = '%s.%s' %(config_package, self._module_name)
+        module_name = '%s.%s' %(config_package, self.module_name)
 
-        app_module = __import__(module_name, fromlist=[ConfigClass])
-        app_provisioner = getattr(app_module, ConfigClass)()
+        app_module = __import__(module_name, fromlist=[config_class])
+        app_provisioner = getattr(app_module, config_class)()
         app_provisioner.do_provision(*self._parameters)
 
 

@@ -322,7 +322,7 @@ class SiteProvisioner(SiteProvisionerBase):
     """
     """
 
-    _module_name = 'wordpress'
+    module_name = 'wordpress'
 
     __source_url        = 'http://wordpress.org/wordpress-%s.tar.gz'
     __latest_source_url = 'http://wordpress.org/latest.tar.gz'
@@ -343,7 +343,7 @@ class SiteProvisioner(SiteProvisionerBase):
         if 'version' in self.parameters.keys():
             self.source_url = self.__source_url %(self.parameters['version'])
 
-    def do_provision(self):
+    def _provision(self):
         """
         """
 

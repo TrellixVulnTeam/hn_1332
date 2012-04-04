@@ -32,12 +32,17 @@ class SiteProvisionerBase:
     Base class for all provisioner objects.
     """
 
+    module_name = ''
+
     # Base command to shell out with
     _base_cmd = [
         sys.executable,
         realpath(join(dirname(sys.argv[0]), 'provisioner.py')),
         'site',
     ]
+
+    # The command we'll actually execute
+    cmd = []
 
     # These files should be cleaned up post-provisioning
     temporary_files = []
@@ -48,15 +53,7 @@ class SiteProvisionerBase:
         """
 
         self.parameters = args
-
-        config = ConfigurationFactory.get('hypernova')
-
-        # This will only be possible when in the context of the agent, so if we
-        # fail, it's not an issue. This ought to be cleaned up.
-        try:
-            self._base_cmd.append(config['provisioner']['config_dir'])
-        except KeyError:
-            pass
+        self.config = ConfigurationFactory.get('hypernova')
 
     def download_url(self, url):
         """
@@ -64,11 +61,8 @@ class SiteProvisionerBase:
         """
 
         file = tempfile.mkstemp()
-        file[0].close()
         self.temporary_files.append(file[1])
-
         request.urlretrieve(url, file[1])
-
         return file[1]
 
     def extract_file(self, archive, target):
@@ -96,6 +90,8 @@ class SiteProvisionerBase:
         from agent modules, not do_provision().
         """
 
+        self.cmd = deepcopy(self._base_cmd)
+
         # It's busy -- leave it well alone.
         #
         # Under normal circumstances it's impossible for this to happen, since
@@ -109,13 +105,15 @@ class SiteProvisionerBase:
         except AttributeError:
             pass
 
-        # Copy value, don't get a reference.
-        #
-        # This isn't very "pythonic", but we need to ensure we don't taint the
-        # base command just in case a developer reuses the provisioning class.
-        cmd = deepcopy(self._base_cmd)
-        cmd.append(self._module_name)
-        cmd.extend(list(map(str, self.parameters)))
+        # This will only be possible when in the context of the agent, so if we
+        # fail, it's not an issue. This ought to be cleaned up.
+        try:
+            self.cmd.append(self.config['provisioner']['config_dir'])
+        except KeyError:
+            pass
+
+        self.cmd.append(self.module_name)
+        [self.cmd.append(o) for o in self.parameters.values()]
 
         self.proc = subprocess.Popen(elevate_cmd(cmd))
 

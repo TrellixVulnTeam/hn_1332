@@ -112,7 +112,8 @@ class AppProvisionerBase:
         # This isn't very "pythonic", but we need to ensure we don't taint the
         # base command just in case a developer reuses the provisioning class.
         cmd = deepcopy(self._base_cmd)
-        cmd.append(self._module_name)
+
+        cmd.append(self.module_name)
         cmd.extend(list(map(str, self.parameters)))
 
         self.proc = subprocess.Popen(elevate_cmd(cmd))
