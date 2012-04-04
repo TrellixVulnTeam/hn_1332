@@ -11,6 +11,7 @@
 
 from copy import deepcopy
 from hypernova.libraries.configuration import ConfigurationFactory
+from hypernova.libraries.permissionelevation import elevate_cmd
 from os.path import dirname, join, realpath
 import pkgutil
 import subprocess
@@ -34,8 +35,7 @@ class SiteProvisionerBase:
     # Base command to shell out with
     _base_cmd = [
         sys.executable,
-        realpath(join(dirname(dirname(sys.argv[0])), 'provisioner',
-                      '__init__.py')),
+        realpath(join(dirname(sys.argv[0]), 'provisioner.py')),
         'site',
     ]
 

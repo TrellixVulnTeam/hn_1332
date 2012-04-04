@@ -41,8 +41,7 @@ class AppProvisionerBase:
 
     _base_cmd = [
         sys.executable,
-        realpath(join(dirname(dirname(sys.argv[0])), 'provisioner',
-                      '__init__.py')),
+        realpath(join(dirname(sys.argv[0]), 'provisioner.py')),
         'app',
     ]
 
