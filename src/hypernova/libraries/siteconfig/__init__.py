@@ -10,15 +10,16 @@
 #
 
 from copy import deepcopy
+import gzip
 from hypernova.libraries.configuration import ConfigurationFactory
 from hypernova.libraries.permissionelevation import elevate_cmd
-from os import unlink
+from os import unlink, urandom
 from os.path import dirname, isdir, join, realpath
+import oursql
 import pkgutil
-from shutil import rmtree
+from shutil import move, rmtree
 import subprocess
 import sys
-import gzip
 import tarfile
 import tempfile
 from urllib import request
@@ -51,7 +52,7 @@ class SiteProvisionerBase:
     # These files should be cleaned up post-provisioning
     temporary_files = []
 
-    def __init__(self, **args):
+    def __init__(self, *args):
         """
         Initialise the provisioner.
         """
@@ -59,12 +60,55 @@ class SiteProvisionerBase:
         self.parameters = args
         self.config = ConfigurationFactory.get('hypernova')
 
-    def download_url(self, url):
+    def create_mysql_database(self):
+        """
+        Create a database and associated credentials.
+
+        TODO: keep a mapping of all of these.
+        TODO: move this code into another library.
+        """
+
+        CREATE_USER = "CREATE USER '%s'@'%s' IDENTIFIED BY '%s'"
+        CREATE_DB   = "CREATE DATABASE `%s` CHARACTER SET '%s'"
+        GRANT       = "GRANT ALL PRIVILEGES ON `%s`.* TO '%s'@'%s'"
+
+        self.credentials = {
+            'host':   self.config['mysql']['host'],
+            'user':   self.config['mysql']['username'],
+            'passwd': self.config['mysql']['password'],
+        }
+        db = oursql.connect(**self.credentials)
+
+        user_and_db = urandom(16)
+        password    = urandom(32)
+        host        = 'localhost'
+
+        try:
+            with db as cursor:
+                cursor.execute(CREATE_USER %(user_and_db, host, password),
+                               plain_query=True)
+            with db as cursor:
+                cursor.execute(CREATE_DB %(user_and_db, 'utf8'),
+                               plain_query=True)
+            with db as cursor:
+                cursor.execute(GRANT %(usrer_and_db, user_and_db, host),
+                               plain_query=True)
+        finally:
+            db.close()
+
+        return {
+            'host':     host,
+            'username': user_and_db,
+            'password': password,
+            'db':       user_and_db,
+        }
+
+    def download_url(self, url, suffix=''):
         """
         Download a URL to a local temporary file and return the file's path.
         """
 
-        file = tempfile.mkstemp()[1]
+        file = tempfile.mkstemp(suffix=suffix)[1]
         self.temporary_files.append(file)
 
         request.urlretrieve(url, file)
@@ -83,6 +127,13 @@ class SiteProvisionerBase:
             a.extractall(path=target)
 
         return target
+
+    def move_tree(self, source, destination):
+        """
+        Move a tree of files to their destination.
+        """
+
+        return move(source, destination)
 
     def do_provision(self, *args):
         """
@@ -135,7 +186,7 @@ class SiteProvisionerBase:
             pass
 
         self.cmd.append(self.module_name)
-        [self.cmd.append(o) for o in self.parameters.values()]
+        self.cmd.extend(self.parameters)
 
         self.proc = subprocess.Popen(elevate_cmd(self.cmd))
 

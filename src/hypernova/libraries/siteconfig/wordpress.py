@@ -11,6 +11,7 @@
 
 import re
 from hypernova.libraries.siteconfig import SiteConfigBase, SiteProvisionerBase
+from os.path import join
 
 class SiteConfig(SiteConfigBase):
     """
@@ -325,11 +326,12 @@ class SiteProvisioner(SiteProvisionerBase):
     module_name = 'wordpress'
 
     __source_url        = 'http://wordpress.org/wordpress-%s.tar.gz'
-    __latest_source_url = 'http://wordpress.org/latest.tar.gz'
+    #__latest_source_url = 'http://wordpress.org/latest.tar.gz'
+    __latest_source_url = 'http://mirror.hypernova.org.local/wordpress/latest.tar.gz'
 
     source_url = None
 
-    def __init__(self, **args):
+    def __init__(self, *args):
         """
         Initialise the provisioner.
 
@@ -337,14 +339,33 @@ class SiteProvisioner(SiteProvisionerBase):
         using the latest available release of the application.
         """
 
-        super().__init__(**args)
+        super().__init__(*args)
 
-        self.source_url = self.__latest_source_url
-        if 'version' in self.parameters.keys():
-            self.source_url = self.__source_url %(self.parameters['version'])
+        try:
+            self.source_url = self.__source_url %(self.parameters[1])
+        except IndexError:
+            self.source_url = self.__latest_source_url
 
     def _provision(self):
-        """
-        """
 
-        source = self.download_url(self.source_url)
+        # Download
+        tarball = self.download_url(self.source_url, suffix='.tar.gz')
+
+        # Extract
+        source = self.extract_gzipped_tarball(tarball)
+
+        # Create database
+        db = self.create_mysql_database()
+
+        # Install the files
+        target = join(self.config['web']['base_dir'], self.parameters[0])
+        self.move_tree(join(source, 'wordpress'), target)
+
+        # Write application configuration
+        config = SiteConfig()
+        with open(join(target, 'wp-config.php'), 'w') as f:
+            f.write(str(config))
+
+        # Write web server configuration and reload daemon
+
+        # Migrate database

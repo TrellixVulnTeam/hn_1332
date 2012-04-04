@@ -29,7 +29,7 @@ class AgentRequestHandler(AgentRequestHandlerBase):
             result = {'error': 'NonexistentProfile'}
             successful = False
 
-        site = Provisioner(domain=params['domain'])
+        site = Provisioner(params['domain'])
         site.provision()
 
         result = {}
