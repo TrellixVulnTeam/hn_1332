@@ -12,10 +12,14 @@
 from copy import deepcopy
 from hypernova.libraries.configuration import ConfigurationFactory
 from hypernova.libraries.permissionelevation import elevate_cmd
-from os.path import dirname, join, realpath
+from os import unlink
+from os.path import dirname, isdir, join, realpath
 import pkgutil
+from shutil import rmtree
 import subprocess
 import sys
+import gzip
+import tarfile
 import tempfile
 from urllib import request
 
@@ -60,15 +64,25 @@ class SiteProvisionerBase:
         Download a URL to a local temporary file and return the file's path.
         """
 
-        file = tempfile.mkstemp()
-        self.temporary_files.append(file[1])
-        request.urlretrieve(url, file[1])
-        return file[1]
+        file = tempfile.mkstemp()[1]
+        self.temporary_files.append(file)
 
-    def extract_file(self, archive, target):
+        request.urlretrieve(url, file)
+
+        return file
+
+    def extract_gzipped_tarball(self, archive):
         """
         Unpack the specified archive to the specified target.
         """
+
+        target = tempfile.mkdtemp()
+        self.temporary_files.append(target)
+
+        with tarfile.open(archive) as a:
+            a.extractall(path=target)
+
+        return target
 
     def do_provision(self, *args):
         """
@@ -79,7 +93,15 @@ class SiteProvisionerBase:
               handles the initialisation of the provisioner utility.
         """
 
-        self._provision()
+        try:
+            self._provision()
+        finally:
+            # Clean up temporary files used during the installation
+            for i in self.temporary_files:
+                if isdir(i):
+                    rmtree(i)
+                else:
+                    unlink(i)
 
     def provision(self):
         """
@@ -116,7 +138,6 @@ class SiteProvisionerBase:
         [self.cmd.append(o) for o in self.parameters.values()]
 
         self.proc = subprocess.Popen(elevate_cmd(self.cmd))
-
 
 def get_provisioner(profile_name):
     """
