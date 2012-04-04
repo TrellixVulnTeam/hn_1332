@@ -37,7 +37,7 @@ class ClientRequestBuilder(ClientRequestBuilderBase):
         Deploy a site from a profile.
         """
 
-class ClientRequestFormatter(ClientRequestFormatterBase):
+class ClientResponseFormatter(ClientResponseFormatterBase):
     """
     Site deployment/management for the client response formatter.
     """
