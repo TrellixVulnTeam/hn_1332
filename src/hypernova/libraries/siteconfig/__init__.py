@@ -13,11 +13,13 @@ from copy import deepcopy
 import gzip
 from hypernova.libraries.configuration import ConfigurationFactory
 from hypernova.libraries.permissionelevation import elevate_cmd
-from os import unlink, urandom
+from os import unlink
 from os.path import dirname, isdir, join, realpath
 import oursql
 import pkgutil
+from random import choice
 from shutil import move, rmtree
+import string
 import subprocess
 import sys
 import tarfile
@@ -60,6 +62,18 @@ class SiteProvisionerBase:
         self.parameters = args
         self.config = ConfigurationFactory.get('hypernova')
 
+    def _random_string(self, length):
+        """
+        Generate a random alphabetical string.
+        """
+
+        result = ''
+
+        for i in range(length):
+            result += choice(string.ascii_letters)
+
+        return result
+
     def create_mysql_database(self):
         """
         Create a database and associated credentials.
@@ -79,8 +93,8 @@ class SiteProvisionerBase:
         }
         db = oursql.connect(**self.credentials)
 
-        user_and_db = urandom(16)
-        password    = urandom(32)
+        user_and_db = self._random_string(16)
+        password    = self._random_string(64)
         host        = 'localhost'
 
         try:
