@@ -91,7 +91,7 @@ class SiteProvisionerBase:
                 cursor.execute(CREATE_DB %(user_and_db, 'utf8'),
                                plain_query=True)
             with db as cursor:
-                cursor.execute(GRANT %(usrer_and_db, user_and_db, host),
+                cursor.execute(GRANT %(user_and_db, user_and_db, host),
                                plain_query=True)
         finally:
             db.close()
