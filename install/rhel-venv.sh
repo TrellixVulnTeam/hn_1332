@@ -54,7 +54,7 @@ fi
 #   IDE, so you won't need to stay elevated or keep bashing out your password!
 if [ "$SKIPDEPS" != 1 ]; then
     # Install system packages
-    sudo yum -y install bash curl git python3
+    sudo yum -y install bash curl git python3{,-devel,-libs}
 
     # Set up setuptools/distribute
     pushd /tmp
