@@ -11,6 +11,7 @@
 
 from copy import deepcopy
 import gzip
+from hypernova.libraries.appconfig import httpserver
 from hypernova.libraries.configuration import ConfigurationFactory
 from hypernova.libraries.permissionelevation import elevate_cmd
 from os import unlink
@@ -37,6 +38,10 @@ class SiteConfigBase:
 class SiteProvisionerBase:
     """
     Base class for all provisioner objects.
+
+    This class is comprised mostly of utility functions that provide a good
+    starting point for deployment. In the long run, we probably want to move
+    most of this code into more focused modules.
     """
 
     module_name = ''
@@ -61,6 +66,21 @@ class SiteProvisionerBase:
 
         self.parameters = args
         self.config = ConfigurationFactory.get('hypernova')
+
+    def _init_http_server(self):
+        """
+        Get an HTTP server object.
+
+        The resulting object will correspond with the provisioner configuration.
+        I.e. if the server is an Apache HTTPd one, we'll return an Apache
+        object, etc.
+
+        TODO: properly take into account directory mapping for custom
+              configurations (see httpserver.AppConfig.__init__()).
+        """
+
+        server_mod = getattr(httpserver, self.config['web']['server'])
+        self.http_server = server_mod.AppConfig(self.config['web']['conf_dir'])
 
     def _random_string(self, length):
         """
@@ -116,6 +136,32 @@ class SiteProvisionerBase:
             'password': password,
             'db':       user_and_db,
         }
+
+    def add_vhost(self):
+        """
+        Get a new VirtualHost instance.
+        """
+
+        if not hasattr(self, 'http_server'):
+            self._init_http_server()
+
+        return self.http_server.get_virtualhost()
+
+    def create_vhost(self, vhost):
+        """
+        Add a virtualhost to the system's web server.
+
+        TODO: move the has_virtualhost() logic into a new method:
+              httpserver.AppConfig.add_virtualhost().
+        """
+
+        if not hasattr(self, 'http_server'):
+            self._init_http_server()
+
+        if self.http_server.has_virtualhost(vhost):
+            raise VirtualHostCollisionError()
+
+        self.http_server.commit_virtualhost(vhost)
 
     def download_url(self, url, suffix=''):
         """
@@ -203,6 +249,17 @@ class SiteProvisionerBase:
         self.cmd.extend(self.parameters)
 
         self.proc = subprocess.Popen(elevate_cmd(self.cmd))
+
+
+class VirtualHostCollisionError(Exception):
+    """
+    Thrown when a virtual host collides with the main domain of an existing one.
+
+    TODO: this logic belongs in the httpserver module.
+    """
+
+    pass
+
 
 def get_provisioner(profile_name):
     """

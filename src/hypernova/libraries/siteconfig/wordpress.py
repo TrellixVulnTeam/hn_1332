@@ -348,23 +348,36 @@ class SiteProvisioner(SiteProvisionerBase):
     def _provision(self):
 
         # Download
+        print('downloading')
         tarball = self.download_url(self.source_url, suffix='.tar.gz')
 
         # Extract
+        print('extracting')
         source = self.extract_gzipped_tarball(tarball)
 
         # Create database
+        print('creating db')
         db = self.create_mysql_database()
 
         # Install the files
+        print('installing files')
         target = join(self.config['web']['base_dir'], self.parameters[0])
         self.move_tree(join(source, 'wordpress'), target)
 
+        # Write web server configuration and reload daemon
+        print('configuring http server')
+        vhost = self.add_vhost()
+        vhost.listen = 80
+        vhost.server_names = [self.parameters[0]]
+        vhost.indexes = ['index.php', 'index.html', 'index.htm']
+        vhost.includes.append('enable_php')
+        self.create_vhost(vhost)
+
         # Write application configuration
+        print('configuring application')
         config = SiteConfig()
         with open(join(target, 'wp-config.php'), 'w') as f:
             f.write(str(config))
 
-        # Write web server configuration and reload daemon
-
         # Migrate database
+        print('migrating db')
