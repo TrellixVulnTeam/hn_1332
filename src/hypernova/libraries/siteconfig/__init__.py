@@ -113,8 +113,8 @@ class SiteProvisionerBase:
         }
         db = oursql.connect(**self.credentials)
 
-        user_and_db = self._random_string(16)
-        password    = self._random_string(64)
+        user_and_db = self._random_string(int(self.config['mysql']['username_length']))
+        password    = self._random_string(int(self.config['mysql']['password_length']))
         host        = 'localhost'
 
         try:
