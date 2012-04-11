@@ -18,7 +18,7 @@ import pwd
 
 # Global system options
 BASE_DIR = None
-SKEL     = None
+SKEL_DIR = None
 
 class Group:
     """
@@ -165,4 +165,3 @@ class UserCollisionError(Exception):
     """
 
     pass
-
