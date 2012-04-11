@@ -389,6 +389,19 @@ class SiteProvisioner(SiteProvisionerBase):
         # Write application configuration
         print('configuring application')
         config = SiteConfig()
+
+        config.db_host     = db['host']
+        config.db_username = db['username']
+        config.db_password = db['password']
+        config.db_name     = db['db']
+        config.db_prefix   = 'wp_'
+        config.db_charset  = SiteConfig.DB_CHARSETS[0]
+        config.dp_collate  = ''
+
+        for k in ['auth', 'secure_auth', 'nonce', 'logged_in']:
+            for t in ['key', 'salt']:
+                setattr(config, '%s_%s' %(t, k), self._random_string(64))
+
         with open(join(target, 'wp-config.php'), 'w') as f:
             f.write(str(config))
 
