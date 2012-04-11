@@ -267,7 +267,9 @@ if (defined('TABLE_PREFIX'))
     ]
 
     __ints = [
-
+        'revisions_autosave_interval',
+        'revisions_compact',
+        'chmod_dir',
     ]
 
     def __php_boolean(self, value):
@@ -308,6 +310,8 @@ if (defined('TABLE_PREFIX'))
                 value = self.__php_boolean(value)
             elif abstract in self.__reverse_bools:
                 value = self.__php_boolean(not value)
+            elif not value:
+                continue
             else:
                 value = self.__php_str(str(value))
 
