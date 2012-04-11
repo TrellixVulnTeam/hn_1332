@@ -9,6 +9,9 @@
 #
 
 instroot="$(readlink -fn "$(dirname "$0")")"
+
+sudo yum --assumeyes install bzip2-devel gcc openssl-devel pcre-devel rpm-build sqlite-devel zlib-devel
+
 mkdir -p "$instroot/build/SOURCES"
 
 wget 'http://python.org/ftp/python/3.2.2/Python-3.2.2.tar.bz2' \
