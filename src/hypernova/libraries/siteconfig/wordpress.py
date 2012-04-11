@@ -267,7 +267,9 @@ if (defined('TABLE_PREFIX'))
     ]
 
     __ints = [
-
+        'revisions_autosave_interval',
+        'revisions_compact',
+        'chmod_dir',
     ]
 
     def __php_boolean(self, value):
