@@ -355,6 +355,10 @@ class SiteProvisioner(SiteProvisionerBase):
         print('extracting')
         source = self.extract_gzipped_tarball(tarball)
 
+        # Create a system user
+        print('creating system user')
+        user = self.create_system_user()
+
         # Create database
         print('creating db')
         db = self.create_mysql_database()
@@ -363,6 +367,10 @@ class SiteProvisioner(SiteProvisionerBase):
         print('installing files')
         target = join(self.config['web']['base_dir'], self.parameters[0])
         self.move_tree(join(source, 'wordpress'), target)
+
+        # Set file permissions
+        print('awesomeifying file permissions')
+        self.set_ownership(user, self.get_web_group(), target)
 
         # Write web server configuration and reload daemon
         print('configuring http server')
