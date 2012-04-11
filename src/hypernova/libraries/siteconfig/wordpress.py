@@ -370,10 +370,6 @@ class SiteProvisioner(SiteProvisionerBase):
         target = join(self.config['web']['base_dir'], self.parameters[0])
         self.move_tree(join(source, 'wordpress'), target)
 
-        # Set file permissions
-        print('awesomeifying file permissions')
-        self.set_ownership(user, self.get_web_group(), target)
-
         # Write web server configuration and reload daemon
         print('configuring http server')
         vhost = self.add_vhost()
@@ -389,6 +385,10 @@ class SiteProvisioner(SiteProvisionerBase):
         config = SiteConfig()
         with open(join(target, 'wp-config.php'), 'w') as f:
             f.write(str(config))
+
+        # Set file permissions
+        print('awesomeifying file permissions')
+        self.set_ownership(user, self.get_web_group(), target)
 
         # Migrate database
         print('migrating db')
