@@ -19,6 +19,7 @@ src/*.egg-info
 chroot/bin/elevator
 chroot/bin/pyrg
 chroot/etc/hypernova/*/local.ini
+chroot/etc/nginx
 chroot/tmp/*
 chroot/var/lib/hypernova/gpg
 chroot/var/log
