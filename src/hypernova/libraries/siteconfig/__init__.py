@@ -116,7 +116,7 @@ class SiteProvisionerBase:
 
         user_and_db = self._random_string(int(self.config['mysql']['username_length']))
         password    = self._random_string(int(self.config['mysql']['password_length']))
-        host        = 'localhost'
+        host        = self.config['mysql']['host']
 
         try:
             with db as cursor:
