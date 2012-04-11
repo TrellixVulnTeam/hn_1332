@@ -14,7 +14,8 @@ import gzip
 from hypernova.libraries.appconfig import httpserver
 from hypernova.libraries.configuration import ConfigurationFactory
 from hypernova.libraries.permissionelevation import elevate_cmd
-from os import unlink
+from hypernova.libraries.usermanagement import Group, User
+from os import chown, unlink, walk
 from os.path import dirname, isdir, join, realpath
 import oursql
 import pkgutil
@@ -137,6 +138,45 @@ class SiteProvisionerBase:
             'db':       user_and_db,
         }
 
+    def create_system_user(self):
+        """
+        Add a new system user.
+        """
+
+        user = User()
+        user.account  = self._random_string(int(self.config['system']['account_length']))
+        user.password = self._random_string(int(self.config['system']['password_length']))
+
+        if self.config['core']['mode'] == 'production':
+            user.create()
+        elif self.config['core']['mode'] == 'development':
+            user.repopulate(self.config['system']['development_user'])
+
+        return user
+
+    def get_web_group(self):
+        """
+        Get a web server's group.
+
+        For careless applications who demand insane permissions.
+        """
+
+        return Group(self.config['web']['group'])
+
+    def set_ownership(self, user, group, path, recursive=True):
+        """
+        Give ownership over the specified files to the specified user.
+
+        Wrapper for os.chown() that provides recursive functionality.
+        """
+
+        if recursive:
+            for root, dirs, files in walk(path):
+                for f in dirs + files:
+                    chown(join(root, f), user.uid, group.gid)
+        else:
+            chown(path, user.uid, group.gid)
+
     def add_vhost(self):
         """
         Get a new VirtualHost instance.
@@ -162,6 +202,17 @@ class SiteProvisionerBase:
             raise VirtualHostCollisionError()
 
         self.http_server.commit_virtualhost(vhost)
+        self.http_server.reload_service()
+
+    def reload_web_server(self):
+        """
+        Reload the system's web server via its adapter.
+        """
+
+        if not hasattr(self, 'http_server'):
+            self._init_http_server()
+
+        self.http_server.reload_service()
 
     def download_url(self, url, suffix=''):
         """
