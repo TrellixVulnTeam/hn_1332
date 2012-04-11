@@ -60,6 +60,13 @@ class HttpServerConfigBase(AppConfigBase):
 
         pass
 
+    def reload_service(self):
+        """
+        Reload the service to apply configuration changes.
+        """
+
+        pass
+
 
 class VirtualHostBase(AppConfigBase):
     """

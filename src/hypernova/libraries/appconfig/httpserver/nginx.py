@@ -12,7 +12,9 @@
 
 from hypernova.libraries.appconfig.httpserver import HttpServerConfigBase, \
                                                      VirtualHostBase
+from hypernova.libraries.permissionelevation import elevate_cmd
 from os.path import abspath, isfile, join
+from subprocess import Popen
 
 # Global blocks
 templ_block_events   = """events {
@@ -91,6 +93,9 @@ class AppConfig(HttpServerConfigBase):
 
     def has_virtualhost(self, vhost):
         return isfile(join(self.vhost_dir, vhost.server_names[0]))
+
+    def reload_service(self):
+        Popen(elevate_cmd(['service', 'nginx', 'reload']))
 
 
 class VirtualHost(VirtualHostBase):
