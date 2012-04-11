@@ -10,7 +10,7 @@
 
 Name:    hypernova
 Version: 0.1.0
-Release: 3%{?dist}
+Release: 4%{?dist}
 Summary: Secure server management and site provisioning suite
 
 Group:     Applications/Internet
