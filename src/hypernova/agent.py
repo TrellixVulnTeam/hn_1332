@@ -335,19 +335,19 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
             # be incorporated very soon and will enable cleaner namespacing of
             # actions.
             try:
-                (module_name, action) = params['action'].rsplit('.', 1)
+                (self.module_name, self.action) = params['action'].rsplit('.', 1)
             except ValueError:
                 self.send_error(400, 'Action not namespaced')
 
             try:
-                module = getattr(modules, module_name)
+                module = getattr(modules, self.module_name)
                 handler = getattr(module, 'AgentRequestHandler')
             except (AttributeError, KeyError):
                 self.send_error(501, 'Unsupported module')
                 return
 
             try:
-                method = getattr(handler, 'do_' + action.lower())
+                method = getattr(handler, 'do_' + self.action.lower())
             except AttributeError:
                 self.send_error(405, 'Unsupported method')
                 return
@@ -384,7 +384,7 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
         # library edition doesn't seem to support it.
 
         msg = format %(args)
-        self._err.error('[%s:%d] %s' %(self.client_address[0],
+        self._err.error("[%s:%d] %s" %(self.client_address[0],
                                        self.client_address[1], msg))
 
     def log_exception(self, exc):
@@ -392,7 +392,7 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
         Write an exception to the log.
         """
 
-        self._err.exception('[%s:%d] exception:' %(self.client_address[0],
+        self._err.exception("[%s:%d] exception:" %(self.client_address[0],
                                                    self.client_address[1]))
 
     def log_message(self, format, *args):
@@ -407,8 +407,17 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
         # socket, which would otherwise be discarded.
 
         msg = format %(args)
-        self._log.info('[%s:%d] %s' %(self.client_address[0],
+        self._log.info("[%s:%d] %s" %(self.client_address[0],
                                       self.client_address[1], msg))
+
+    def log_request(self, code):
+
+        # Overridden from BaseHTTPRequestHandler.
+        #
+        # Don't display the HTTP request line in the log, since it's useless to
+        # us. If possible, log the module and action, else log a warning.
+
+        self.log_message("%s.%s - %i", self.module_name, self.action, code)
 
     def send_error(self, code, message=None, exception=None):
 
