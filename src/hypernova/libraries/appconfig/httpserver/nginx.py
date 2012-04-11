@@ -116,6 +116,13 @@ class VirtualHost(VirtualHostBase):
 
         return "\n    ".join(opts)
 
+    def fmt_directive_indexes(self, indexes):
+        """
+        Format a list of index files for a configuration file.
+        """
+
+        return globals()['templ_directive_indexes'] %(' '.join(indexes))
+
     def fmt_directive_server_names(self, server_names):
         """
         Format a list of server names for a configuration file.
