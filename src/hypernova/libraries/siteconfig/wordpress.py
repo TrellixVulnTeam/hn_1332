@@ -367,6 +367,7 @@ class SiteProvisioner(SiteProvisionerBase):
         # Write web server configuration and reload daemon
         print('configuring http server')
         vhost = self.add_vhost()
+        vhost.document_root = join(self.config['web']['base_dir'], self.parameters[0])
         vhost.listen = 80
         vhost.server_names = [self.parameters[0]]
         vhost.indexes = ['index.php', 'index.html', 'index.htm']
