@@ -167,8 +167,12 @@ class SiteConfig(SiteConfigBase):
  */
 """
     __file_post = """
-if (defined('TABLE_PREFIX'))
-    $table_prefix = TABLE_PREFIX;
+$table_prefix = defined('TABLE_PREFIX') ? TABLE_PREFIX : '';
+
+if (!defined('ABSPATH'))
+    define('ABSPATH', (dirname(__FILE__) . DIRECTORY_SEPARATOR));
+
+require_once(ABSPATH . 'wp-settings.php');
 """
 
     __mapping = {
