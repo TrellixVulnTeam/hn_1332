@@ -30,19 +30,25 @@ class AuthoritativeServer(dns.AuthoritativeServerBase):
     credentials = {}
 
     SELECT_ZONE = "SELECT `id`, `name` " \
-                  "FROM domains " \
+                  "FROM `domains` " \
                   "WHERE `name` = ? " \
                   "LIMIT 1"
 
     SELECT_ZONE_RECORDS = "SELECT `name`, `type`, `content`, `ttl`, `prio` " \
-                          "FROM records " \
+                          "FROM `records` " \
                           "WHERE `domain_id` = ?"
 
-    INSERT_RECORD = "INSERT INTO records (`domain_id`, `name`, `type`, `content`, `ttl`, `prio`) " \
+    INSERT_RECORD = "INSERT INTO `records` (`domain_id`, `name`, `type`, `content`, `ttl`, `prio`) " \
                     "VALUES (?, ?, ?, ?, ?, ?)"
 
     INSERT_ZONE = "INSERT INTO `domains` (`name`, `type`) " \
                   "VALUES (?, ?)"
+
+    DELETE_ZONE = "DELETE FROM `domains` " \
+                  "WHERE `id` = ?"
+
+    DELETE_RECORDS_ASSOCIATED_WITH_DOMAIN = "DELETE FROM `records` " \
+                                            "WHERE `domain_id` = ?"
 
     DELETE_RECORD = "DELETE FROM `records` " \
                     "WHERE `domain_id` = ? " \
@@ -169,6 +175,24 @@ class AuthoritativeServer(dns.AuthoritativeServerBase):
 
         zone.id = cursor.lastrowid
         return cursor.lastrowid
+
+    def rm_zone(self, zone):
+        """
+        See the documentation for AuthorititativeServerBase.rm_zone() for
+        details.
+        """
+
+        db = oursql.connect(**self.credentials)
+
+        if isinstance(zone, str):
+            zone = self.get_zone(zone)
+
+        with db as cursor:
+            cursor.execute(self.DELETE_ZONE, (zone.id,))
+
+        with db as cursor:
+            cursor.execute(self.DELETE_RECORDS_ASSOCIATED_WITH_DOMAIN, (zone.id,))
+
     def get_zone(self, main_domain):
         """
         See the documentation for ServerBase.get_zone() for details.

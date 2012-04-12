@@ -133,6 +133,32 @@ class AgentRequestHandler(AgentRequestHandlerBase):
             error_code=0
         )
 
+    def do_rm_zone(params):
+        """
+        Remove a zone.
+        """
+
+        config = ConfigurationFactory.get('hypernova')
+
+        try:
+            server = get_authoritative_server(config['dns']['adapter'],
+                                               config['dns'])
+            try:
+                server.rm_zone(params['domain'])
+                successful = True
+                result     = {}
+            except NonexistentZoneError:
+                successful = False
+                result     = {'error': 'NonexistentZoneError'}
+        except ServerCommunicationError:
+            successful = False
+            result     = {'error': 'ServerCommunication'}
+            
+        return AgentRequestHandler._format_response(
+            result,
+            successful=successful
+        )
+
     def do_get_zone(params):
         """
         Get a zone.
@@ -207,6 +233,9 @@ class ClientRequestBuilder(ClientRequestBuilderBase):
                   ClientRequestBuilder.SOA_ATTR_INT):
             sp.add_argument("soa_%s" %(a))
 
+        sp = subparser_factory.add_parser('rm_zone')
+        sp.add_argument('domain')
+
         sp = subparser_factory.add_parser('get_zone')
         sp.add_argument('domain')
 
@@ -278,6 +307,17 @@ class ClientRequestBuilder(ClientRequestBuilderBase):
 
         return ClientRequestBuilderBase._format_request(
             ['dns', 'add_zone'], args
+        )
+
+    def do_rm_zone(cli_args, client):
+        """
+        Remove a zone.
+        """
+
+        return ClientRequestBuilderBase._format_request(
+            ['dns', 'rm_zone'], {
+                'domain': cli_args.domain
+            }
         )
 
     def do_get_zone(cli_args, client):
@@ -410,12 +450,24 @@ class ClientResponseFormatter(ClientResponseFormatterBase):
 
         return result
 
+    def do_rm_zone(cli_args, response):
+        """
+        Remove a zone.
+        """
+
+        result = 'Failed: nonexistent zone'
+
+        if response['status']['successful']:
+            result = ''
+
+        return result
+
     def do_rm_record(cli_args, response):
         """
         Remove a record.
         """
 
-        result = "Failed: no records to delete or nonexistent zone"
+        result = 'Failed: no records to delete or nonexistent zone'
 
         if response['status']['successful']:
             result = ClientResponseFormatter._format_records(
