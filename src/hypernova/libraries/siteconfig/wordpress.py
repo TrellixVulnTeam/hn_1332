@@ -316,6 +316,8 @@ require_once(ABSPATH . 'wp-settings.php');
                 value = self.__php_boolean(value)
             elif abstract in self.__reverse_bools:
                 value = self.__php_boolean(not value)
+            elif not value:
+                continue
             else:
                 value = self.__php_str(str(value))
 
