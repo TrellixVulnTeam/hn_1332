@@ -159,7 +159,7 @@ mkdir deps
 
 # Python
 %setup -q -n src -T -D -a 1
-mv Python-3.2.2 deps/python
+mv Python-3.2.3 deps/python
 
 # Elevator
 %setup -q -n src -T -D -a 2
@@ -244,7 +244,6 @@ popd
 pushd ../chroot
 cp -r * "$RPM_BUILD_ROOT/usr/local/hypernova"
 
-# Shhh, I know
 mkdir -p "$RPM_BUILD_ROOT/etc/profile.d"
 find "$RPM_BUILD_ROOT/usr/local/hypernova/etc/profile.d" -type f \
      -exec mv {} "$RPM_BUILD_ROOT/etc/profile.d" \;
