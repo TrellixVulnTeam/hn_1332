@@ -79,7 +79,6 @@ class ClientConfigAction(ClientActionBase):
             except IndexError:
                 print('Failed: the specified private key is invalid')
 
-
             with open(os.path.join(config_dir, 'client.ini'), 'w') as c:
                 self._config.write(c)
 
@@ -97,6 +96,8 @@ class ClientConfigAction(ClientActionBase):
                 result = gpg.import_keys(key_blob)
                 try:
                     key_fingerprint = result.fingerprints[0]
+                    gpg.sign_key(result.fingerprints[0])
+                    gpg.trust_key(result.fingerprints[0])
                 except IndexError:
                     print('Failed: the specified public key is invalid', file=sys.stderr)
                     sys.exit(64)
