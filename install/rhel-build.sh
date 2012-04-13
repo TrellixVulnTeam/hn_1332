@@ -31,8 +31,9 @@ tar -cjf "$instroot/build/SOURCES/python-distribute.tar.bz2" python-distribute
 rm -rf *
 
 cp -r "$instroot/../chroot" "$instroot/../src" .
-rm -rf chroot/bin/{activate*,easy_install*,elevator,pip*,python*} \
-       chroot/{include,lib*,tmp}
+sudo rm -rf chroot/bin/{activate*,easy_install*,elevator,pip*,python*} \
+            chroot/{include,lib*,tmp} \
+            chroot/var/www/*
 find 'chroot/etc' -name '*local*.ini' -type f -exec rm -f {} \;
 find 'chroot/var/lib/hypernova/gpg' -type f -exec rm -f {} \;
 find 'chroot/var/log' -type f -exec rm -f {} \;
