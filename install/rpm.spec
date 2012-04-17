@@ -257,8 +257,17 @@ popd
 rm -rf "$RPM_BUILD_ROOT"
 
 
+%post
+useradd -c 'HyperNova agent' -d '/usr/local/hypernova/home' -u 703 -mU 'hnagent'
+
+
+%postun
+userdel -r 'hnagent'
+
+
 %files
 %defattr(-, root, root, -)
+%dir                            /usr/local/hypernova
                                 /etc/profile.d/hypernova.sh
                                 /usr/local/hypernova/bin/hn-*
 %config(noreplace)              /usr/local/hypernova/etc/hypernova/*/base.ini
