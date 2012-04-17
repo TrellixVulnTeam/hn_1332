@@ -36,7 +36,6 @@ chroot/var/www
 
 # Temporary build files
 install/build/*
-install/*-push.sh
 
 # OS temporary rubbish
 .DS_Store
