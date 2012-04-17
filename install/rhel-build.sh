@@ -10,7 +10,7 @@
 
 instroot="$(readlink -fn "$(dirname "$0")")"
 
-sudo yum --assumeyes install bzip2-devel gcc openssl-devel pcre-devel rpm-build sqlite-devel zlib-devel
+sudo yum --assumeyes install bzip2-devel gcc {mysql,openssl,pcre,sqlite,zlib}-devel rpm-build
 
 # Remove old artifacts
 rm -rf "$instroot/build/SOURCES"

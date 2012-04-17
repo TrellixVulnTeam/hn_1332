@@ -18,7 +18,7 @@ License:   TDM Internal
 URL:       http://dev.ossservices.com/projects/cloudnova-hypernova
 
 BuildRoot: %(mktemp -ud %{_tmppath}/%{name}-%{version}-%{release}-XXXXXX)
-BuildRequires: bzip2, findutils, gcc, make, openssl-devel, pcre-devel, sed, tar, zlib-devel
+BuildRequires: bzip2, findutils, gcc, make, mysql-devel, openssl-devel, pcre-devel, sed, tar, zlib-devel
 
 # Breaks the resulting RPMs by adding incoherent dependencies (#83)
 AutoReqProv: no
