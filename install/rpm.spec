@@ -208,6 +208,9 @@ popd
 
 pushd deps/python
 make install DESTDIR="$RPM_BUILD_ROOT"
+
+# Hack for libpython3.2m.a (see issue #321)
+chmod u+w "$RPM_BUILD_ROOT/usr/local/hypernova/lib/libpython3.2m.a"
 popd
 
 # Hack for elevator
