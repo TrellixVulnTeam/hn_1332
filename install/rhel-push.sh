@@ -22,5 +22,6 @@ ssh      "$user@$host" mkdir -p hypernova
 scp -r * "$user@$host:hypernova"
 ssh      "$user@$host" hypernova/install/rhel-build.sh
 ssh      "$user@$host" rm -rf rpms/RPMS/x86_64/hypernova-*
+ssh      "$user@$host" mkdir -p rpms/RPMS/x86_64
 ssh      "$user@$host" cp hypernova/install/build/RPMS/x86_64/* rpms/RPMS/x86_64
 ssh      "$user@$host" createrepo rpms/RPMS/x86_64/
