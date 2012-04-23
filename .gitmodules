@@ -13,3 +13,6 @@
 [submodule "deps/python-pexpect"]
 	path = deps/python-pexpect
 	url = https://github.com/LukeCarrier/py3k-pexpect.git
+[submodule "py3k-daemon"]
+	path = py3k-daemon
+	url = https://github.com/LukeCarrier/py3k-daemon.git
