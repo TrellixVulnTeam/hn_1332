@@ -13,8 +13,8 @@ instroot="$(readlink -fn "$(dirname "$0")")"
 sudo yum --assumeyes install bzip2-devel gcc {mysql,openssl,pcre,sqlite,zlib}-devel rpm-build
 
 # Remove old artifacts
-rm -rf "$instroot/build/SOURCES"
-mkdir -p "$instroot/build/SOURCES"
+rm -rf "$instroot/build"
+mkdir -p "$instroot/build/"{RPMS,SOURCES,SPECS}
 
 wget 'http://python.org/ftp/python/3.2.3/Python-3.2.3.tar.bz2' \
      -O "$instroot/build/SOURCES/python.tar.bz2"
@@ -37,9 +37,9 @@ rm -rf chroot/bin/{activate*,easy_install*,elevator,pip*,python*} \
 find 'chroot/etc' -name '*local*.ini' -type f -exec rm -f {} \;
 find 'chroot/var/lib/gpg' -type f -exec rm -f {} \;
 find 'chroot/var/log' -type f -exec rm -f {} \;
+rm -rf src/{build,dist}
 
-tar --exclude-vcs -cjf "$instroot/build/SOURCES/hypernova.tar.bz2" \
-    chroot src
+tar --exclude-vcs -cjf "$instroot/build/SOURCES/hypernova.tar.bz2" chroot src
 popd
 
 pushd "$instroot/../deps"
