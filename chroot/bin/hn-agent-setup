@@ -36,7 +36,7 @@ Name-Comment: ${KEY_COMMENT}
 EOF
 
 mkdir -p "$GPG_HOME"
-sudo -u 'hnagent' gpg --homedir "$GPG_HOME" \
+gpg --homedir "$GPG_HOME" \
                       --batch \
                       --gen-key "$BATCH_FILE"
 
@@ -50,7 +50,7 @@ cat >"$CUSTOM_CONF" <<EOF
 [gpg]
 fingerprint = ${KEY_FINGERPRINT}
 EOF
-chown 'hnagent:root' "$CUSTOM_CONF"
+chown -R 'hnagent:root' "$CUSTOM_CONF" "$GPG_HOME"
 
 echo "A custom configuration file has been generated in $CUSTOM_CONF; you will"
 echo 'likely need to customise this for your environment and requirements. For'
