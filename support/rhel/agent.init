@@ -1,0 +1,90 @@
+#!/bin/bash
+#
+# HyperNova server management framework
+#
+# Agent/RHEL init script
+#
+# Copyright (c) 2012 TDM Ltd
+#                    Luke Carrier <luke.carrier@tdm.info>
+#
+# chkconfig:   - 85 15
+# description: The HyperNova agent daemon (hn-agent) provides secure
+#              remote server administration via hn-client and web
+#              applications.
+# processname: hn-agent
+# config:      /usr/local/hypernova/etc/hypernova/agent/base.ini
+# config:      /usr/local/hypernova/etc/hypernova/agent/local.ini
+# pidfile:     /usr/local/hypernova/var/run/hypernova/agent.pid
+
+. /etc/sysconfig/network
+
+BIN='/usr/local/hypernova/bin/hn-agent'
+NAME="$(basename "$BIN")"
+ETC='/usr/local/hypernova/etc/agent'
+SYSETC='/etc/sysconfig/hn-agent'
+PID='/usr/local/hypernova/var/run/hn-agent.pid'
+USER='hnagent'
+
+[ -f "$SYSETC" ] && . "$SYSETC"
+
+stop() {
+    killproc $NAME -QUIT
+    retval=$?
+    exit $retval
+}
+
+restart() {
+    stop
+    start
+}
+
+start() {
+    su -c "$BIN " "$USER"
+    retval=$?
+    exit $retval
+}
+
+status() {
+    echo -n "$NAME is "
+
+    if [ -f "$PID" ]; then
+        pid="$(cat "$PID")"
+        ps -p "$pid" >/dev/null 2>&1
+
+        if [ "$?" = "0" ]; then
+            echo 'running'
+        else
+            echo 'not running'
+        fi
+    else
+        echo 'not running'
+    fi
+}
+
+help() {
+    echo
+}
+
+case "$1" in
+    'start')
+        echo "Starting $NAME"
+        start
+        ;;
+
+    'stop')
+        echo "Stopping $NAME"
+        stop
+        ;;
+
+    {'restart','reload','force-reload'})
+        restart
+        ;;
+
+    'status')
+        status
+        ;;
+
+    *)
+        help
+        ;;
+esac

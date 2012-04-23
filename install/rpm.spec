@@ -23,8 +23,7 @@ BuildRequires: bzip2, findutils, gcc, make, mysql-devel, openssl-devel, pcre-dev
 # Breaks the resulting RPMs by adding incoherent dependencies (#83)
 AutoReqProv: no
 
-Requires: hypernova-elevator hypernova-python hypernova-python-distribute
-Requires: hypernova-python-gnupg
+Requires: gpg hypernova-elevator hypernova-python hypernova-python-distribute hypernova-python-gnupg hypernova-python-oursql hypernova-python-pexpect
 
 Source0: hypernova.tar.bz2
 Source1: python.tar.bz2
@@ -260,8 +259,15 @@ rm -rf "$RPM_BUILD_ROOT"
 %post
 useradd -c 'HyperNova agent' -d '/usr/local/hypernova/home' -u 703 -mU 'hnagent'
 
+# Fix permissions.
+#
+# We can't set these in the files section of the spec because the user is only
+# created after the files have been installed.
+chown -R 'hnagent:root' '/usr/local/hypernova/var'
+
 
 %postun
+pkill -u 'hnagent'
 userdel -r 'hnagent'
 
 
@@ -270,10 +276,12 @@ userdel -r 'hnagent'
 %dir                            /usr/local/hypernova
                                 /etc/profile.d/hypernova.sh
                                 /usr/local/hypernova/bin/hn-*
-%config(noreplace)              /usr/local/hypernova/etc/hypernova/*/base.ini
-%config(noreplace)              /usr/local/hypernova/var/lib/hypernova/platforms/*/packages.json
+%config(noreplace)              /usr/local/hypernova/etc/*/base.ini
+%config(noreplace)              /usr/local/hypernova/var/lib/platforms/*/packages.json
                                 /usr/local/hypernova/lib/python*/site-packages/HyperNova-*.egg
-
+%dir                            /usr/local/hypernova/var/lib/gpg
+%dir                            /usr/local/hypernova/var/log
+%dir                            /usr/local/hypernova/var/run
 
 %files elevator
 %defattr(6755, root, root, -)

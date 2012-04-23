@@ -35,7 +35,7 @@ rm -rf chroot/bin/{activate*,easy_install*,elevator,pip*,python*} \
        chroot/{include,lib*,tmp} \
        chroot/var/www/*
 find 'chroot/etc' -name '*local*.ini' -type f -exec rm -f {} \;
-find 'chroot/var/lib/hypernova/gpg' -type f -exec rm -f {} \;
+find 'chroot/var/lib/gpg' -type f -exec rm -f {} \;
 find 'chroot/var/log' -type f -exec rm -f {} \;
 
 tar --exclude-vcs -cjf "$instroot/build/SOURCES/hypernova.tar.bz2" \

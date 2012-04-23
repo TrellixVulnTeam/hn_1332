@@ -11,8 +11,9 @@
 
 PYTHON='python3.2'
 
-[ -z "$BINDIR"  ]   && BINDIR="/usr/local/hypernova/bin"
-[ -z "$CONFDIR" ]   && CONFDIR="/usr/local/hypernova/etc/hypernova"
+[ -z "$BINDIR"  ] &&  BINDIR="/usr/local/hypernova/bin"
+[ -z "$CONFDIR" ] && CONFDIR="/usr/local/hypernova/etc/agent"
+[ -n "$1"       ] && PIDFILE=$1
 
 if [ -z "$PYTHONPATH" ]; then
     PYTHONPATHBASE=/usr/local/hypernova/lib/python3.2/site-packages
@@ -22,3 +23,6 @@ if [ -z "$PYTHONPATH" ]; then
 fi
 
 PYTHONPATH="$PYTHONPATH" "$BINDIR/$PYTHON" -m hypernova.agent "$CONFDIR"
+PID=$!
+
+[ -n "$PIDFILE" ] && echo $pid > $PIDFILE
