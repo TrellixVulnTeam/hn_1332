@@ -392,8 +392,9 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
         Write an exception to the log.
         """
 
-        self._err.exception("[%s:%d] exception:" %(self.client_address[0],
-                                                   self.client_address[1]))
+        if hasattr(exc, '__cause__'):
+            self._err.exception("[%s:%d] exception:" %(self.client_address[0],
+                                                       self.client_address[1]))
 
     def log_message(self, format, *args):
         """
@@ -417,7 +418,8 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
         # Don't display the HTTP request line in the log, since it's useless to
         # us. If possible, log the module and action, else log a warning.
 
-        self.log_message("%s.%s - %i", self.module_name, self.action, code)
+        if hasattr(self, 'module_name') and hasattr(self, 'action'):
+            self.log_message("%s.%s - %i", self.module_name, self.action, code)
 
     def send_error(self, code, message=None, exception=None):
 
