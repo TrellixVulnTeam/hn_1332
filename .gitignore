@@ -5,6 +5,7 @@
 /.project
 .redcar
 .*.sw?
+*~
 
 # Interpreter temporary files
 __pycache__
