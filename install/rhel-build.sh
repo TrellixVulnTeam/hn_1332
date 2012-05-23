@@ -17,12 +17,16 @@ rm -rf "$instroot/build"
 mkdir -p "$instroot/build/"{RPMS,SOURCES,SPECS}
 
 if [ "$1" = "--with-python" ] || [ ! -d "$instroot/../deps/python" ]; then
-    mkdir -p "$instroot/python"
-    wget 'http://python.org/ftp/python/3.2.3/Python-3.2.3.tar.bz2' \
-         -O "$instroot/python/src.tar.bz2"
-    tar -xjvf "$instroot/python/src.tar.bz2"
+    rm -rf "$instroot/python" "$instroot/deps/python"
 
-    pushd Python-3.2.3
+    mkdir -p "$instroot/python"
+    pushd "$instroot/python"
+    wget 'http://python.org/ftp/python/3.2.3/Python-3.2.3.tar.bz2' \
+         -O src.tar.bz2
+    tar -xjvf src.tar.bz2
+    popd
+
+    pushd "$instroot/python/Python-3.2.3"
     ./configure \
         --prefix=/usr/local/hypernova
     make
