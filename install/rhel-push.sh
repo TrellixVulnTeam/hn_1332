@@ -15,11 +15,11 @@ user="$2"
 cd "$(dirname "$0")/.."
 rm -rf install/build
 
-echo                   "sudo yum -y install createrepo gcc make rpm-build wget" \
-                       {mysql,openssl,pcre,sqlite,zlib}-devel
-ssh      "$user@$host" rm -rf hypernova
+echo                   "# yum -y install createrepo gcc make rpm-build rsync " \
+                       "sudo wget {mysql,openssl,pcre,sqlite,zlib}-devel"
 ssh      "$user@$host" mkdir -p hypernova
 scp -r * "$user@$host:hypernova"
+ssh      "$user@$host" rm -rf hypernova/deps/python
 ssh      "$user@$host" hypernova/install/rhel-build.sh
 ssh      "$user@$host" rm -rf rpms/RPMS/x86_64/hypernova-*
 ssh      "$user@$host" mkdir -p rpms/RPMS/x86_64
