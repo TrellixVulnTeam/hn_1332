@@ -125,6 +125,9 @@ There's extensive documentation available online at http://packages.python.org/o
 Summary: Colours unittest output
 Group:   Development/Libraries
 
+# Breaks the resulting RPMs by adding incoherent dependencies (#83)
+AutoReqProv: no
+
 
 %description python-pyrg
 This script is colourised to Python's UnitTest Result.
