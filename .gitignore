@@ -19,11 +19,12 @@ src/*.egg-info
 # chroot environment stuff
 chroot/bin/elevator
 chroot/bin/pyrg
-chroot/etc/hypernova/*/local.ini
+chroot/etc/*/local.ini
 chroot/etc/nginx
 chroot/tmp/*
-chroot/var/lib/hypernova/gpg
+chroot/var/lib/gpg
 chroot/var/log
+chroot/var/www
 
 # virtualenv stuff
 chroot/bin/2to3*
@@ -33,7 +34,6 @@ chroot/bin/pip*
 chroot/bin/python*
 chroot/include
 chroot/lib*
-chroot/var/www
 
 # Temporary build files
 install/build/*
