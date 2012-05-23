@@ -16,8 +16,26 @@ sudo yum --assumeyes install bzip2-devel gcc {mysql,openssl,pcre,sqlite,zlib}-de
 rm -rf "$instroot/build"
 mkdir -p "$instroot/build/"{RPMS,SOURCES,SPECS}
 
-wget 'http://python.org/ftp/python/3.2.3/Python-3.2.3.tar.bz2' \
-     -O "$instroot/build/SOURCES/python.tar.bz2"
+if [ "$1" = "--with-python" ] || [ !-d "$instroot/../deps/python" ]; then
+    mkdir -p "$instroot/python"
+    wget 'http://python.org/ftp/python/3.2.3/Python-3.2.3.tar.bz2' \
+         -O "$instroot/python/src.tar.bz2"
+    tar -xjvf "$instroot/python/src.tar.bz2"
+
+    pushd Python-3.2.3
+    ./configure \
+        --prefix=/usr/local/hypernova
+    make
+    make install DESTDIR="$instroot/python/chroot"
+
+    # Hack for libpython3.2m.a (see issue #321)
+    chmod u+w "$instroot/python/chroot/usr/local/hypernova/lib/libpython3.2m.a"
+
+    popd
+
+    [ -d "$instroot/../deps/python" ] && rm -rf "$instroot/../deps/python"
+    mv "$instroot/python/chroot" "$instroot/../deps/python"
+fi
 
 [ -d /tmp/hypernova ] && rm -rf /tmp/hypernova
 

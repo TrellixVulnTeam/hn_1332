@@ -158,7 +158,7 @@ mkdir deps
 
 # Python
 %setup -q -n src -T -D -a 1
-mv Python-3.2.3 deps/python
+mv python deps
 
 # Elevator
 %setup -q -n src -T -D -a 2
@@ -187,12 +187,6 @@ mv python-pexpect deps
 
 %build
 
-pushd deps/python
-./configure \
-    --prefix=/usr/local/hypernova
-make
-popd
-
 pushd deps/elevator
 ./configure \
     --prefix=/usr/local/hypernova \
@@ -205,11 +199,10 @@ popd
 
 %install
 
-pushd deps/python
-make install DESTDIR="$RPM_BUILD_ROOT"
+mkdir -p "$RPM_BUILD_ROOT"
 
-# Hack for libpython3.2m.a (see issue #321)
-chmod u+w "$RPM_BUILD_ROOT/usr/local/hypernova/lib/libpython3.2m.a"
+pushd deps/python
+mv * "$RPM_BUILD_ROOT"
 popd
 
 # Hack for elevator

@@ -12,6 +12,8 @@ __pycache__
 *.pyc
 
 # Binary distributions
+deps/python
+install/python
 src/build
 src/dist
 src/*.egg-info
