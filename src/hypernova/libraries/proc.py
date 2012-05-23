@@ -24,7 +24,8 @@ import sys
 #     ulimit -n
 MAX_FD = 1024
 
-def daemonise(std_stream_target=None, work_dir=None, umask=None, max_fd=None):
+def daemonise(std_stream_target=None, work_dir=None, umask=None, max_fd=None,
+              keep_fds=[]):
     """
     Daemonise a process.
 
@@ -81,10 +82,11 @@ def daemonise(std_stream_target=None, work_dir=None, umask=None, max_fd=None):
     # but since we have no way of determining which FDs are in use, that's
     # tough.
     for fd in range(0, max_fd):
-        try:
-            os.close(fd)
-        except OSError:
-            pass
+        if fd not in keep_fds:
+            try:
+                os.close(fd)
+            except OSError:
+                pass
 
     # Redirect stdin, stdout (1) and stderr (2)
     os.open(std_stream_target, os.O_RDWR)

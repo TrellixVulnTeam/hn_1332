@@ -86,7 +86,14 @@ class Agent:
         self._config_logging()
 
         if self._config.getboolean('server', 'daemon'):
-            daemonise()
+            keep_fds = []
+            for (name, logger) in logging.Logger.manager.loggerDict.items():
+                for handler in logger.handlers:
+                    if hasattr(handler, 'stream'):
+                        keep_fds.append(handler.stream.fileno())
+            fd_str = ', '.join(str(fd) for fd in keep_fds)
+            self._main_log.debug('retaining file descriptors %s' %(fd_str))
+            daemonise(keep_fds=keep_fds)
 
         self._init_modules()
 

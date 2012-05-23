@@ -14,9 +14,3 @@
 	path = deps/python-pexpect
 	url = https://github.com/LukeCarrier/py3k-pexpect.git
 
-[submodule "deps/python-daemon"]
-	path = deps/python-daemon
-	url = git@github.com:LukeCarrier/py3k-daemon.git
-[submodule "deps/python-lockfile"]
-	path = deps/python-lockfile
-	url = https://github.com/LukeCarrier/py3k-lockfile.git
