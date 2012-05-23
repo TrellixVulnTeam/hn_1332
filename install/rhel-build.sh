@@ -16,7 +16,7 @@ sudo yum --assumeyes install bzip2-devel gcc {mysql,openssl,pcre,sqlite,zlib}-de
 rm -rf "$instroot/build"
 mkdir -p "$instroot/build/"{RPMS,SOURCES,SPECS}
 
-if [ "$1" = "--with-python" ] || [ !-d "$instroot/../deps/python" ]; then
+if [ "$1" = "--with-python" ] || [ ! -d "$instroot/../deps/python" ]; then
     mkdir -p "$instroot/python"
     wget 'http://python.org/ftp/python/3.2.3/Python-3.2.3.tar.bz2' \
          -O "$instroot/python/src.tar.bz2"
