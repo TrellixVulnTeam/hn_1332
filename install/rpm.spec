@@ -244,6 +244,11 @@ find "$RPM_BUILD_ROOT/usr/local/hypernova/etc/profile.d" -type f \
      -exec mv {} "$RPM_BUILD_ROOT/etc/profile.d" \;
 popd
 
+# Add directories which may not be present
+mkdir -p "$RPM_BUILD_ROOT/usr/local/hypernova/var/log"
+mkdir -p "$RPM_BUILD_ROOT/usr/local/hypernova/var/run"
+mkdir -p "$RPM_BUILD_ROOT/usr/local/hypernova/var/lib/gpg"
+
 
 %clean
 rm -rf "$RPM_BUILD_ROOT"
