@@ -315,12 +315,14 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
             # came from an authorised machine.
             self.clear = self._gpg.decrypt(raw)
             if str(self.clear) == '':
-                self.log_error('decrypted request body empty; potential authentication failure')
+                self.log_error('decrypted request body empty; potential ' \
+                               'authentication failure')
                 self.send_error(403, 'Access denied')
                 return
 
             if not hasattr(self.clear, 'fingerprint'):
-                self.log_error('data unsigned or signing key not in local key store')
+                self.log_error('data unsigned or signing key not in local ' \
+                               'key store')
                 self.send_error(403, 'Access denied')
                 return
 
@@ -342,7 +344,8 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
             # be incorporated very soon and will enable cleaner namespacing of
             # actions.
             try:
-                (self.module_name, self.action) = params['action'].rsplit('.', 1)
+                (self.module_name, self.action) = params['action'].rsplit('.',
+                                                                          1)
             except ValueError:
                 self.send_error(400, 'Action not namespaced')
 
@@ -457,7 +460,8 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
         self.send_header('Connection', 'close')
         self.end_headers()
 
-        response = modules.AgentRequestHandlerBase._format_response({}, False, code, '')
+        response = modules.AgentRequestHandlerBase._format_response({}, False,
+                                                                    code, '')
 
         self.send_preformatted_response(response)
 
