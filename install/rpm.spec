@@ -247,10 +247,20 @@ find "$RPM_BUILD_ROOT/usr/local/hypernova/etc/profile.d" -type f \
      -exec mv {} "$RPM_BUILD_ROOT/etc/profile.d" \;
 popd
 
+# Red Hat specific files
+ls ..
+pushd ../support/rhel
+mkdir -p "$RPM_BUILD_ROOT/etc/init.d"
+cp agent.init "$RPM_BUILD_ROOT/etc/init.d/hnagent"
+popd
+
 # Add directories which may not be present
 mkdir -p "$RPM_BUILD_ROOT/usr/local/hypernova/var/log"
 mkdir -p "$RPM_BUILD_ROOT/usr/local/hypernova/var/run"
 mkdir -p "$RPM_BUILD_ROOT/usr/local/hypernova/var/lib/gpg"
+
+# And now the files
+touch "$RPM_BUILD_ROOT/usr/local/hypernova/var/run/agent.pid"
 
 
 %clean
@@ -275,14 +285,13 @@ userdel -r 'hnagent'
 %files
 %defattr(-, root, root, -)
 %dir                            /usr/local/hypernova
+%attr(755, root, root)          /etc/init.d/hnagent
                                 /etc/profile.d/hypernova.sh
                                 /usr/local/hypernova/bin/hn-*
 %config(noreplace)              /usr/local/hypernova/etc/*/base.ini
 %config(noreplace)              /usr/local/hypernova/var/lib/platforms/*/packages.json
                                 /usr/local/hypernova/lib/python*/site-packages/HyperNova-*.egg
-%dir                            /usr/local/hypernova/var/lib/gpg
-%dir                            /usr/local/hypernova/var/log
-%dir                            /usr/local/hypernova/var/run
+                                /usr/local/hypernova/var
 
 %files elevator
 %defattr(6755, root, root, -)

@@ -52,7 +52,7 @@ mv distribute-0.6.24 python-distribute
 tar -cjf "$instroot/build/SOURCES/python-distribute.tar.bz2" python-distribute
 rm -rf *
 
-cp -r "$instroot/../chroot" "$instroot/../src" .
+cp -r "$instroot"/../{chroot,support} "$instroot/../src" .
 rm -rf chroot/bin/{activate*,easy_install*,elevator,pip*,python*} \
        chroot/{include,lib*,tmp} \
        chroot/var/www/*
@@ -61,7 +61,8 @@ find 'chroot/var/lib/gpg' -type f -exec rm -f {} \;
 find 'chroot/var/log' -type f -exec rm -f {} \;
 rm -rf src/{build,dist}
 
-tar --exclude-vcs -cjf "$instroot/build/SOURCES/hypernova.tar.bz2" chroot src
+tar --exclude-vcs -cjf "$instroot/build/SOURCES/hypernova.tar.bz2" \
+    chroot src support
 popd
 
 pushd "$instroot/../deps"
