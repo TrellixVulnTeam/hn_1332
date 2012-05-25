@@ -16,36 +16,53 @@
 # config:      /usr/local/hypernova/etc/hypernova/agent/local.ini
 # pidfile:     /usr/local/hypernova/var/run/hypernova/agent.pid
 
+. /etc/rc.d/init.d/functions
 . /etc/sysconfig/network
 
 BIN='/usr/local/hypernova/bin/hn-agent'
-NAME="$(basename "$BIN")"
+PROG="$(basename "$BIN")"
 ETC='/usr/local/hypernova/etc/agent'
 SYSETC='/etc/sysconfig/hn-agent'
-PID='/usr/local/hypernova/var/run/hn-agent.pid'
+PID='/usr/local/hypernova/var/run/agent.pid'
 USER='hnagent'
 
 [ -f "$SYSETC" ] && . "$SYSETC"
 
 stop() {
-    killproc $NAME -QUIT
-    retval=$?
-    exit $retval
-}
+    echo -n $"Stopping $PROG: "
 
-restart() {
-    stop
-    start
+    pid="$(cat "$PID")"
+    kill -3 "$pid" &>/dev/null
+    sleep 0.5
+
+    kill -0 "$pid" &>/dev/null && failure || success
+    retval=$?
+
+    echo
 }
 
 start() {
-    su -c "$BIN " "$USER"
-    retval=$?
-    exit $retval
+    echo -n $"Starting $PROG: "
+
+    pid="$(cat "$PID")"
+    kill -0 "$pid" &>/dev/null
+    if [ "$?" = "0" ]; then
+        # pid is already alive
+        failure
+    else
+        su -c "$BIN " "$USER"
+        retval=$?
+
+        sleep 0.5
+        pid="$(cat "$PID")"
+        kill -0 "$pid" && success || failure
+    fi
+
+    echo
 }
 
 status() {
-    echo -n "$NAME is "
+    echo -n "$PROG is "
 
     if [ -f "$PID" ]; then
         pid="$(cat "$PID")"
@@ -62,22 +79,21 @@ status() {
 }
 
 help() {
-    echo
+    echo "$0 start|stop|restart|reload|force-reload|status"
 }
 
 case "$1" in
     'start')
-        echo "Starting $NAME"
         start
         ;;
 
     'stop')
-        echo "Stopping $NAME"
         stop
         ;;
 
-    {'restart','reload','force-reload'})
-        restart
+    'restart'|'reload'|'force-reload')
+        stop
+        start
         ;;
 
     'status')
