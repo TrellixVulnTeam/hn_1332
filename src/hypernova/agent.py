@@ -95,6 +95,12 @@ class Agent:
             self._main_log.debug('retaining file descriptors %s' %(fd_str))
             daemonise(keep_fds=keep_fds)
 
+        try:
+            with open(self._config['server']['pid_file'], 'w') as f:
+                f.write(str(os.getpid()))
+        except KeyError:
+            self._main_log.warn('cannot write PID; check server.pid_file value')
+
         self._init_modules()
 
         addr = (self._config['server']['address'],
