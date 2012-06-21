@@ -3,7 +3,7 @@
 	url = https://github.com/LukeCarrier/elevator.git
 [submodule "deps/python-gnupg"]
 	path = deps/python-gnupg
-	url = https://github.com/LukeCarrier/python-gnupg.git
+	url = https://github.com/LukeCarrier/py3k-gnupg.git
 [submodule "deps/python-oursql"]
 	path = deps/python-oursql
 	url = https://github.com/LukeCarrier/py3k-oursql.git
