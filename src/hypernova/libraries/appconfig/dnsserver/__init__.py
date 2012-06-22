@@ -78,10 +78,14 @@ class AuthoritativeServerBase(ServerBase):
         Remove an SOA record.
         """
 
+        self._not_implemented()
+
     def rm_zone(self, zone):
         """
         Remove a zone.
         """
+
+        self._not_implemented()
 
 class Zone:
     """
