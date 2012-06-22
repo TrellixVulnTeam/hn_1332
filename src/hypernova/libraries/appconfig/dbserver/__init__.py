@@ -84,3 +84,13 @@ class User:
         self.username = username
         self.password = password
         self.host     = host
+
+
+def get_dbms(**kwargs):
+    adapter = kwargs.pop('adapter')
+    module_name = "hypernova.libraries.appconfig.dbserver.%s" %(adapter)
+
+    module = __import__(module_name, fromlist=['Server'])
+    Klass  = getattr(module, 'Server')
+
+    return Klass(**kwargs)
