@@ -331,6 +331,7 @@ require_once(ABSPATH . 'wp-settings.php');
 
 class SiteProvisioner(SiteProvisionerBase):
     """
+    WordPress provisioner.
     """
 
     module_name = 'wordpress'
@@ -341,13 +342,6 @@ class SiteProvisioner(SiteProvisionerBase):
     source_url = None
 
     def __init__(self, *args):
-        """
-        Initialise the provisioner.
-
-        If version is None (the default), the provisioner will fall back on
-        using the latest available release of the application.
-        """
-
         super().__init__(*args)
 
         try:
@@ -398,7 +392,7 @@ class SiteProvisioner(SiteProvisionerBase):
         config.db_name     = db['db']
         config.db_prefix   = 'wp_'
         config.db_charset  = SiteConfig.DB_CHARSETS[0]
-        config.dp_collate  = ''
+        config.db_collate  = ''
 
         for k in ['auth', 'secure_auth', 'nonce', 'logged_in']:
             for t in ['key', 'salt']:
