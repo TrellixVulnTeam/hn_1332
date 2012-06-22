@@ -39,6 +39,15 @@ class HttpServerConfigBase(AppConfigBase):
 
         pass
 
+    def add_virtualhost(self, vhost):
+        """
+        Add a new virtualhost.
+
+        Behaves exactly like commit_virtualhost(), except that if a vhost of the
+        same name already exists it will _not_ be overwritten. In this instance,
+        a VirtualHostCollisionError is raised and the commit does is aborted.
+        """
+
     def commit_virtualhost(self, vhost):
         """
         Commit a changed virtualhost.
@@ -149,12 +158,21 @@ class VirtualHostLocationBase(AppConfigBase):
     mode = ''
 
 
+class VirtualHostCollisionError(Exception):
+    """
+    Thrown when a virtual host collides with the main domain of an existing one.
+    """
+
+    pass
+
+
 class InvalidVirtualHostError(Exception):
     """
     Thrown when a commit is attempted on an invalid virtual host.
     """
 
     pass
+
 
 def get_server(server):
     """

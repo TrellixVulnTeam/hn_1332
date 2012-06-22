@@ -180,6 +180,10 @@ class SiteProvisionerBase:
     def add_vhost(self):
         """
         Get a new VirtualHost instance.
+
+        Note that this method does not commit a virtualhost, but merely provides
+        you with an object you may modify and later commit to disk with the
+        create_vhost() method.
         """
 
         if not hasattr(self, 'http_server'):
@@ -190,16 +194,7 @@ class SiteProvisionerBase:
     def create_vhost(self, vhost):
         """
         Add a virtualhost to the system's web server.
-
-        TODO: move the has_virtualhost() logic into a new method:
-              httpserver.AppConfig.add_virtualhost().
         """
-
-        if not hasattr(self, 'http_server'):
-            self._init_http_server()
-
-        if self.http_server.has_virtualhost(vhost):
-            raise VirtualHostCollisionError()
 
         self.http_server.commit_virtualhost(vhost)
         self.http_server.reload_service()
@@ -302,14 +297,9 @@ class SiteProvisionerBase:
         self.proc = subprocess.Popen(elevate_cmd(self.cmd))
 
 
-class VirtualHostCollisionError(Exception):
     """
-    Thrown when a virtual host collides with the main domain of an existing one.
-
-    TODO: this logic belongs in the httpserver module.
     """
 
-    pass
 
 
 def get_provisioner(profile_name):

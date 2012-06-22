@@ -81,6 +81,12 @@ class AppConfig(HttpServerConfigBase):
         self.config_dir = abspath(config_dir)
         self.vhost_dir  = join(self.config_dir, dir_mapping['virtualhosts'])
 
+    def add_virtualhost(self, vhost):
+        if self.has_virtualhost(vhost):
+            raise VirtualHostCollisionError()
+
+        self.commit_virtualhost(vhost)
+
     def commit_virtualhost(self, vhost):
         if not vhost.is_valid():
             raise InvalidVirtualHostError()
@@ -162,4 +168,3 @@ class VirtualHost(VirtualHostBase):
             chunks.append(chunk)
 
         return templates['templ_block_server'] %("\n    ".join(chunks))
-
