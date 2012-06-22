@@ -49,7 +49,7 @@ class Provisioner:
         """
 
         self.run_type    = run_type
-        self.module_name  = module_name
+        self.module_name = module_name
         self.parameters  = params
 
         self._init_logging()

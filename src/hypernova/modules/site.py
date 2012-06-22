@@ -87,3 +87,4 @@ class ClientResponseFormatter(ClientResponseFormatterBase):
                 ClientResponseFormatter.errors[response['response']['error']])
 
         return result
+

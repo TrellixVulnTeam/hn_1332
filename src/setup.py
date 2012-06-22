@@ -33,7 +33,7 @@ setup(
     install_requires = ['python-gnupg'],
     classifiers      = [
         'Programming Language :: Python',
-        'Topic :: Internet'
+        'Topic :: Internet',
     ],
     keywords         = 'cloud linux networking system'.split(' '),
     license          = 'GPL'
