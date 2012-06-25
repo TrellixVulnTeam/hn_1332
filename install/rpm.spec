@@ -248,7 +248,6 @@ find "$RPM_BUILD_ROOT/usr/local/hypernova/etc/profile.d" -type f \
 popd
 
 # Red Hat specific files
-ls ..
 pushd ../support/rhel
 mkdir -p "$RPM_BUILD_ROOT/etc/init.d"
 cp agent.init "$RPM_BUILD_ROOT/etc/init.d/hnagent"
