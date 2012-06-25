@@ -81,16 +81,18 @@ class SiteProvisionerBase:
         self.parameters = args
         self.config = ConfigurationFactory.get('hypernova')
 
-        self._base_cmd = [
-            self.config['provisioner']['binary'],
-            'site'
-        ]
+        # Try to be tolerant of calls outside of the agent where we don't have
+        # access to our normal configuration
+        try:
+            self._base_cmd.append(self.config['provisioner']['binary'])
+        except KeyError:
+            self._base_cmd.append(join(dirname(sys.argv[0]), 'provisioner.py'))
+        self._base_cmd.append('site')
 
-        self.env = deepcopy(os.env)
-
+        self.env = deepcopy(environ)
         try:
             self.env['CONFDIR'] = self.config['provisioner']['config_dir']
-        except:
+        except KeyError:
             pass
 
     def _init_http_server(self):
