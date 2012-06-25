@@ -380,8 +380,9 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
             try:
                 response = method(params['parameters'])
                 self.send_preformatted_response(response)
-            except:
+            except Exception as e:
                 self.send_error(500, 'Module execution failure')
+                self.log_exception(e)
                 return
 
         except socket.timeout as e:
