@@ -83,8 +83,10 @@ class ClientResponseFormatter(ClientResponseFormatterBase):
                      'on the selected profile, this process could take a few ' \
                      'minutes.'
         else:
-            result = result %(
-                ClientResponseFormatter.errors[response['response']['error']])
+            try:
+                result = result %(ClientResponseFormatter.errors[response['response']['error']])
+            except KeyError:
+                result = result %("an unknown error occurred")
+
 
         return result
-
