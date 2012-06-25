@@ -43,7 +43,7 @@ class Provisioner:
     _main_log_formatter = None
     _main_log_handler   = None
 
-    def __init__(self, run_type, config_root_dir, module_name, *params):
+    def __init__(self, config_root_dir, run_type, module_name, *params):
         """
         Initialise the configuration parameters.
         """

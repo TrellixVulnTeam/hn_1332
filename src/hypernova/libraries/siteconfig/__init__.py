@@ -51,14 +51,21 @@ class SiteProvisionerBase:
     most of this code into more focused modules.
     """
 
+    # Different associated resources
+    #
+    # We "serialise" these resources' properties to store them in the data store
+    # database. This enables us to associate a site with all of its components
+    # without shoehorning applications into a "one size fits all" pattern.
+    resources = []
+
+    # The name of the current module
+    #
+    # We use this string to seek related classes required in the provisioning
+    # run.
     module_name = ''
 
     # Base command to shell out with
-    _base_cmd = [
-        sys.executable,
-        realpath(join(dirname(sys.argv[0]), 'provisioner.py')),
-        'site',
-    ]
+    _base_cmd = []
 
     # The command we'll actually execute
     cmd = []
@@ -73,6 +80,18 @@ class SiteProvisionerBase:
 
         self.parameters = args
         self.config = ConfigurationFactory.get('hypernova')
+
+        self._base_cmd = [
+            self.config['provisioner']['binary'],
+            'site'
+        ]
+
+        self.env = deepcopy(os.env)
+
+        try:
+            self.env['CONFDIR'] = self.config['provisioner']['config_dir']
+        except:
+            pass
 
     def _init_http_server(self):
         """
@@ -249,7 +268,7 @@ class SiteProvisionerBase:
 
     def do_provision(self, *args):
         """
-        Called by the app provisioner to perform the provisioning operation.
+        Called by the app PROVISIONER to perform the provisioning operation.
 
         Note: you should NOT call this method from your own code. Doing so will
               lead to huge permission issues. Use provision() instead, which
@@ -270,9 +289,10 @@ class SiteProvisionerBase:
         """
         Provision the service unit in a subprocess.
 
-        Handle the initialisation of the provisioner utility and hand off the
-        deployment of the unit to it. This is the method which should be called
-        from agent modules, not do_provision().
+        When called from within the agent, handles the initialisation of the
+        provisioner utility and hand off the deployment of the unit to it. This
+        is the method which should be called from AGENT modules, not
+        do_provision().
         """
 
         self.cmd = deepcopy(self._base_cmd)

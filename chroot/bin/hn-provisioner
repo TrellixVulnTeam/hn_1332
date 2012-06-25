@@ -1,0 +1,24 @@
+#!/usr/bin/env bash
+
+#
+# HyperNova server management framework
+#
+# Agent launch bootstrapper
+#
+# Copyright (c) 2012 TDM Ltd
+#                    Luke Carrier <luke.carrier@tdm.info>
+#
+
+PYTHON='python3.2'
+
+[ -z "$BINDIR"  ] &&  BINDIR="/usr/local/hypernova/bin"
+[ -z "$CONFDIR" ] && CONFDIR="/usr/local/hypernova/etc/provisioner"
+
+if [ -z "$PYTHONPATH" ]; then
+    PYTHONPATHBASE=/usr/local/hypernova/lib/python3.2/site-packages
+    for p in $PYTHONPATHBASE/*; do
+        PYTHONPATH="$PYTHONPATH:$p"
+    done
+fi
+
+PYTHONPATH="$PYTHONPATH" "$BINDIR/$PYTHON" -m hypernova.provisioner "$CONFDIR" $@
