@@ -15,7 +15,7 @@ from hypernova.libraries.appconfig import httpserver
 from hypernova.libraries.configuration import ConfigurationFactory
 from hypernova.libraries.permissionelevation import elevate_cmd
 from hypernova.libraries.usermanagement import Group, User
-from os import chown, unlink, walk
+from os import chown, environ, unlink, walk
 from os.path import dirname, isdir, join, realpath
 import oursql
 import pkgutil
@@ -26,6 +26,7 @@ import subprocess
 import sys
 import tarfile
 import tempfile
+from time import time
 from urllib import request
 
 class SiteConfigBase:
@@ -95,6 +96,16 @@ class SiteProvisionerBase:
         except KeyError:
             pass
 
+
+    def _get_output_file_base(self):
+        """
+        Get the log file for this provisioner run.
+        """
+
+        pattern = self.config.get('provisioner', 'log_filename_pattern',
+                                  raw=True)
+        return pattern %{'domain': self.parameters[0],
+                         'time':   str(round(time()))}
     def _init_http_server(self):
         """
         Get an HTTP server object.
@@ -312,17 +323,19 @@ class SiteProvisionerBase:
         except AttributeError:
             pass
 
-        # This will only be possible when in the context of the agent, so if we
-        # fail, it's not an issue. This ought to be cleaned up.
-        try:
-            self.cmd.append(self.config['provisioner']['config_dir'])
-        except KeyError:
-            pass
-
         self.cmd.append(self.module_name)
         self.cmd.extend(self.parameters)
 
-        self.proc = subprocess.Popen(elevate_cmd(self.cmd))
+        with open(self._get_output_file_base() + ".out.log", "wb") as out:
+            with open(self._get_output_file_base() + ".err.log", "wb") as err:
+                proc = subprocess.Popen(elevate_cmd(self.cmd), env=environ,
+                                        stdin=subprocess.PIPE,
+                                        stdout=subprocess.PIPE,
+                                        stderr=subprocess.PIPE)
+                proc.wait()
+                (out_buf, err_buf) = proc.communicate()
+                out.write(out_buf)
+                err.write(err_buf)
 
 
     """
