@@ -33,7 +33,13 @@ class SiteConfigBase:
     Base class for all configuration objects.
     """
 
-    pass
+    def __str__(self):
+        """
+        Return a string representation.
+
+        Assemble a configuration file from the options defined within the
+        object.
+        """
 
 
 class SiteProvisionerBase:

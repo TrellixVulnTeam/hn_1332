@@ -17,7 +17,7 @@ class SiteConfig(SiteConfigBase):
     """
     WordPress site configuration.
 
-    This file represents a standard wp-config.php file. Its __str__() method
+    This object represents a standard wp-config.php file. Its __str__() method
     converts into such.
 
     When making changes to this file, be sure to carefully examine the
@@ -299,13 +299,6 @@ require_once(ABSPATH . 'wp-settings.php');
         """
 
     def __str__(self):
-        """
-        Return a string representation.
-
-        Assemble a configuration file from the options defined within the
-        object.
-        """
-
         options = []
         for abstract, actual in self.__mapping.items():
             value = getattr(self, abstract)
