@@ -13,7 +13,6 @@ from hypernova.modules import AgentRequestHandlerBase, \
                               ClientRequestBuilderBase, \
                               ClientResponseFormatterBase
 import os
-import subprocess
 
 class AgentRequestHandler(AgentRequestHandlerBase):
 
