@@ -80,17 +80,11 @@ class SiteProvisionerBase:
         """
 
         self.parameters = args
-        self.config = ConfigurationFactory.get('hypernova')
+        self.config     = ConfigurationFactory.get('hypernova')
+        self.env        = deepcopy(environ)
 
-        # Try to be tolerant of calls outside of the agent where we don't have
-        # access to our normal configuration
-        try:
-            self._base_cmd.append(self.config['provisioner']['binary'])
-        except KeyError:
-            self._base_cmd.append(join(dirname(sys.argv[0]), 'provisioner.py'))
-        self._base_cmd.append('site')
-
-        self.env = deepcopy(environ)
+        # Attempt to guess the provsioner's configuration directory; we can only
+        # do this if it's set in the agent's configuration
         try:
             self.env['CONFDIR'] = self.config['provisioner']['config_dir']
         except KeyError:
@@ -106,6 +100,7 @@ class SiteProvisionerBase:
                                   raw=True)
         return pattern %{'domain': self.parameters[0],
                          'time':   str(round(time()))}
+
     def _init_http_server(self):
         """
         Get an HTTP server object.
@@ -308,8 +303,6 @@ class SiteProvisionerBase:
         do_provision().
         """
 
-        self.cmd = deepcopy(self._base_cmd)
-
         # It's busy -- leave it well alone.
         #
         # Under normal circumstances it's impossible for this to happen, since
@@ -323,6 +316,12 @@ class SiteProvisionerBase:
         except AttributeError:
             pass
 
+        self.cmd = deepcopy(self._base_cmd)
+        try:
+            self.cmd.append(self.config['provisioner']['binary'])
+        except KeyError:
+            self.cmd.append(join(dirname(sys.argv[0]), 'provisioner.py'))
+        self.cmd.append('site')
         self.cmd.append(self.module_name)
         self.cmd.extend(self.parameters)
 
