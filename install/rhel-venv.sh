@@ -14,8 +14,10 @@
 #   $2 = str
 in_array() {
     for e in "${@:2}"; do
-        [ "$e" == "$1" ] && break
+        [ "$e" == "$1" ] && return 0
     done;
+
+    return 1
 }
 
 # Exit the running script with an error status and clear warning
@@ -26,10 +28,6 @@ error_trap() {
     exit 69
 }
 
-# Bail out now unless the user is in a virtualenv context -- we'll probably
-# modify global system configuration!
-[ -z "$VIRTUAL_ENV" ] && echo "$0: activate a virtualenv first!" >&2 \
-                      && exit
 # Establish what we need to do before initiating error trapping, since we have
 # to return error exit statuses in in_array
 FORCE=0
@@ -39,6 +37,14 @@ in_array '--force' "${@}"
 SKIPDEPS=0
 in_array '--skip-deps' "${@}"
 [ "$?" == 0 ] && SKIPDEPS=1
+
+# Bail out now unless the user is in a virtualenv context -- we'll probably
+# modify global system configuration!
+if [ -z "$VIRTUAL_ENV" ] && [ $FORCE -eq 0 ]; then
+    echo "$0: activate a virtualenv first!" >&2 \
+    echo "If this is your first time, use the --force to install a fresh one"
+    exit
+fi
 
 # Don't risk screwing the system up; exit early
 trap error_trap 1 2 3 15 ERR

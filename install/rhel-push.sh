@@ -41,4 +41,3 @@ cp hypernova/install/build/RPMS/"\$hypernova_build_arch"/* \
 createrepo rpms/RPMS/"\$hypernova_build_arch"
 exit
 EOF
-
