@@ -21,11 +21,15 @@ in_array() {
 # Exit the running script with an error status and clear warning
 error_trap() {
     echo " "
-    echo "$0: an error occurred during the execution of an action; aborting"
+    echo "$0: an error occurred during the execution of an action; aborting" >&2
     echo " "
     exit 69
 }
 
+# Bail out now unless the user is in a virtualenv context -- we'll probably
+# modify global system configuration!
+[ -z "$VIRTUAL_ENV" ] && echo "$0: activate a virtualenv first!" >&2 \
+                      && exit
 # Establish what we need to do before initiating error trapping, since we have
 # to return error exit statuses in in_array
 FORCE=0
