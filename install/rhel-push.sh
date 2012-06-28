@@ -24,8 +24,9 @@ exit
 EOF
 
 echo "synchronising local files with remote..."
-rsync -arvuz * "$user@$host:hypernova" \
-      --exclude ".git" --exclude "deps/python" \
+rsync -arvuz * "$user"@"$host":hypernova \
+      --exclude ".git" \
+      --exclude "deps/python" \
       --exclude "install/build" \
       --exclude "install/python"
 
@@ -35,7 +36,8 @@ export hypernova_build_arch="\$(rpm --eval %{_arch})"
 hypernova/install/rhel-build.sh "$with_python"
 rm -rf rpms/RPMS/"\$hypernova_build_arch"/hypernova-*
 mkdir -p rpms/RPMS/"\$hypernova_build_arch"
-cp hypernova/install/build/RPMS/"\$hypernova_build_arch"/* rpms/RPMS/
+cp hypernova/install/build/RPMS/"\$hypernova_build_arch"/* \
+   rpms/RPMS/"\$hypernova_build_arch"
 createrepo rpms/RPMS/"\$hypernova_build_arch"
 exit
 EOF
