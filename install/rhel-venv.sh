@@ -10,8 +10,8 @@
 #
 
 # Check whether an array contains a given value
-#   $1 = arr
-#   $2 = str
+#   $1 = str
+#   $2 = arr
 in_array() {
     for e in "${@:2}"; do
         [ "$e" == "$1" ] && return 0
