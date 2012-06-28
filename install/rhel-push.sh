@@ -15,14 +15,28 @@ user="$2"
 
 cd "$(dirname "$0")/.."
 
-echo                   "# yum -y install createrepo gcc make rpm-build rsync " \
-                       "sudo wget {mysql,openssl,pcre,sqlite,zlib}-devel"
-ssh      "$user@$host" mkdir -p hypernova
+echo "preparing remote build environment..."
+ssh -tt -l "$user" "$host" <<EOF
+sudo yum -y install createrepo gcc make rpm-build rsync sudo wget \
+                    {mysql,openssl,pcre,sqlite,zlib}-devel
+mkdir -p hypernova
+exit
+EOF
+
+echo "synchronising local files with remote..."
 rsync -arvuz * "$user@$host:hypernova" \
-      --exclude '.git' --exclude 'deps/python' --exclude 'install/build' \
-      --exclude 'install/python'
-ssh      "$user@$host" hypernova/install/rhel-build.sh $with_python
-ssh      "$user@$host" rm -rf rpms/RPMS/x86_64/hypernova-*
-ssh      "$user@$host" mkdir -p rpms/RPMS/x86_64
-ssh      "$user@$host" cp hypernova/install/build/RPMS/x86_64/* rpms/RPMS/x86_64
-ssh      "$user@$host" createrepo rpms/RPMS/x86_64/
+      --exclude ".git" --exclude "deps/python" \
+      --exclude "install/build" \
+      --exclude "install/python"
+
+echo "performing the build..."
+ssh -tt -l "$user" "$host" <<EOF
+export hypernova_build_arch="\$(rpm --eval %{_arch})"
+hypernova/install/rhel-build.sh "$with_python"
+rm -rf rpms/RPMS/"\$hypernova_build_arch"/hypernova-*
+mkdir -p rpms/RPMS/"\$hypernova_build_arch"
+cp hypernova/install/build/RPMS/"\$hypernova_build_arch"/* rpms/RPMS/
+createrepo rpms/RPMS/"\$hypernova_build_arch"
+exit
+EOF
+
