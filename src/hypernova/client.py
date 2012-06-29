@@ -194,7 +194,11 @@ class ClientRequestAction(ClientActionBase):
                                      'do_' + cli_args.request_action)
 
         request  = request_builder(cli_args, client)
-        keys     = (self._config['client']['privkey'], node['pubkey'])
+        try:
+            keys     = (self._config['client']['privkey'], node['pubkey'])
+        except KeyError:
+            print("Failed: no private key configured")
+            sys.exit(1)
         response = client.query(request, *keys)
 
         result = response_formatter(cli_args, response)
