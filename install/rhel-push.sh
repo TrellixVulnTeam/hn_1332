@@ -24,11 +24,41 @@ exit
 EOF
 
 echo "synchronising local files with remote..."
-rsync -arvuz * "$user"@"$host":hypernova \
-      --exclude ".git" \
-      --exclude "deps/python" \
-      --exclude "install/build" \
-      --exclude "install/python"
+includes=(
+    "chroot"
+    "deps"
+    "install"
+    "src"
+    "support"
+)
+
+excludes=(
+    "**/.git*"
+    "**/.hg*"
+    "**/__pycache__"
+    "**/*.egg-info"
+    "chroot/lib*/**"
+    "deps/**/build"
+    "deps/**/dist"
+    "deps/**/*.egg"
+    "deps/python"
+    "install/build"
+    "install/python"
+    "src/build"
+    "src/**/*.egg"
+)
+
+includes_line=""
+for include in ${includes[@]}; do
+    includes_line="${includes_line}${include} "
+done
+
+excludes_line=""
+for exclude in ${excludes[@]}; do
+    excludes_line="${excludes_line}--exclude ${exclude} "
+done
+
+rsync -arvuz $includes_line$excludes_line "$user"@"$host":hypernova
 
 echo "performing the build..."
 ssh -tt -l "$user" "$host" <<EOF
