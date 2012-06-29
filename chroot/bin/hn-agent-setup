@@ -9,23 +9,23 @@
 #                    Luke Carrier <luke.carrier@tdm.info>
 #
 
-[ "$(whoami)" != 'root' ] && echo 'You must be root' \
+[ "$(whoami)" != 'root' ] && echo "You must be root" \
                           && exit 79
 
 [ -d "$GPG_HOME" ] && echo "Cowardly refusing to overwrite old keys!" \
                    && exit 79
 
-CHROOT='/usr/local/hypernova'
+CHROOT="/usr/local/hypernova"
 CUSTOM_CONF="$CHROOT/etc/agent/local.ini"
 GPG_HOME="$CHROOT/var/lib/gpg"
 
-BATCH_FILE='/tmp/hypernova_gpg_batch'
+BATCH_FILE="/tmp/hypernova_gpg_batch"
 
-KEY_TYPE='rsa'
-KEY_LENGTH='2048'
+KEY_TYPE="rsa"
+KEY_LENGTH="2048"
 KEY_REAL_NAME="$(hostname --short)"
 KEY_EMAIL="$(hostname | sed 's/\./@/')"
-KEY_COMMENT='Automatically generated via hn-agent-setup'
+KEY_COMMENT="Automatically generated via hn-agent-setup"
 
 cat >"$BATCH_FILE" <<EOF
 Key-Type: ${KEY_TYPE}
@@ -50,7 +50,9 @@ cat >"$CUSTOM_CONF" <<EOF
 [gpg]
 fingerprint = ${KEY_FINGERPRINT}
 EOF
-chown -R 'hnagent:root' "$CUSTOM_CONF" "$GPG_HOME"
+chown -R "hnagent:root" "$CUSTOM_CONF" "$GPG_HOME"
+find "$GPG_HOME" -type d -exec chmod 750 {}
+find "$GPG_HOME" -type f -exec chmod 640 {}
 
 echo "A custom configuration file has been generated in $CUSTOM_CONF; you will"
 echo 'likely need to customise this for your environment and requirements. For'
