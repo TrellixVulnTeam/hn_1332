@@ -16,8 +16,9 @@
                    && exit 79
 
 CHROOT="/usr/local/hypernova"
+SHARED_STATE="$CHROOT/var"
 CUSTOM_CONF="$CHROOT/etc/agent/local.ini"
-GPG_HOME="$CHROOT/var/lib/gpg"
+GPG_HOME="$SHARED_STATE/lib/gpg"
 
 BATCH_FILE="/tmp/hypernova_gpg_batch"
 
@@ -51,8 +52,8 @@ cat >"$CUSTOM_CONF" <<EOF
 fingerprint = ${KEY_FINGERPRINT}
 EOF
 chown -R "hnagent:root" "$CUSTOM_CONF" "$CHROOT/var"
-find "$GPG_HOME" -type d -exec chmod 750 {}
-find "$GPG_HOME" -type f -exec chmod 640 {}
+find "$SHARED_STATE" -type d -exec chmod 750 {} \;
+find "$SHARED_STATE" -type f -exec chmod 640 {} \;
 
 echo "A custom configuration file has been generated in $CUSTOM_CONF; you will"
 echo 'likely need to customise this for your environment and requirements. For'
