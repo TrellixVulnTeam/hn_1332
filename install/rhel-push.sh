@@ -37,6 +37,7 @@ excludes=(
     "**/.hg*"
     "**/__pycache__"
     "**/*.egg-info"
+    "chroot/etc/client"
     "chroot/lib*/**"
     "deps/**/build"
     "deps/**/dist"
@@ -58,7 +59,8 @@ for exclude in ${excludes[@]}; do
     excludes_line="${excludes_line}--exclude ${exclude} "
 done
 
-rsync -arvuz $includes_line$excludes_line "$user"@"$host":hypernova
+rsync -arvuz --delete{,-excluded} $includes_line$excludes_line \
+      "$user"@"$host":hypernova
 
 echo "performing the build..."
 ssh -tt -l "$user" "$host" <<EOF

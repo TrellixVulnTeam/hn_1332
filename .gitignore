@@ -22,6 +22,7 @@ src/*.egg-info
 # chroot environment stuff
 chroot/bin/elevator
 chroot/bin/pyrg
+chroot/etc/client
 chroot/etc/*/local.ini
 chroot/etc/nginx
 chroot/tmp/*
