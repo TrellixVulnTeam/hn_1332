@@ -55,7 +55,7 @@ in_array '--skip-deps' "${@}"
 # Bail out now unless the user is in a virtualenv context -- we'll probably
 # modify global system configuration!
 if [ -z "$VIRTUAL_ENV" ] && [ $FORCE -eq 0 ]; then
-    echo "$0: activate a virtualenv first!" >&2 \
+    echo "$0: activate a virtualenv first!" >&2
     echo "If this is your first time, use the --force to install a fresh one"
     exit
 fi
@@ -68,8 +68,7 @@ srcroot="$(readlink -fn "$(dirname "$0")/..")"
 cd $srcroot
 
 # If forced, remove all the things
-if [ "$FORCE" == 1 ]
-then
+if [ "$FORCE" == 1 ]; then
     rm -rf $srcroot/chroot/bin/{activate,easy_install,pip,py}*
     pythonbrew venv delete hypernova
 fi
@@ -133,26 +132,29 @@ if [ "$SKIPDEPS" = 0 ]; then
 fi
 
 # Set up virtualenv
+PATHS=<<EOF
+export BINDIR="$srcroot/chroot/bin"
+export CONFDIR="$srcroot/chroot/etc/hypernova"
+export PATH="\$PATH:\$BINDIR"
+EOF
+
 if [ "$FORCE" == 1 ] || [ ! -f bin/activate ]; then
+    pushd chroot
     if [ "$USE_PYTHONBREW" = "0" ]; then
-        pushd chroot
         if [ ! -f "bin/activate" ]; then
             virtualenv --help
             virtualenv "$(pwd)"
         fi
-        . bin/activate
-        popd
-    else
-        touch "$srcroot/chroot/bin/activate"
-        ln -s "$(which python3.2)" "$srcroot/chroot/bin/python3.2"
-    fi
 
-    # Patch virtualenv activation file
-    echo "
-    export BINDIR="$srcroot/chroot/bin"
-    export CONFDIR="$srcroot/chroot/etc/hypernova"
-    export PATH="\$PATH:\$BINDIR"
-    " >> "$srcroot/chroot/bin/activate"
+        echo $PATHS >> bin/activate
+
+        . bin/activate
+    else
+        echo $PATHS > bin/activate
+    fi
+    popd
+
+    "$srcroot/chroot/bin/activate"
 fi
 
 # Install Python dependencies
@@ -192,3 +194,4 @@ rm -rfv build/ dist/
 "python3.2" setup.py bdist_egg
 "easy_install-3.2" dist/HyperNova-*-py3.2.egg
 popd
+
