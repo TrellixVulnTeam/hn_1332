@@ -36,6 +36,7 @@ setup(
         'Programming Language :: Python',
         'Topic :: Internet',
     ],
-    keywords         = 'cloud linux networking system'.split(' '),
+    keywords         = ['cloud', 'linux', 'management', 'networking',
+                        'orchestration', 'system'],
     license          = 'GPL'
 )
