@@ -60,6 +60,15 @@ if [ -z "$VIRTUAL_ENV" ] && [ $FORCE -eq 0 ]; then
     exit
 fi
 
+# Detect pythonbrew; we can sidestep the system python totally then
+USE_PYTHONBREW=0
+in_array "--use-pythonbrew" "${@}"
+retval="$?"
+if [ "$retval" = 0 ] || [[ "$PYTHONPATH" =~ "$HOME/.pythonbrew" ]]; then
+    echo "pythonbrew detected or forced; we'll assume a per-user install"
+    USE_PYTHONBREW=1
+fi
+
 # Don't risk screwing the system up; exit early
 trap_on
 
@@ -70,7 +79,7 @@ cd $srcroot
 # If forced, remove all the things
 if [ "$FORCE" == 1 ]; then
     rm -rf $srcroot/chroot/bin/{activate,easy_install,pip,py}*
-    pythonbrew venv delete hypernova
+    [ "$USE_PYTHONBREW" = "1" ] && pythonbrew venv delete hypernova
 fi
 
 # Prepare the system
@@ -89,15 +98,6 @@ if [ "$SKIPDEPS" = 0 ]; then
     if [ "$?" != "0" ]; then
         echo "python3.2 must be available on your PATH!"
         exit 1
-    fi
-
-    # Detect pythonbrew; we can sidestep the system python totally then
-    USE_PYTHONBREW=0
-    in_array "--use-pythonbrew" "${@}"
-    retval="$?"
-    if [ "$retval" = 0 ] || [[ "$PYTHONPATH" =~ "$HOME/.pythonbrew" ]]; then
-        echo "pythonbrew detected or forced; we'll assume a per-user install"
-        USE_PYTHONBREW=1
     fi
 
     # Re-enable error trapping
@@ -194,4 +194,3 @@ rm -rfv build/ dist/
 "python3.2" setup.py bdist_egg
 "easy_install-3.2" dist/HyperNova-*-py3.2.egg
 popd
-
