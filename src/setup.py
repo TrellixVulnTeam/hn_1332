@@ -24,6 +24,7 @@ setup(
         'hypernova',
         'hypernova.libraries',
         'hypernova.libraries.appconfig',
+        'hypernova.libraries.appconfig.authserver',
         'hypernova.libraries.appconfig.dbserver',
         'hypernova.libraries.appconfig.dnsserver',
         'hypernova.libraries.appconfig.httpserver',

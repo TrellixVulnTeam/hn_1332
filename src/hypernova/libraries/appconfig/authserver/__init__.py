@@ -140,15 +140,12 @@ class UserCollisionError(Exception):
     pass
 
 
-def get_auth_server(adapter):
+def get_auth_server(adapter, *args, **kwargs):
     """
     Seek and attempt to load a password management tool.
     """
 
     module_name = "hypernova.libraries.appconfig.authserver.%s" %(adapter)
-
     module = __import__(module_name, fromlist=["Server"])
     Klass  = getattr(module, "Server")
-
-    return Klass(**kwargs)
-
+    return Klass(*args, **kwargs)
