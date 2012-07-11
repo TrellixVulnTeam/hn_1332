@@ -4,6 +4,7 @@ spawn ssh -p 2222 root@localhost
 expect "password:"
 send "password\r"
 expect "#"
+send "find /usr/ &>/dev/null" # Generates entropy
 send "gpg --gen-key\r"
 expect "Your selection?"
 send "1\r"
