@@ -4,13 +4,11 @@
 
 
 # Run the build system
-[ ! -e manager.img ] && qemu-img create -f qcow2 -b centos-6.2.img manager.img && echo "Creating the manager image..." 
-[ ! -e node.img ] && qemu-img create -f qcow2 -b centos-6.2.img node.img && echo "Creating the node image..." 
+[ ! -e builder.img ] && qemu-img create -f qcow2 -b centos-6.2.img builder.img && echo "Creating the builder image..." 
 
 echo "Launch the VM to build HyperNova Package: will be use for the build AND the client"
 echo "Running emulator. You can ssh into it from the port 3333"
-qemu-system-x86_64 -m 512 -net nic,vhost -net user -hda manager.img  -enable-kvm &
-qemu-system-x86_64 -m 512 -net nic -net user -hda node.img  -enable-kvm &
+qemu-system-x86_64 -m 512 -net nic -net user -hda builder.img  -enable-kvm -redir tcp:3333::22 &
 
 until `ssh -l hnbuild localhost -p 3333 exit` ; do echo -n "."; done
 
