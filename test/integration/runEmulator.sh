@@ -7,10 +7,12 @@
 [ ! -e manager.img ] && qemu-img create -f qcow2 -b centos-6.2.img manager.img && echo "Creating the manager image..." 
 [ ! -e node.img ] && qemu-img create -f qcow2 -b centos-6.2.img node.img && echo "Creating the node image..." 
 
-echo "Running emulator. You can ssh into it from the port 2222"
-qemu-system-x86_64 -m 512 -net nic -net socket,vlan=1,listen=:8010 -hda manager.img  -enable-kvm  &
-qemu-system-x86_64 -m 512 -net nic -net socket,vlan=1,connect=connect=127.0.0.1:8010 -hda node.img  -enable-kvm  &
+echo "Running emulator. You can ssh into it from the port 3333"
+# For Mac address see /etc/udev rules, we have 2 interfaces eth0=..66 and eth1=...56
+qemu-system-x86_64 -m 512 -net nic,macaddr=52:54:00:f5:80:66 -net user,dhcpstart=10.0.2.15 -redir tcp:3333::22 -net socket,listen=:6070 -hda manager.img  -enable-kvm  &
+qemu-system-x86_64 -m 512 -net nic,macaddr=52:54:00:12:34:56 -net user -redir tcp:4444::22  -net socket,connect=127.0.0.1:6070 -hda node.img  -enable-kvm &
 
+read KEY
 # Run the target server system
 #echo "Launch the VM as a target install for HyperNova"
 #qemu-img create -f qcow2 -b centos-6.0.img builder.img 

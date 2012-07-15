@@ -8,8 +8,8 @@
 
 echo "Launch the VM to build HyperNova Package: will be use for the build AND the client"
 echo "Running emulator. You can ssh into it from the port 3333"
-qemu-system-x86_64 -m 512 -net nic -net user -hda builder.img  -enable-kvm -redir tcp:3333::22 &
-
+qemu-system-x86_64 -m 512 -net nic,macaddr=52:54:00:f5:80:66 -net user -hda builder.img  -enable-kvm -redir tcp:3333::22 &
+# -nographic -no-acpi  ?
 until `ssh -l hnbuild localhost -p 3333 exit` ; do echo -n "."; done
 
 echo "Running the build"
