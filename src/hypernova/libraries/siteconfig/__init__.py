@@ -12,9 +12,11 @@
 from copy import deepcopy
 import gzip
 from hypernova.libraries.appconfig import httpserver
+from hypernova.libraries.appconfig.authserver import (get_auth_server,
+                                                      Group  as AuthGroup,
+                                                      User   as AuthUser)
 from hypernova.libraries.configuration import ConfigurationFactory
 from hypernova.libraries.permissionelevation import elevate_cmd
-from hypernova.libraries.usermanagement import Group, User
 from os import chown, environ, unlink, walk
 from os.path import dirname, isdir, join, realpath
 import oursql
@@ -176,14 +178,18 @@ class SiteProvisionerBase:
         Add a new system user.
         """
 
-        user = User()
-        user.account  = self._random_string(int(self.config['system']['account_length']))
-        user.password = self._random_string(int(self.config['system']['password_length']))
+        server = get_auth_server(self.config['system']['auth_server'])
 
         if self.config['core']['mode'] == 'production':
-            user.create()
+            # If we're in production mode, create the user account...
+            user = AuthUser(
+                self._random_string(int(self.config['system']['account_length'])),
+                self._random_string(int(self.config['system']['password_length']))
+            )
+            server.add_user(user)
         elif self.config['core']['mode'] == 'development':
-            user.repopulate(self.config['system']['development_user'])
+            # ...otherwise just play pretend
+            user = AuthServer.get_user(self.config['system']['development_user'])
 
         return user
 

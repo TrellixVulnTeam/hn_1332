@@ -337,6 +337,8 @@ class SiteProvisioner(SiteProvisionerBase):
     def __init__(self, *args):
         super().__init__(*args)
 
+        self.domain_name = self.parameters[0]
+
         try:
             self.source_url = self.__source_url %(self.parameters[1])
         except IndexError:
@@ -361,16 +363,24 @@ class SiteProvisioner(SiteProvisionerBase):
         db = self.create_mysql_database()
 
         # Install the files
-        print('installing files')
-        target = join(self.config['web']['base_dir'], self.parameters[0])
+        # Use Python-native interpolation instead of the functionality
+        # implemented in configparser to avoid accidentally substituting values
+        # from the user's config; they *must* come from the user object
+        print('installing source...')
+        target = self.config.get('web', 'base_dir', raw=True)
+        print(' => skeleton:', target)
+        target = target.format(domainname=self.domain_name,
+                               homedir=user.directory,
+                               username=user.account)
+        print(' => resulting path:', target)
         self.move_tree(join(source, 'wordpress'), target)
 
         # Write web server configuration and reload daemon
         print('configuring http server')
         vhost = self.add_vhost()
-        vhost.document_root = join(self.config['web']['base_dir'], self.parameters[0])
+        vhost.document_root = target
         vhost.listen = 80
-        vhost.server_names = [self.parameters[0]]
+        vhost.server_names = [self.domain_name]
         vhost.indexes = ['index.php', 'index.html', 'index.htm']
         vhost.includes.append('enable_php')
         self.create_vhost(vhost)
