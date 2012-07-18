@@ -346,19 +346,19 @@ class SiteProvisioner(SiteProvisionerBase):
 
     def _provision(self):
 
-        # Download
         print('downloading source...')
         tarball = self.download_url(self.source_url, provider='HTTP',
                                     suffix='.tar.gz')
         print(' =>', tarball)
 
-        # Extract
-        print('extracting')
+        print('extracting source...')
         source = self.extract_gzipped_tarball(tarball)
+        print(' =>', source)
 
-        # Create a system user
-        print('creating system user')
+        print('creating system user account...')
         user = self.create_system_user()
+        print(' => username:', user.account)
+        print(' => password:', user.password)
 
         print('creating database...')
         db = self.create_mysql_database()
@@ -366,7 +366,6 @@ class SiteProvisioner(SiteProvisionerBase):
         print(' => password:', db['user'].password)
         print(' => database:', db['database'].name)
 
-        # Install the files
         # Use Python-native interpolation instead of the functionality
         # implemented in configparser to avoid accidentally substituting values
         # from the user's config; they *must* come from the user object
@@ -379,8 +378,7 @@ class SiteProvisioner(SiteProvisionerBase):
         print(' => resulting path:', target)
         self.move_tree(join(source, 'wordpress'), target)
 
-        # Write web server configuration and reload daemon
-        print('configuring http server')
+        print('configuring web server...')
         vhost = self.add_vhost()
         vhost.document_root = target
         vhost.listen = 80
@@ -389,8 +387,7 @@ class SiteProvisioner(SiteProvisionerBase):
         vhost.includes.append('enable_php')
         self.create_vhost(vhost)
 
-        # Write application configuration
-        print('configuring application')
+        print('configuring application...')
         config = SiteConfig()
 
         config.db_host     = db['user'].host
@@ -409,8 +406,5 @@ class SiteProvisioner(SiteProvisionerBase):
             f.write(str(config))
 
         # Set file permissions
-        print('awesomeifying file permissions')
+        print('securing file permissions...')
         self.set_ownership(user, self.get_web_group(), target)
-
-        # Migrate database
-        print('migrating db')
