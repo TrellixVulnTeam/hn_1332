@@ -117,7 +117,8 @@ class SiteProvisionerBase:
         """
 
         self.http_server = httpserver.get_server(self.config['web']['server'],
-                                                 self.config['web']['conf_dir'])
+                                                 self.config['web']['conf_files'].split(','),
+                                                 self.config.get('web', 'vhost_file', raw=True))
 
     def _random_string(self, length):
         """
@@ -216,7 +217,7 @@ class SiteProvisionerBase:
 
         return self.http_server.get_virtualhost()
 
-    def create_vhost(self, vhost):
+    def create_vhost(self, vhost, file_substitutions={}):
         """
         Add a virtualhost to the system's web server.
         """

@@ -71,15 +71,13 @@ class Server(ServerBase):
     nginx configurator.
     """
 
-    def __init__(self, config_dir, dir_mapping=None):
-        if not dir_mapping:
-            dir_mapping = {}
+    core_configs = []
+    vhost_file   = ""
 
-        if 'virtualhosts' not in dir_mapping.keys():
-            dir_mapping['virtualhosts'] = 'sites'
+    def __init__(self, core_configs, vhost_file):
 
-        self.config_dir = abspath(config_dir)
-        self.vhost_dir  = join(self.config_dir, dir_mapping['virtualhosts'])
+        self.core_configs = core_configs
+        self.vhost_file   = vhost_file
 
     def add_virtualhost(self, vhost):
         if self.has_virtualhost(vhost):
@@ -87,11 +85,15 @@ class Server(ServerBase):
 
         self.commit_virtualhost(vhost)
 
-    def commit_virtualhost(self, vhost):
+    def commit_virtualhost(self, vhost, file_substitutions={}):
         if not vhost.is_valid():
             raise InvalidVirtualHostError()
 
-        with open(join(self.vhost_dir, vhost.server_names[0]), 'w') as f:
+        vhost_file = self.vhost_file
+        if len(file_substitutions):
+            vhost_file = vhost_file.format(**file_substitutions)
+
+        with open(vhost_file, 'w') as f:
             f.write(str(vhost))
 
     def get_virtualhost(self):

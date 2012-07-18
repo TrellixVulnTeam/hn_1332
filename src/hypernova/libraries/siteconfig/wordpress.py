@@ -360,6 +360,14 @@ class SiteProvisioner(SiteProvisionerBase):
         print(' => username:', user.account)
         print(' => password:', user.password)
 
+        # We now have all the data we need to know the substitutions we can
+        # apply to formatting strings
+        substitutions = {
+            "domainname": self.domain_name,
+            "homedir":    user.directory,
+            "username":   user.account,
+        }
+
         print('creating database...')
         db = self.create_mysql_database()
         print(' => username:', db['user'].username)
@@ -372,9 +380,7 @@ class SiteProvisioner(SiteProvisionerBase):
         print('installing source...')
         target = self.config.get('web', 'base_dir', raw=True)
         print(' => skeleton:', target)
-        target = target.format(domainname=self.domain_name,
-                               homedir=user.directory,
-                               username=user.account)
+        target = target.format(**substitutions)
         print(' => resulting path:', target)
         self.move_tree(join(source, 'wordpress'), target)
 
@@ -385,7 +391,7 @@ class SiteProvisioner(SiteProvisionerBase):
         vhost.server_names = [self.domain_name]
         vhost.indexes = ['index.php', 'index.html', 'index.htm']
         vhost.includes.append('enable_php')
-        self.create_vhost(vhost)
+        self.create_vhost(vhost, file_substitutions=substitutions)
 
         print('configuring application...')
         config = SiteConfig()
