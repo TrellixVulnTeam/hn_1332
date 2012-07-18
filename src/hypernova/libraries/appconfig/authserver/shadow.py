@@ -107,8 +107,8 @@ class Server(ServerBase):
         status = self.__run_cmd("add", user.account, args)
 
         if status[0] == 0:
-            (user.password, user.uid, user.gid, user.gecos, user.directory,
-             user.shell) = list(pwd.getpwnam(user.account))[1:]
+            (user.uid, user.gid, user.gecos, user.directory,
+             user.shell) = list(pwd.getpwnam(user.account))[2:]
 
         return status
 
