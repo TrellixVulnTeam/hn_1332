@@ -13,7 +13,7 @@ from hypernova.libraries.appconfig import AppConfigBase
 import pkgutil
 import sys
 
-class HttpServerConfigBase(AppConfigBase):
+class ServerBase(AppConfigBase):
     """
     Base representation of an HTTP server's configuration.
 
@@ -174,20 +174,12 @@ class InvalidVirtualHostError(Exception):
     pass
 
 
-def get_server(server):
+def get_server(adapter, *args, **kwargs):
     """
     Get an HTTP server configuration instance.
     """
 
-    return getattr(globals()[server], 'AppConfig')
-
-# Import submodules
-#
-# Since __all__ only contains imported submodules, we need to walk through the
-# packages under this namespace and import them here in order to work with them
-# later. This isn't pretty, but it works.
-__all__ = []
-for (loader, module_name, is_package) in pkgutil.walk_packages(__path__):
-    __all__.append(module_name)
-    module = loader.find_module(module_name).load_module(module_name)
-    exec("%s = module" %(module_name))
+    module_name = "hypernova.libraries.appconfig.httpserver.%s" %(adapter)
+    module = __import__(module_name, fromlist=['Server'])
+    Klass = getattr(module, 'Server')
+    return Klass(*args, **kwargs)

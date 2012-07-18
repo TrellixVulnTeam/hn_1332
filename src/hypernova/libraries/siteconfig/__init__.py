@@ -116,8 +116,8 @@ class SiteProvisionerBase:
               configurations (see httpserver.AppConfig.__init__()).
         """
 
-        server_mod = getattr(httpserver, self.config['web']['server'])
-        self.http_server = server_mod.AppConfig(self.config['web']['conf_dir'])
+        self.http_server = httpserver.get_server(self.config['web']['server'],
+                                                 self.config['web']['conf_dir'])
 
     def _random_string(self, length):
         """

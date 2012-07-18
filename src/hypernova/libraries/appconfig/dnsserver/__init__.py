@@ -304,16 +304,13 @@ class ServerCommunicationError(Exception):
     pass
 
 
-def get_authoritative_server(adapter, kwargs):
+def get_authoritative_server(adapter, *args, **kwargs):
     """
     Get a DNS server by its adapter name, and initialise it with the arguments
     in args.
     """
 
-    kwargs = dict(kwargs)
-    kwargs.pop('adapter')
-
     module_name = "hypernova.libraries.appconfig.dnsserver.%s" %(adapter)
     module = __import__(module_name, fromlist=['AuthoritativeServer'])
     Klass = getattr(module, 'AuthoritativeServer')
-    return Klass(**kwargs)
+    return Klass(*args, **kwargs)

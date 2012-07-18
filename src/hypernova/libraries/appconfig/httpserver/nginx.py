@@ -10,7 +10,7 @@
 #                    Luke Carrier <luke.carrier@tdm.info>
 #
 
-from hypernova.libraries.appconfig.httpserver import HttpServerConfigBase, \
+from hypernova.libraries.appconfig.httpserver import ServerBase, \
                                                      VirtualHostBase
 from hypernova.libraries.permissionelevation import elevate_cmd
 from os.path import abspath, isfile, join
@@ -66,7 +66,7 @@ def to_nginx_bool(self, bool_val):
     else:
         return 'off'
 
-class AppConfig(HttpServerConfigBase):
+class Server(ServerBase):
     """
     nginx configurator.
     """
