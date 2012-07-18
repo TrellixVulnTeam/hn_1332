@@ -104,7 +104,13 @@ class Server(ServerBase):
                 # This occurs when looking for skel_dir and base_dir overrides
                 pass
 
-        return self.__run_cmd("add", user.account, args)
+        status = self.__run_cmd("add", user.account, args)
+
+        if status[0] == 0:
+            (user.password, user.uid, user.gid, user.gecos, user.directory,
+             user.shell) = list(pwd.getpwnam(user.account))[1:]
+
+        return status
 
     def get_user(self, account):
         pwd_info = pwd.getpwnam(account)
