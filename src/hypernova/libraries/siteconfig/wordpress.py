@@ -347,8 +347,10 @@ class SiteProvisioner(SiteProvisionerBase):
     def _provision(self):
 
         # Download
-        print('downloading')
-        tarball = self.download_url(self.source_url, suffix='.tar.gz')
+        print('downloading source...')
+        tarball = self.download_url(self.source_url, provider='HTTP',
+                                    suffix='.tar.gz')
+        print(' =>', tarball)
 
         # Extract
         print('extracting')

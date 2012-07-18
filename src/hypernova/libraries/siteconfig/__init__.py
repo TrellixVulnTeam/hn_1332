@@ -16,6 +16,7 @@ from hypernova.libraries.appconfig.authserver import (get_auth_server,
                                                       Group  as AuthGroup,
                                                       User   as AuthUser)
 from hypernova.libraries.configuration import ConfigurationFactory
+from hypernova.libraries.downloader import download
 from hypernova.libraries.permissionelevation import elevate_cmd
 from os import chown, environ, unlink, walk
 from os.path import dirname, isdir, join, realpath
@@ -29,7 +30,6 @@ import sys
 import tarfile
 import tempfile
 from time import time
-from urllib import request
 
 class SiteConfigBase:
     """
@@ -248,16 +248,14 @@ class SiteProvisionerBase:
 
         self.http_server.reload_service()
 
-    def download_url(self, url, suffix=''):
+    def download_url(self, url, **options):
         """
         Download a URL to a local temporary file and return the file's path.
         """
 
-        file = tempfile.mkstemp(suffix=suffix)[1]
+        file = tempfile.mkstemp(suffix=options['suffix'])[1]
         self.temporary_files.append(file)
-
-        request.urlretrieve(url, file)
-
+        download(url, file, **options)
         return file
 
     def extract_gzipped_tarball(self, archive):
