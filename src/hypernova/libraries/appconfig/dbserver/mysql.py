@@ -63,7 +63,7 @@ class Server(ServerBase):
 
     def add_database(self, database):
         character_set = 'utf8'
-        if hasattr(database, 'character_set'):
+        if hasattr(database, 'character_set') and database.character_set:
             character_set = database.character_set
 
         with self.__conn as cursor:
@@ -74,29 +74,30 @@ class Server(ServerBase):
         with self.__conn as cursor:
             return cursor.execute(self.DELETE_DATABASE %(database.name))
 
-    def grant(self, database, user, host, tables, privileges, limit_options=[]):
-
-        if tables == '*':
+    def grant(self, database, user, tables, privileges, limit_options=[]):
+        if tables in (None, '*'):
             database_tables = '*'
         elif (isinstance(tables, list) and len(tables) > 1) \
                 or not isinstance(tables, str):
             database_tables = '`' + '`, `'.join(tables) + '`'
 
-        permissions = ''
-        for p in privileges:
+        if privileges in (None, '*'):
+            permissions = 'ALL PRIVILEGES'
+        else:
             permissions += (' ' + self.PERMISSIONS[p])
 
-        permissions += ' WITH'
-        for l in limit_options:
-            if isinstance(l, list):
-                permissions += ' %s %s' %l
-            else:
-                permissions += (' ' + l)
+        if len(limit_options) > 0:
+            permissions += ' WITH'
+            for l in limit_options:
+                if isinstance(l, list):
+                    permissions += ' %s %s' %l
+                else:
+                    permissions += (' ' + l)
 
         with self.__conn as cursor:
             return cursor.execute(self.GRANT %(permissions,
                                                database.name, database_tables,
-                                               user.username, host))
+                                               user.username, user.host))
 
     def __del__(self):
         self.__conn.close()

@@ -11,16 +11,17 @@
 
 from copy import deepcopy
 import gzip
-from hypernova.libraries.appconfig import httpserver
+from hypernova.libraries.appconfig import dbserver, httpserver
 from hypernova.libraries.appconfig.authserver import (get_auth_server,
                                                       Group  as AuthGroup,
                                                       User   as AuthUser)
+from hypernova.libraries.appconfig.dbserver import (Database,
+                                                    User as DBUser)
 from hypernova.libraries.configuration import ConfigurationFactory
 from hypernova.libraries.downloader import download
 from hypernova.libraries.permissionelevation import elevate_cmd
 from os import chown, environ, unlink, walk
 from os.path import dirname, isdir, join, realpath
-import oursql
 import pkgutil
 from random import choice
 from shutil import move, rmtree
@@ -135,42 +136,27 @@ class SiteProvisionerBase:
         Create a database and associated credentials.
 
         TODO: keep a mapping of all of these.
-        TODO: move this code into another library.
         """
-
-        CREATE_USER = "CREATE USER '%s'@'%s' IDENTIFIED BY '%s'"
-        CREATE_DB   = "CREATE DATABASE `%s` CHARACTER SET '%s'"
-        GRANT       = "GRANT ALL PRIVILEGES ON `%s`.* TO '%s'@'%s'"
-
-        self.credentials = {
-            'host':   self.config['mysql']['host'],
-            'user':   self.config['mysql']['username'],
-            'passwd': self.config['mysql']['password'],
-        }
-        db = oursql.connect(**self.credentials)
 
         user_and_db = self._random_string(int(self.config['mysql']['username_length']))
         password    = self._random_string(int(self.config['mysql']['password_length']))
         host        = self.config['mysql']['host']
 
-        try:
-            with db as cursor:
-                cursor.execute(CREATE_USER %(user_and_db, host, password),
-                               plain_query=True)
-            with db as cursor:
-                cursor.execute(CREATE_DB %(user_and_db, 'utf8'),
-                               plain_query=True)
-            with db as cursor:
-                cursor.execute(GRANT %(user_and_db, user_and_db, host),
-                               plain_query=True)
-        finally:
-            db.close()
+        dbms = dbserver.get_dbms(adapter="mysql",
+                                 host=self.config['mysql']['host'],
+                                 username=self.config['mysql']['username'],
+                                 password=self.config['mysql']['password'])
+
+        user = DBUser(user_and_db, password, host)
+        db   = Database(user_and_db)
+
+        dbms.add_user(user)
+        dbms.add_database(db)
+        dbms.grant(db, user, None, None)
 
         return {
-            'host':     host,
-            'username': user_and_db,
-            'password': password,
-            'db':       user_and_db,
+            'user':     user,
+            'database': db,
         }
 
     def create_system_user(self):
@@ -200,7 +186,7 @@ class SiteProvisionerBase:
         For careless applications who demand insane permissions.
         """
 
-        return Group(self.config['web']['group'])
+        return AuthGroup(self.config['web']['group'])
 
     def set_ownership(self, user, group, path, recursive=True):
         """

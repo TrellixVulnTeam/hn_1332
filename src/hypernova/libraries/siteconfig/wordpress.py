@@ -360,9 +360,11 @@ class SiteProvisioner(SiteProvisionerBase):
         print('creating system user')
         user = self.create_system_user()
 
-        # Create database
-        print('creating db')
+        print('creating database...')
         db = self.create_mysql_database()
+        print(' => username:', db['user'].username)
+        print(' => password:', db['user'].password)
+        print(' => database:', db['database'].name)
 
         # Install the files
         # Use Python-native interpolation instead of the functionality
@@ -391,10 +393,10 @@ class SiteProvisioner(SiteProvisionerBase):
         print('configuring application')
         config = SiteConfig()
 
-        config.db_host     = db['host']
-        config.db_username = db['username']
-        config.db_password = db['password']
-        config.db_name     = db['db']
+        config.db_host     = db['user'].host
+        config.db_username = db['user'].username
+        config.db_password = db['user'].password
+        config.db_name     = db['database'].name
         config.db_prefix   = 'wp_'
         config.db_charset  = SiteConfig.DB_CHARSETS[0]
         config.db_collate  = ''

@@ -44,7 +44,7 @@ class ServerBase:
         Remove a Database object.
         """
 
-    def grant(self, database, user, host, tables, privileges, limit_options=[]):
+    def grant(self, database, user, tables, privileges, limit_options=[]):
         """
         Grant a User specific privileges on a Database.
         """
@@ -86,11 +86,10 @@ class User:
         self.host     = host
 
 
-def get_dbms(**kwargs):
-    adapter = kwargs.pop('adapter')
+def get_dbms(adapter, *args, **kwargs):
     module_name = "hypernova.libraries.appconfig.dbserver.%s" %(adapter)
 
     module = __import__(module_name, fromlist=['Server'])
     Klass  = getattr(module, 'Server')
 
-    return Klass(**kwargs)
+    return Klass(*args, **kwargs)
