@@ -413,4 +413,6 @@ class SiteProvisioner(SiteProvisionerBase):
 
         # Set file permissions
         print('securing file permissions...')
-        self.set_ownership(user, self.get_web_group(), target)
+        self.set_document_root_permissions(
+            user, self.get_web_group(), vhost,
+            self.config.getboolean("web", "acl_group"))
