@@ -122,6 +122,8 @@ class Server(ServerBase):
             except KeyError:
                 pass
 
+        return user
+
     def rm_user(self, user):
         self.__run_cmd("rm", user.account)
 
