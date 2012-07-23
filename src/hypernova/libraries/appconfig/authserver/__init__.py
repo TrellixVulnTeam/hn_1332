@@ -114,8 +114,24 @@ class User:
 
 
 class Group:
-    def __init__(self):
-        raise Exception("not yet implemented")
+    """
+    Used to represent a single system group.
+    """
+
+    group   = None
+    passwd  = None
+    gid     = None
+    members = None
+
+    def __init__(self, group=None, passwd=None, gid=None, members=None):
+        """
+        Create a new group.
+        """
+
+        self.group   = group
+        self.passwd  = passwd,
+        self.gid     = gid
+        self.members = members
 
 
 class NonexistentUserError(Exception):
