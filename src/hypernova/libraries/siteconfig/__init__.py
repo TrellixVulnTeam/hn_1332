@@ -165,7 +165,8 @@ class SiteProvisionerBase:
         Add a new system user.
         """
 
-        server = get_auth_server(self.config['system']['auth_server'])
+        if not hasattr(self, 'auth_server'):
+            self.auth_server = get_auth_server(self.config['system']['auth_server'])
 
         if self.config['core']['mode'] == 'production':
             # If we're in production mode, create the user account...
@@ -173,7 +174,7 @@ class SiteProvisionerBase:
                 self._random_string(int(self.config['system']['account_length'])),
                 self._random_string(int(self.config['system']['password_length']))
             )
-            server.add_user(user)
+            self.auth_server.add_user(user)
         elif self.config['core']['mode'] == 'development':
             # ...otherwise just play pretend
             user = AuthServer.get_user(self.config['system']['development_user'])
@@ -187,7 +188,9 @@ class SiteProvisionerBase:
         For careless applications who demand insane permissions.
         """
 
-        return AuthGroup(self.config['web']['group'])
+        if not hasattr(self, 'auth_server'):
+            self._auth_server = get_auth_server(self.config['system']['auth_server'])
+
 
     def set_ownership(self, user, group, path, recursive=True):
         """
@@ -196,12 +199,52 @@ class SiteProvisionerBase:
         Wrapper for os.chown() that provides recursive functionality.
         """
 
+        uid = getattr(user,  "uid", None)
+        gid = getattr(group, "gid", None)
+
+        if not uid and not gid:
+            raise ValueError("must have a uid or gid")
+
         if recursive:
             for root, dirs, files in walk(path):
                 for f in dirs + files:
-                    chown(join(root, f), user.uid, group.gid)
+                    chown(join(root, f), uid, gid)
         else:
-            chown(path, user.uid, group.gid)
+            chown(path, uid, gid)
+
+    def allow_via_acl(self, user, group, path, mode):
+        """
+        Set ownership of a given path to a given user/group combination.
+
+        The user and group parameters may be set to None where appropriate. Mode
+        should be a string containing character names for filesystem permission
+        bits (rwx) which should be set.
+        """
+
+        if user:
+            acl = "user:{0}:{1}".format(group.group, mode)
+            subprocess.Popen(elevate_cmd("setfacl", "-m", acl, path))
+
+        if group:
+            acl = "group:{0}:{1}".format(user.account, mode)
+            subprocess.Popen(elevate_cmd("setfacl", "-m", acl, path))
+
+    def set_document_root_permissions(self, owner, server, vhost, with_acl):
+        """
+        Sets permissions on the document root of a virtual host object.
+
+        Given a user and group, set permissions on a virtual host. If with_acl
+        is true, we assume the filesystem makes use of extended ACLs and use the
+        setfacl tool to configure the group, else we use the traditional
+        recursive chgrp method. We chown the directory recursively regardless of
+        the value of this parameter.
+        """
+
+        if with_acl:
+            self.set_ownership(owner, owner, vhost.document_root)
+            self.allow_via_acl(None, server, vhost.document_root, "rx")
+        else:
+            self.set_ownership(user, server, vhost.document_root)
 
     def add_vhost(self):
         """
