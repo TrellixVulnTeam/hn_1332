@@ -12,9 +12,10 @@
 #                    Luke Carrier <luke.carrier@tdm.info>
 #
 
-from hypernova.libraries.appconfig.authserver import ServerBase, User
+from hypernova.libraries.appconfig.authserver import ServerBase, User, Group
 from hypernova.libraries.environment import where_is
 from hypernova.libraries.permissionelevation import elevate_cmd
+import grp
 import pwd
 import subprocess
 
@@ -54,6 +55,14 @@ class Server(ServerBase):
         "add":    "useradd",
         "rm":     "userdel",
         "update": "usermod",
+    }
+
+    # grp -> Group field mappings
+    GRP_GROUP_MAPPING = {
+        "gr_name":   "group",
+        "gr_passwd": "password",
+        "gr_gid":    "gid",
+        "gr_mem":    "members",
     }
 
     # pwd -> User field mappings
@@ -129,3 +138,15 @@ class Server(ServerBase):
 
     def update_user(self, user):
         return self.__run_cmd("update", user.account)
+
+    def get_group(group):
+        grp_info = grp.getgrnam(group)
+        group    = Group()
+        for (grp_name, group_name) in self.GRP_USER_MAPPING.items():
+            try:
+                value = getattr(grp_info, grp_name, None)
+                setattr(group, user_name, None)
+            except KeyError:
+                pass
+
+        return group
