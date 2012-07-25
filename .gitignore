@@ -12,7 +12,6 @@ __pycache__
 *.pyc
 
 # Binary distributions
-build
 deps/python
 install/python
 src/build
