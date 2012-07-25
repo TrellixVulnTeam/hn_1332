@@ -25,5 +25,6 @@ done
 
 pushd "${PYTHON_SOURCE_DIR}"
 DESTDIR="${PYTHON_INSTALL_DIR}" make install
+popd
 
 exit 0
