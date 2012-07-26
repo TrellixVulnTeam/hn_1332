@@ -29,11 +29,13 @@ chroot/var/lib/gpg
 chroot/var/log
 chroot/var/www
 
-# virtualenv stuff
+# Python core stuff
 chroot/bin/2to3*
 chroot/bin/activate*
 chroot/bin/easy_install*
+chroot/bin/idle*
 chroot/bin/pip*
+chroot/bin/pydoc*
 chroot/bin/python*
 chroot/include
 chroot/lib*
