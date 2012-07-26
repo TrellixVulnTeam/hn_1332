@@ -33,7 +33,7 @@ fi
 
 if [ ! -f "${PYTHON_SOURCE_DIR}"/".hypernova_build_complete" ]; then
     pushd "${PYTHON_SOURCE_DIR}"
-    ./configure
+    ./configure --prefix=
     make
     touch ".hypernova_build_complete"
     popd

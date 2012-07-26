@@ -27,6 +27,8 @@ all:
 	@echo '| build-python    | build just Python                              |'
 	@echo '| clean           | clean all build artefacts                      |'
 	@echo '| clean-python    | clean just Python build artefacts              |'
+	@echo '| venv            | build the tree and install it to a virtualenv  |'
+	@echo '| venv-python     | build and install just Python                  |'
 	@echo '+-----------------+------------------------------------------------+'
 
 build: build-python
@@ -43,7 +45,10 @@ clean-python:
 	$(BUILD_ROOT_DIR)/build/clean-python.sh \
 		--python-source-dir $(PYTHON_SOURCE_DIR) \
 
-install-python: build-python
-	$(BUILD_ROOT_DIR)/build/install-python.sh \
+venv: venv-python
+
+venv-python: build-python
+	$(BUILD_ROOT_DIR)/build/venv-python.sh \
 		--python-install-dir $(PYTHON_INSTALL_DIR) \
 		--python-source-dir $(PYTHON_SOURCE_DIR)
+
