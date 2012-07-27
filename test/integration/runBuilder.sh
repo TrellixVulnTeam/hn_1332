@@ -6,7 +6,7 @@
 # Run the build system
 [ ! -e builder.img ] && qemu-img create -f qcow2 -b centos-6.2.img builder.img && echo "Creating the builder image..." 
 
-echo "Launch the VM to build HyperNova Package: will be use for the build AND the client"
+echo "Launch the VM to build HyperNova Package: will be use for the build"
 echo "Running emulator. You can ssh into it from the port 3333"
 qemu-system-x86_64 -m 512 -net nic,macaddr=52:54:00:f5:80:66 -net user -hda builder.img  -enable-kvm -redir tcp:3333::22 &
 # -nographic -no-acpi  ?
