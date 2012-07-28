@@ -14,17 +14,18 @@ cd "$(dirname "$(readlink -fn "$0")")"
 
 trap error_trap 1 2 3 15 ERR
 
-eval set -- "$(getopt -o "di:" --long "python-source-dir:,python-install-dir:" -- "$@")"
+eval set -- "$(getopt -o "sv:" --long "python-source-dir:,python-venv-prefix:" -- "$@")"
 while true; do
     case "$1" in
-        -d|--python-source-dir ) PYTHON_SOURCE_DIR="$2"  ; shift 2 ;;
-        -i|--python-install-dir) PYTHON_INSTALL_DIR="$2" ; shift 2 ;;
+        -s|--python-source-dir ) PYTHON_SOURCE_DIR="$2"  ; shift 2 ;;
+        -v|--python-venv-prefix) PYTHON_VENV_PREFIX="$2" ; shift 2 ;;
         *                      ) break                             ;;
     esac
 done
 
 pushd "${PYTHON_SOURCE_DIR}"
-DESTDIR="${PYTHON_INSTALL_DIR}" make install
+DESTDIR="${PYTHON_VENV_PREFIX}" make install
 popd
 
 exit 0
+
