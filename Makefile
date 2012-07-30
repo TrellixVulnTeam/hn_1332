@@ -10,7 +10,8 @@
 BUILD_ROOT_DIR := $(CURDIR)
 BUILD_TEMP_DIR := $(shell mktemp -d)
 
-PYTHON_SOURCE_URL  := http://python.org/ftp/python/3.2.3/Python-3.2.3.tar.bz2
+PYTHON_VERSION     := 3.2.3
+PYTHON_SOURCE_URL  := http://python.org/ftp/python/$(PYTHON_VERSION)/Python-$(PYTHON_VERSION).tar.bz2
 PYTHON_SOURCE_DIR  := $(BUILD_ROOT_DIR)/deps/python
 PYTHON_RPM_PREFIX  := /usr/local/hypernova
 PYTHON_VENV_PREFIX := $(BUILD_ROOT_DIR)/chroot
@@ -48,7 +49,8 @@ clean: clean-python
 
 clean-python:
 	$(BUILD_ROOT_DIR)/build/clean-python.sh \
-		--python-source-dir $(PYTHON_SOURCE_DIR)
+		--python-source-dir $(PYTHON_SOURCE_DIR) \
+		--rpm-output-dir $(RPM_OUTPUT_DIR)
 
 rpm: rpm-python
 
@@ -58,7 +60,8 @@ rpm-python: build-python
 		--rpm-output-dir $(RPM_OUTPUT_DIR) \
 		--rpm-spec-dir $(RPM_SPEC_DIR) \
 		--python-rpm-prefix $(PYTHON_RPM_PREFIX) \
-		--python-source-dir $(PYTHON_SOURCE_DIR)
+		--python-source-dir $(PYTHON_SOURCE_DIR) \
+		--python-version $(PYTHON_VERSION)
 
 venv: venv-python
 
