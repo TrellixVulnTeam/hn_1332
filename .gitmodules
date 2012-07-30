@@ -1,16 +1,21 @@
 [submodule "deps/elevator"]
 	path = deps/elevator
 	url = https://github.com/LukeCarrier/elevator.git
+	ignore = dirty
 [submodule "deps/python-gnupg"]
 	path = deps/python-gnupg
 	url = https://github.com/LukeCarrier/py3k-gnupg.git
+	ignore = dirty
 [submodule "deps/python-oursql"]
 	path = deps/python-oursql
 	url = https://github.com/LukeCarrier/py3k-oursql.git
+	ignore = dirty
 [submodule "deps/python-pyrg"]
 	path = deps/python-pyrg
 	url = https://github.com/LukeCarrier/py3k-pyrg.git
+	ignore = dirty
 [submodule "deps/python-pexpect"]
 	path = deps/python-pexpect
 	url = https://github.com/LukeCarrier/py3k-pexpect.git
+	ignore = dirty
 
