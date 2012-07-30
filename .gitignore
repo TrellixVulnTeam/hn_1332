@@ -13,6 +13,7 @@ __pycache__
 
 # Binary distributions
 deps/python
+dist
 install/python
 src/build
 src/dist
@@ -24,7 +25,8 @@ chroot/bin/pyrg
 chroot/etc/client
 chroot/etc/*/local.ini
 chroot/etc/nginx
-chroot/tmp/*
+chroot/share
+chroot/tmp
 chroot/var/lib/gpg
 chroot/var/log
 chroot/var/www
