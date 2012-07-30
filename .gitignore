@@ -12,6 +12,7 @@ __pycache__
 *.pyc
 
 # Binary distributions
+build/rpm
 deps/python
 dist
 install/python
