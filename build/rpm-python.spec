@@ -16,6 +16,7 @@ Group:   Development/Languages
 License: PSF License
 URL:     http://python.org/
 
+
 %description
 An entirely self-contained Python interpreter for use with the HyperNova
 software stack.
@@ -23,6 +24,7 @@ software stack.
 
 %prep
 rm -rfv "%buildroot"
+
 
 %install
 cd "%builddir"
