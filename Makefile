@@ -1,5 +1,3 @@
-#!/usr/bin/env bash
-
 #
 # HyperNova server management framework
 #
