@@ -16,3 +16,4 @@ error_trap () {
     echo "Command returned non-zero (${exit_status}) exit status; aborting"
     exit "${exit_status}"
 }
+
