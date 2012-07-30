@@ -30,7 +30,7 @@ done
 
 arch="$(rpm --eval "%_arch")"
 dist="$(rpm --eval "%dist")"
-rpm="${RPM_OUTPUT_DIR}/${arch}/hypernova-python-${PYTHON_VERSION}-1${dist}.${arch}.rpm"
+rpm="${RPM_OUTPUT_DIR}/${arch}/hypernova-python-${PYTHON_VERSION}-${dist}.${arch}.rpm"
 
 if [ ! -f "${rpm}" ]; then
     pushd "${PYTHON_SOURCE_DIR}"
@@ -42,6 +42,7 @@ if [ ! -f "${rpm}" ]; then
         --define "_specdir  ${RPM_SPEC_DIR}" \
         --define "builddir  ${PYTHON_SOURCE_DIR}" \
         --define "prefixdir ${PYTHON_RPM_PREFIX}" \
+        --define "version   ${PYTHON_VERSION}" \
          "${RPM_SPEC_DIR}/rpm-python.spec"
     popd
 fi

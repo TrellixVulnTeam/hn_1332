@@ -8,8 +8,8 @@
 #
 
 Name:    hypernova-python
-Version: 3.2.3
-Release: 1%{?dist}
+Version: %version
+Release: %{?dist}
 Summary: HyperNova's self-contained Python installation
 
 Group:   Development/Languages

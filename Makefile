@@ -67,6 +67,6 @@ venv: venv-python
 
 venv-python: build-python
 	$(BUILD_ROOT_DIR)/build/venv-python.sh \
-		--python-venv-prefix $(PYTHON_VENV_PREFIX) \
-		--python-source-dir $(PYTHON_SOURCE_DIR)
+		--python-source-dir $(PYTHON_SOURCE_DIR) \
+		--python-venv-prefix $(PYTHON_VENV_PREFIX)
 
