@@ -23,9 +23,11 @@ while true; do
     esac
 done
 
-pushd "${PYTHON_SOURCE_DIR}"
-DESTDIR="${PYTHON_VENV_PREFIX}" make install
-popd
+if [ ! -x "${PYTHON_VENV_PREFIX}/bin"/python* ]; then
+    pushd "${PYTHON_SOURCE_DIR}"
+    DESTDIR="${PYTHON_VENV_PREFIX}" make install
+    popd
+fi
 
 exit 0
 
