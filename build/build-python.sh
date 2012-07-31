@@ -26,8 +26,8 @@ done
 
 if [ ! -d "${PYTHON_SOURCE_DIR}" ]; then
     mkdir -p "${PYTHON_SOURCE_DIR}"
-    wget -O "${BUILD_TEMP_DIR}"/python.tar.bz2 "${PYTHON_SOURCE_URL}"
-    tar -xjvf "${BUILD_TEMP_DIR}"/python.tar.bz2 -C "${BUILD_TEMP_DIR}"
+    wget -O "${BUILD_TEMP_DIR}/python.tar.bz2" "${PYTHON_SOURCE_URL}"
+    tar -xjvf "${BUILD_TEMP_DIR}/python.tar.bz2" -C "${BUILD_TEMP_DIR}"
     mv "${BUILD_TEMP_DIR}"/Python-*/* "${PYTHON_SOURCE_DIR}"
 fi
 
