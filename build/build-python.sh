@@ -17,9 +17,9 @@ trap error_trap 1 2 3 15 ERR
 eval set -- "$(getopt -o "dtu:" --long "python-source-dir:,build-temp-dir:,python-source-url:" -- "$@")"
 while true; do
     case "$1" in
-        -d|--python-source-dir) PYTHON_SOURCE_DIR="$2"  ; shift 2 ;;
-        -t|--build-temp-dir   ) BUILD_TEMP_DIR="$2"     ; shift 2 ;;
-        -u|--python-source-url) PYTHON_SOURCE_URL="$2"  ; shift 2 ;;
+        -d|--python-source-dir) PYTHON_SOURCE_DIR="$2" ; shift 2 ;;
+        -t|--build-temp-dir   ) BUILD_TEMP_DIR="$2"    ; shift 2 ;;
+        -u|--python-source-url) PYTHON_SOURCE_URL="$2" ; shift 2 ;;
         *                     ) break                             ;;
     esac
 done
