@@ -49,6 +49,10 @@ all:
 
 build: build-elevator build-python
 
+.PHONY: all build                   clean                   rpm                   venv
+.PHONY:     build-elevator          clean-elevator          rpm-elevator          venv-elevator
+.PHONY:     build-python            clean-python            rpm-python            venv-python
+
 build-elevator:
 	$(BUILD_ROOT_DIR)/build/build-elevator.sh \
 		--elevator-source-dir $(ELEVATOR_SOURCE_DIR)
