@@ -20,6 +20,7 @@ PYTHON_SOURCE_URL  := http://python.org/ftp/python/$(PYTHON_VERSION)/Python-$(PY
 PYTHON_SOURCE_DIR  := $(BUILD_ROOT_DIR)/deps/python
 PYTHON_RPM_PREFIX  := /usr/local/hypernova
 PYTHON_VENV_PREFIX := $(BUILD_ROOT_DIR)/chroot
+PYTHON_VENV_BINARY := $(BUILD_ROOT_DIR)/chroot/bin/python3.2
 
 RPM_BUILD_DIR  := $(BUILD_ROOT_DIR)/build/rpm
 RPM_OUTPUT_DIR := $(BUILD_ROOT_DIR)/dist/rpm
@@ -99,6 +100,7 @@ venv-elevator: build-elevator
 
 venv-python: build-python
 	$(BUILD_ROOT_DIR)/build/venv-python.sh \
+		--python-binary $(PYTHON_VENV_BINARY) \
 		--python-source-dir $(PYTHON_SOURCE_DIR) \
 		--python-venv-prefix $(PYTHON_VENV_PREFIX)
 
