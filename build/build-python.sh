@@ -31,7 +31,7 @@ if [ ! -d "${PYTHON_SOURCE_DIR}" ]; then
     mv "${BUILD_TEMP_DIR}"/Python-*/* "${PYTHON_SOURCE_DIR}"
 fi
 
-if [ ! -f "${PYTHON_SOURCE_DIR}"/".hypernova_build_complete" ]; then
+if [ ! -f "${PYTHON_SOURCE_DIR}/.hypernova_build_complete" ]; then
     pushd "${PYTHON_SOURCE_DIR}"
     ./configure --prefix=
     make
