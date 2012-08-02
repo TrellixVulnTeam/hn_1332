@@ -34,7 +34,6 @@ rpm="${RPM_OUTPUT_DIR}/${arch}/hypernova-elevator-${ELEVATOR_VERSION}-${dist}.${
 
 if [ ! -f "${rpm}" ]; then
     pushd "${ELEVATOR_SOURCE_DIR}"
-    export ELEVATOR_RPM_PREFIX
     rpmbuild \
         -bb -vv \
         --define "_topdir   ${RPM_BUILD_DIR}" \

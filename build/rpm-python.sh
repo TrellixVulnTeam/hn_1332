@@ -14,14 +14,13 @@ cd "$(dirname "$(readlink -fn "$0")")"
 
 trap error_trap 1 2 3 15 ERR
 
-eval set -- "$(getopt -o "bfprsv:" --long "rpm-build-dir:,rpm-spec-dir:,python-rpm-prefix:,python-source-dir:,rpm-output-dir:,python-version:" -- "$@")"
+eval set -- "$(getopt -o "bforsv:" --long "rpm-build-dir:,rpm-spec-dir:,rpm-output-dir:,python-rpm-prefix:,python-source-dir:,python-version:" -- "$@")"
 while true; do
     case "$1" in
         -b|--rpm-build-dir     ) RPM_BUILD_DIR="$2"      ; shift 2 ;;
         -f|--rpm-spec-dir      ) RPM_SPEC_DIR="$2"       ; shift 2 ;;
-        -i|--python-install-dir) PYTHON_INSTALL_DIR="$2" ; shift 2 ;;
+        -o|--rpm-output-dir    ) RPM_OUTPUT_DIR="$2"     ; shift 2 ;;
         -r|--python-rpm-prefix ) PYTHON_RPM_PREFIX="$2"  ; shift 2 ;;
-        -r|--rpm-output-dir    ) RPM_OUTPUT_DIR="$2"     ; shift 2 ;;
         -s|--python-source-dir ) PYTHON_SOURCE_DIR="$2"  ; shift 2 ;;
         -v|--python-version    ) PYTHON_VERSION="$2"     ; shift 2 ;;
         *                      ) break                             ;;
