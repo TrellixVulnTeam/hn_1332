@@ -8,7 +8,9 @@
 
 echo "Launch the VM to build HyperNova Package: will be use for the build"
 echo "Running emulator. You can ssh into it from the port 3333"
-qemu-system-x86_64 -m 512 -net nic,macaddr=52:54:00:f5:80:66 -net user -hda builder.img  -enable-kvm -redir tcp:3333::22 &
+qemu-system-x86_64 -m 512 -net nic,macaddr=52:54:00:f5:80:66 -net user -hda builder.img  -enable-kvm -redir tcp:3333::22 -nographic &
+QEMU_PID=$!
+
 # -nographic -no-acpi  ?
 until `ssh -l hnbuild localhost -p 3333 exit` ; do echo -n "."; done
 
@@ -20,3 +22,4 @@ scp -P 3333 -r hnbuild@localhost:/home/hnbuild/hypernova/install/build/RPMS/ .
 #echo "Launch the VM as a target install for HyperNova"
 #qemu-img create -f qcow2 -b centos-6.0.img builder.img 
 
+kill $QEMU_PID
