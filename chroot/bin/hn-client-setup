@@ -1,0 +1,79 @@
+#!/usr/bin/env bash
+
+#
+# HyperNova server management framework
+#
+# Client GPG key initialisation tool
+#
+# Copyright (c) 2012 TDM Ltd
+#                     Laurent David<laurent@tdm.info>
+#
+
+function usage()
+{
+cat << EOF
+usage: $0 options
+
+This script will create a client GPG Key to go with the agent.
+
+You can add more entropy by using rngd tool.
+	sudo yum -y install rng-tools
+	sudo rngd -r /dev/urandom -o /dev/random
+
+OPTIONS:
+	-e --email: email linked to this key
+	-n --name:  user name associated with the key
+EOF
+}
+
+
+[ "$(whoami)" == 'root' ] && echo "You must not be root" \
+                          && exit 79
+                          
+                          
+eval set -- "$(getopt -o "en:" --long "email:,name:" -- "$@")"
+
+while true; do
+    case "$1" in
+        -e|--email) KEY_EMAIL="$2" ; shift 2 ;;
+        -n|--name) KEY_REAL_NAME="$2" ; shift 2 ;;
+        *) break                              ;;
+    esac
+done
+                
+[ -z "$KEY_EMAIL" ] && echo "ERROR: You should provide the email address for the key" && usage && exit 127
+[ -z "$KEY_REAL_NAME" ] && echo "ERROR: You should provide the user name associated with key" && usage && exit 127
+
+CHROOT="/usr/local/hypernova"
+SHARED_STATE="$CHROOT/var"
+
+BATCH_FILE="/tmp/hypernova_gpg_client_batch"
+KEY_TYPE="rsa"
+KEY_LENGTH="2048"
+KEY_COMMENT="Automatically generated via hn-client-setup"
+
+KEY_FILE=client
+
+cat >"$BATCH_FILE" <<EOF
+Key-Type: ${KEY_TYPE}
+Key-Length: ${KEY_LENGTH}
+Name-Real: ${KEY_REAL_NAME}
+Name-Email: ${KEY_EMAIL}
+Name-Comment: ${KEY_COMMENT}
+EOF
+
+gpg --batch  --gen-key "$BATCH_FILE"
+gpg --export $KEY_EMAIL > {$KEY_FILE}.pub
+gpg --export-secret-keys $KEY_EMAIL > $KEY_FILE
+hn-client config key client
+
+cat << EOF
+Keys [$KEY_FILE] and [$KEY_FILE.pub] have been generated
+Now you can transfer the key onto the server/agent and run
+hn-agent-add-client with the key.
+
+EOF
+
+rm -f "$BATCH_FILE"
+
+
