@@ -3,7 +3,7 @@
 #
 # HyperNova server management framework
 #
-# Python build script
+# Elevator clean script
 #
 # Copyright (c) 2012 TDM Ltd
 #                    Luke Carrier <luke.carrier@tdm.info>
