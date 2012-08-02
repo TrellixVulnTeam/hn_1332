@@ -28,7 +28,10 @@ PYTHON_DISTRIBUTE_VERSION     := 0.6.28
 PYTHON_DISTRIBUTE_SOURCE_DIR  := $(BUILD_ROOT_DIR)/deps/python-distribute
 PYTHON_DISTRIBUTE_SOURCE_URL  := http://pypi.python.org/packages/source/d/distribute/distribute-$(PYTHON_DISTRIBUTE_VERSION).tar.gz
 PYTHON_DISTRIBUTE_RPM_PREFIX  := /usr/local/hypernova
-PYTHON_DISTRIBUTE_VENV_PREFIX := $(BUILD_ROOT_DIR)/chroot
+
+PYTHON_GNUPG_VERSION     := 0.3.0
+PYTHON_GNUPG_SOURCE_DIR  := $(BUILD_ROOT_DIR)/deps/python-gnupg
+PYTHON_GNUPG_RPM_PREFIX  := /usr/local/hypernova
 
 RPM_BUILD_DIR  := $(BUILD_ROOT_DIR)/build/rpm
 RPM_OUTPUT_DIR := $(BUILD_ROOT_DIR)/dist/rpm
@@ -45,31 +48,39 @@ all:
 	@echo '| build-elevator          | build just Elevator                    |'
 	@echo '| build-python            | build just Python                      |'
 	@echo '| build-python-distribute | build just Python Distribute module    |'
+	@echo '| build-python-gnupg      | build just Python GnuPG module         |'
 	@echo '| clean                   | clean all build artefacts              |'
 	@echo '| clean-elevator          | clean just Elevator build artefacts    |'
 	@echo '| clean-python            | clean just Python build artefacts      |'
 	@echo '| clean-python-distribute | clean just Python Distribute module    |'
 	@echo '|                         | build artefacts                        |'
+	@echo '| clean-python-gnupg      | clean just Python GnuPG module build   |'
+	@echo '|                         | artefacts                              |'
 	@echo '| rpm                     | generate RPM packages of HyperNova and |'
 	@echo '|                         | dependencies                           |'
 	@echo '| rpm-elevator            | generate RPM packages of just Elevator |'
 	@echo '| rpm-python              | generate RPM packages of just Python   |'
 	@echo '| rpm-python-distribute   | generate RPM packages of just Python   |'
 	@echo '|                         | Distribute module                      |'
+	@echo '| rpm-python-gnupg        | generate RPM packages of just Python   |'
+	@echo '|                         | GnuPG module                           |'
 	@echo '| venv                    | build the tree and install it to a     |'
 	@echo '|                         | virtualenv                             |'
 	@echo '| venv-elevator           | build and install just Elevator        |'
 	@echo '| venv-python             | build and install just Python          |'
 	@echo '| venv-python-distribute  | build and install just Python          |'
 	@echo '|                         | Distribute module                      |'
+	@echo '| venv-python-gnupg       | build and install just Python GnuPG    |'
+	@echo '|                         | module                                 |'
 	@echo '+-------------------------+----------------------------------------+'
 
 .PHONY: all build                   clean                   rpm                   venv
 .PHONY:     build-elevator          clean-elevator          rpm-elevator          venv-elevator
 .PHONY:     build-python            clean-python            rpm-python            venv-python
 .PHONY:     build-python-distribute clean-python-distribute rpm-python-distribute venv-python-distribute
+.PHONY:     build-python-gnupg      clean-python-gnupg      rpm-python-gnupg      venv-python-gnupg
 
-build: build-elevator build-python build-python-distribute
+build: build-elevator build-python build-python-distribute build-python-gnupg
 
 build-elevator:
 	$(BUILD_ROOT_DIR)/build/build-elevator.sh \
@@ -82,12 +93,19 @@ build-python:
 		--python-source-dir $(PYTHON_SOURCE_DIR)
 
 build-python-distribute:
-	$(BUILD_ROOT_DIR)/build/build-python-distribute.sh \
+	$(BUILD_ROOT_DIR)/build/build-python-module.sh \
 		--build-temp-dir $(BUILD_TEMP_DIR) \
 		--python-binary $(PYTHON_VENV_BINARY) \
-		--python-distribute-source-dir $(PYTHON_DISTRIBUTE_SOURCE_DIR) \
-		--python-distribute-source-url $(PYTHON_DISTRIBUTE_SOURCE_URL) \
-		--python-distribute-version $(PYTHON_DISTRIBUTE_VERSION)
+		--python-module-name "distribute" \
+		--python-module-source-dir $(PYTHON_DISTRIBUTE_SOURCE_DIR) \
+		--python-module-source-url $(PYTHON_DISTRIBUTE_SOURCE_URL)
+
+build-python-gnupg: venv-python-distribute
+	$(BUILD_ROOT_DIR)/build/build-python-module.sh \
+		--python-binary $(PYTHON_VENV_BINARY) \
+		--python-module-name "gnupg" \
+		--python-module-source-dir $(PYTHON_GNUPG_SOURCE_DIR) \
+		--python-module-version $(PYTHON_GNUPG_VERSION)
 
 clean: clean-elevator clean-python clean-python-distribute
 
@@ -102,8 +120,16 @@ clean-python:
 		--rpm-output-dir $(RPM_OUTPUT_DIR)
 
 clean-python-distribute:
-	$(BUILD_ROOT_DIR)/build/clean-python-distribute.sh \
-		--python-distribute-source-dir $(PYTHON_DISTRIBUTE_SOURCE_DIR) \
+	$(BUILD_ROOT_DIR)/build/clean-python-module.sh \
+		--python-module-name "distribute" \
+		--python-module-source-dir $(PYTHON_DISTRIBUTE_SOURCE_DIR) \
+		--rpm-output-dir $(RPM_OUTPUT_DIR)
+
+clean-python-gnupg:
+	$(BUILD_ROOT_DIR)/build/clean-python-module.sh \
+		--is-local-submodule \
+		--python-module-name "gnupg" \
+		--python-module-source-dir $(PYTHON_GNUPG_SOURCE_DIR) \
 		--rpm-output-dir $(RPM_OUTPUT_DIR)
 
 rpm: rpm-elevator rpm-python rpm-python-distribute
@@ -127,16 +153,31 @@ rpm-python: build-python
 		--rpm-spec-dir $(RPM_SPEC_DIR)
 
 rpm-python-distribute: build-python-distribute venv-python
-	$(BUILD_ROOT_DIR)/build/rpm-python-distribute.sh \
-		--python-distribute-rpm-prefix $(PYTHON_DISTRIBUTE_RPM_PREFIX) \
-		--python-distribute-source-dir $(PYTHON_DISTRIBUTE_SOURCE_DIR) \
-		--python-distribute-version $(PYTHON_DISTRIBUTE_VERSION) \
+	$(BUILD_ROOT_DIR)/build/rpm-python-module.sh \
+		--python-module-name "distribute" \
+		--python-module-st-name "distribute" \
+		--python-module-rpm-prefix $(PYTHON_DISTRIBUTE_RPM_PREFIX) \
+		--python-module-source-dir $(PYTHON_DISTRIBUTE_SOURCE_DIR) \
+		--python-module-version $(PYTHON_DISTRIBUTE_VERSION) \
 		--python-source-dir $(PYTHON_SOURCE_DIR) \
 		--rpm-build-dir $(RPM_BUILD_DIR) \
 		--rpm-output-dir $(RPM_OUTPUT_DIR) \
 		--rpm-spec-dir $(RPM_SPEC_DIR)
 
-venv: venv-elevator venv-python-distribute
+rpm-python-gnupg: build-python-gnupg venv-python
+	$(BUILD_ROOT_DIR)/build/rpm-python-module.sh \
+		--python-distribute-source-dir $(PYTHON_DISTRIBUTE_SOURCE_DIR) \
+		--python-module-st-name "python_gnupg" \
+		--python-module-name "gnupg" \
+		--python-module-rpm-prefix $(PYTHON_GNUPG_RPM_PREFIX) \
+		--python-module-source-dir $(PYTHON_GNUPG_SOURCE_DIR) \
+		--python-module-version $(PYTHON_GNUPG_VERSION) \
+		--python-source-dir $(PYTHON_SOURCE_DIR) \
+		--rpm-build-dir $(RPM_BUILD_DIR) \
+		--rpm-output-dir $(RPM_OUTPUT_DIR) \
+		--rpm-spec-dir $(RPM_SPEC_DIR)
+
+venv: venv-elevator venv-python venv-python-distribute
 
 venv-elevator: build-elevator
 	$(BUILD_ROOT_DIR)/build/venv-elevator.sh \
@@ -149,9 +190,19 @@ venv-python: build-python
 		--python-source-dir $(PYTHON_SOURCE_DIR) \
 		--python-venv-prefix $(PYTHON_VENV_PREFIX)
 
-venv-python-distribute: build-python-distribute
-	$(BUILD_ROOT_DIR)/build/venv-python-distribute.sh \
-		--python-distribute-source-dir $(PYTHON_DISTRIBUTE_SOURCE_DIR) \
-		--python-distribute-venv-prefix $(PYTHON_DISTRIBUTE_VENV_PREFIX) \
+venv-python-distribute: build-python-distribute venv-python
+	$(BUILD_ROOT_DIR)/build/venv-python-module.sh \
+		--python-binary $(PYTHON_VENV_BINARY) \
+		--python-module-st-name "distribute" \
+		--python-module-source-dir $(PYTHON_DISTRIBUTE_SOURCE_DIR) \
+		--python-module-version $(PYTHON_DISTRIBUTE_VERSION) \
+		--python-sitepackages-dir $(PYTHON_VENV_SITEPACKAGES_DIR)
+
+venv-python-gnupg: build-python-gnupg venv-python venv-python-distribute
+	$(BUILD_ROOT_DIR)/build/venv-python-module.sh \
+		--python-binary $(PYTHON_VENV_BINARY) \
+		--python-module-st-name "python_gnupg" \
+		--python-module-source-dir $(PYTHON_GNUPG_SOURCE_DIR) \
+		--python-module-version $(PYTHON_GNUPG_VERSION) \
 		--python-sitepackages-dir $(PYTHON_VENV_SITEPACKAGES_DIR)
 
