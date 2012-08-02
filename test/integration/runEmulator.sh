@@ -18,6 +18,6 @@ scp -P 3333 -r RPMS/ hnbuild@localhost:/home/hnbuild/hypernova/
 
 expect -f installAgent.tcl
 
-#kill $QEMU_PID
+kill $QEMU_PID
 
 

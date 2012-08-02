@@ -19,6 +19,5 @@ if [ -z "$PYTHONPATH" ]; then
     for p in $PYTHONPATHBASE/*; do
         PYTHONPATH="$PYTHONPATH:$p"
     done
-fi
-
+fi 
 PYTHONPATH="$PYTHONPATH" "$BINDIR/$PYTHON" -m hypernova.client $@

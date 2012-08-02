@@ -1,6 +1,6 @@
 #!/usr/bin/expect -f  
 
-set timeout 10
+set timeout 100
 set prompt "\^.*\]\\\$ "
 
 spawn ssh -p 3333 hnbuild@localhost
