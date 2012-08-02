@@ -42,10 +42,6 @@ rm -rfv "%buildroot%prefixdir"/lib*/!(python*)
 rm -rfv "%buildroot%prefixdir"/lib*/python*/!("site-packages")
 rm -rfv "%buildroot%prefixdir"/lib*/python*/"site-packages"/!(distribute-*)
 
-#find "%buildroot%prefixdir" \
-#    -not \
-#        -path "%buildroot%prefixdir"/lib*/python*/"site-packages"/distribute-* \
-#    -exec rm -rfv {} \;
 
 %files
 %defattr(-, root, root, -)
