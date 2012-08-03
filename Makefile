@@ -33,6 +33,10 @@ PYTHON_GNUPG_VERSION     := 0.3.0
 PYTHON_GNUPG_SOURCE_DIR  := $(BUILD_ROOT_DIR)/deps/python-gnupg
 PYTHON_GNUPG_RPM_PREFIX  := /usr/local/hypernova
 
+PYTHON_OURSQL_VERSION     := 0.9.2
+PYTHON_OURSQL_SOURCE_DIR  := $(BUILD_ROOT_DIR)/deps/python-oursql
+PYTHON_OURSQL_RPM_PREFIX  := /usr/local/hypernova
+
 RPM_BUILD_DIR  := $(BUILD_ROOT_DIR)/build/rpm
 RPM_OUTPUT_DIR := $(BUILD_ROOT_DIR)/dist/rpm
 RPM_SPEC_DIR   := $(BUILD_ROOT_DIR)/build
@@ -80,7 +84,7 @@ all:
 .PHONY:     build-python-distribute clean-python-distribute rpm-python-distribute venv-python-distribute
 .PHONY:     build-python-gnupg      clean-python-gnupg      rpm-python-gnupg      venv-python-gnupg
 
-build: build-elevator build-python build-python-distribute build-python-gnupg
+build: build-elevator build-python build-python-distribute build-python-gnupg build-python-oursql
 
 build-elevator:
 	$(BUILD_ROOT_DIR)/build/build-elevator.sh \
@@ -107,7 +111,14 @@ build-python-gnupg: venv-python-distribute
 		--python-module-source-dir $(PYTHON_GNUPG_SOURCE_DIR) \
 		--python-module-version $(PYTHON_GNUPG_VERSION)
 
-clean: clean-elevator clean-python clean-python-distribute
+build-python-oursql: venv-python-distribute
+	$(BUILD_ROOT_DIR)/build/build-python-module.sh \
+		--python-binary $(PYTHON_VENV_BINARY) \
+		--python-module-name "oursql" \
+		--python-module-source-dir $(PYTHON_OURSQL_SOURCE_DIR) \
+		--python-module-version $(PYTHON_OURSQL_VERSION)
+
+clean: clean-elevator clean-python clean-python-distribute clean-python-gnupg clean-python-oursql
 
 clean-elevator:
 	$(BUILD_ROOT_DIR)/build/clean-elevator.sh \
@@ -132,7 +143,14 @@ clean-python-gnupg:
 		--python-module-source-dir $(PYTHON_GNUPG_SOURCE_DIR) \
 		--rpm-output-dir $(RPM_OUTPUT_DIR)
 
-rpm: rpm-elevator rpm-python rpm-python-distribute
+clean-python-oursql:
+	$(BUILD_ROOT_DIR)/build/clean-python-module.sh \
+		--is-local-submodule \
+		--python-module-name "oursql" \
+		--python-module-source-dir $(PYTHON_OURSQL_SOURCE_DIR) \
+		--rpm-output-dir $(RPM_OUTPUT_DIR)
+
+rpm: rpm-elevator rpm-python rpm-python-distribute rpm-python-gnupg rpm-python-oursql
 
 rpm-elevator: build-elevator
 	$(BUILD_ROOT_DIR)/build/rpm-elevator.sh \
@@ -152,7 +170,7 @@ rpm-python: build-python
 		--rpm-output-dir $(RPM_OUTPUT_DIR) \
 		--rpm-spec-dir $(RPM_SPEC_DIR)
 
-rpm-python-distribute: build-python-distribute venv-python
+rpm-python-distribute: build-python-distribute
 	$(BUILD_ROOT_DIR)/build/rpm-python-module.sh \
 		--python-module-name "distribute" \
 		--python-module-st-name "distribute" \
@@ -164,7 +182,7 @@ rpm-python-distribute: build-python-distribute venv-python
 		--rpm-output-dir $(RPM_OUTPUT_DIR) \
 		--rpm-spec-dir $(RPM_SPEC_DIR)
 
-rpm-python-gnupg: build-python-gnupg venv-python
+rpm-python-gnupg: build-python-gnupg
 	$(BUILD_ROOT_DIR)/build/rpm-python-module.sh \
 		--python-distribute-source-dir $(PYTHON_DISTRIBUTE_SOURCE_DIR) \
 		--python-module-st-name "python_gnupg" \
@@ -177,7 +195,20 @@ rpm-python-gnupg: build-python-gnupg venv-python
 		--rpm-output-dir $(RPM_OUTPUT_DIR) \
 		--rpm-spec-dir $(RPM_SPEC_DIR)
 
-venv: venv-elevator venv-python venv-python-distribute
+rpm-python-oursql: build-python-oursql
+	$(BUILD_ROOT_DIR)/build/rpm-python-module.sh \
+		--python-distribute-source-dir $(PYTHON_DISTRIBUTE_SOURCE_DIR) \
+		--python-module-st-name "oursql" \
+		--python-module-name "oursql" \
+		--python-module-rpm-prefix $(PYTHON_OURSQL_RPM_PREFIX) \
+		--python-module-source-dir $(PYTHON_OURSQL_SOURCE_DIR) \
+		--python-module-version $(PYTHON_OURSQL_VERSION) \
+		--python-source-dir $(PYTHON_SOURCE_DIR) \
+		--rpm-build-dir $(RPM_BUILD_DIR) \
+		--rpm-output-dir $(RPM_OUTPUT_DIR) \
+		--rpm-spec-dir $(RPM_SPEC_DIR)
+
+venv: venv-elevator venv-python venv-python-distribute venv-python-gnupg venv-python-oursql
 
 venv-elevator: build-elevator
 	$(BUILD_ROOT_DIR)/build/venv-elevator.sh \
@@ -204,5 +235,13 @@ venv-python-gnupg: build-python-gnupg venv-python venv-python-distribute
 		--python-module-st-name "python_gnupg" \
 		--python-module-source-dir $(PYTHON_GNUPG_SOURCE_DIR) \
 		--python-module-version $(PYTHON_GNUPG_VERSION) \
+		--python-sitepackages-dir $(PYTHON_VENV_SITEPACKAGES_DIR)
+
+venv-python-oursql: build-python-oursql venv-python venv-python-distribute
+	$(BUILD_ROOT_DIR)/build/venv-python-module.sh \
+		--python-binary $(PYTHON_VENV_BINARY) \
+		--python-module-st-name "oursql" \
+		--python-module-source-dir $(PYTHON_OURSQL_SOURCE_DIR) \
+		--python-module-version $(PYTHON_OURSQL_VERSION) \
 		--python-sitepackages-dir $(PYTHON_VENV_SITEPACKAGES_DIR)
 
