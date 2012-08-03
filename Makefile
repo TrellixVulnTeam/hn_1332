@@ -57,12 +57,15 @@ all:
 	@echo '| build-python            | build just Python                      |'
 	@echo '| build-python-distribute | build just Python Distribute module    |'
 	@echo '| build-python-gnupg      | build just Python GnuPG module         |'
+	@echo '| build-python-oursql     | build just Python OurSQL module        |'
 	@echo '| clean                   | clean all build artefacts              |'
 	@echo '| clean-elevator          | clean just Elevator build artefacts    |'
 	@echo '| clean-python            | clean just Python build artefacts      |'
 	@echo '| clean-python-distribute | clean just Python Distribute module    |'
 	@echo '|                         | build artefacts                        |'
 	@echo '| clean-python-gnupg      | clean just Python GnuPG module build   |'
+	@echo '|                         | artefacts                              |'
+	@echo '| clean-python-oursql     | clean just Python OurSQL module build  |'
 	@echo '|                         | artefacts                              |'
 	@echo '| rpm                     | generate RPM packages of HyperNova and |'
 	@echo '|                         | dependencies                           |'
@@ -72,6 +75,8 @@ all:
 	@echo '|                         | Distribute module                      |'
 	@echo '| rpm-python-gnupg        | generate RPM packages of just Python   |'
 	@echo '|                         | GnuPG module                           |'
+	@echo '| rpm-python-oursql       | generate RPM packages of just Python   |'
+	@echo '|                         | OurSQL module                          |'
 	@echo '| venv                    | build the tree and install it to a     |'
 	@echo '|                         | virtualenv                             |'
 	@echo '| venv-elevator           | build and install just Elevator        |'
@@ -80,6 +85,8 @@ all:
 	@echo '|                         | Distribute module                      |'
 	@echo '| venv-python-gnupg       | build and install just Python GnuPG    |'
 	@echo '|                         | module                                 |'
+	@echo '| venv-python-oursql      | build and install just Python OurSQL   |'
+	@echo '|                         | module                                 |'
 	@echo '+-------------------------+----------------------------------------+'
 
 .PHONY: all build                   clean                   rpm                   venv
@@ -87,6 +94,7 @@ all:
 .PHONY:     build-python            clean-python            rpm-python            venv-python
 .PHONY:     build-python-distribute clean-python-distribute rpm-python-distribute venv-python-distribute
 .PHONY:     build-python-gnupg      clean-python-gnupg      rpm-python-gnupg      venv-python-gnupg
+.PHONY:     build-python-oursql     clean-python-oursql     rpm-python-oursql     venv-python-oursql
 
 build: build-elevator build-python build-python-distribute build-python-gnupg build-python-oursql build-python-pexpect
 
