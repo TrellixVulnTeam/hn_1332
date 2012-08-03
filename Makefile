@@ -24,18 +24,18 @@ PYTHON_VENV_BINARY           := $(BUILD_ROOT_DIR)/chroot/bin/python3.2
 PYTHON_VENV_LIBRARY_DIR      := $(PYTHON_VENV_PREFIX)/lib/python3.2
 PYTHON_VENV_SITEPACKAGES_DIR := $(PYTHON_VENV_LIBRARY_DIR)/site-packages
 
-PYTHON_DISTRIBUTE_VERSION     := 0.6.28
-PYTHON_DISTRIBUTE_SOURCE_DIR  := $(BUILD_ROOT_DIR)/deps/python-distribute
-PYTHON_DISTRIBUTE_SOURCE_URL  := http://pypi.python.org/packages/source/d/distribute/distribute-$(PYTHON_DISTRIBUTE_VERSION).tar.gz
-PYTHON_DISTRIBUTE_RPM_PREFIX  := /usr/local/hypernova
+PYTHON_DISTRIBUTE_VERSION    := 0.6.28
+PYTHON_DISTRIBUTE_SOURCE_DIR := $(BUILD_ROOT_DIR)/deps/python-distribute
+PYTHON_DISTRIBUTE_SOURCE_URL := http://pypi.python.org/packages/source/d/distribute/distribute-$(PYTHON_DISTRIBUTE_VERSION).tar.gz
+PYTHON_DISTRIBUTE_RPM_PREFIX := /usr/local/hypernova
 
-PYTHON_GNUPG_VERSION     := 0.3.0
-PYTHON_GNUPG_SOURCE_DIR  := $(BUILD_ROOT_DIR)/deps/python-gnupg
-PYTHON_GNUPG_RPM_PREFIX  := /usr/local/hypernova
+PYTHON_GNUPG_VERSION    := 0.3.0
+PYTHON_GNUPG_SOURCE_DIR := $(BUILD_ROOT_DIR)/deps/python-gnupg
+PYTHON_GNUPG_RPM_PREFIX := /usr/local/hypernova
 
-PYTHON_OURSQL_VERSION     := 0.9.2
-PYTHON_OURSQL_SOURCE_DIR  := $(BUILD_ROOT_DIR)/deps/python-oursql
-PYTHON_OURSQL_RPM_PREFIX  := /usr/local/hypernova
+PYTHON_OURSQL_VERSION    := 0.9.2
+PYTHON_OURSQL_SOURCE_DIR := $(BUILD_ROOT_DIR)/deps/python-oursql
+PYTHON_OURSQL_RPM_PREFIX := /usr/local/hypernova
 
 RPM_BUILD_DIR  := $(BUILD_ROOT_DIR)/build/rpm
 RPM_OUTPUT_DIR := $(BUILD_ROOT_DIR)/dist/rpm
