@@ -10,7 +10,7 @@
 #
 
 from http.client import HTTPConnection
-from hypernova import GPG
+from hypernova.libraries.gnupg import GPG
 import json
 import os
 

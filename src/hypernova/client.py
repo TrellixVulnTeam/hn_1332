@@ -11,7 +11,7 @@
 
 import argparse
 import configparser
-from hypernova import GPG
+from hypernova.libraries.gnupg import GPG
 from hypernova.libraries.client import Client
 from hypernova.libraries.configuration import ConfigurationFactory, LoadError
 from hypernova import modules

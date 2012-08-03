@@ -10,11 +10,12 @@
 #
 
 from http.server import HTTPServer, BaseHTTPRequestHandler
-from hypernova import GPG, modules
+from hypernova import modules
 import json
 import logging
 import logging.handlers
 from hypernova.libraries.configuration import ConfigurationFactory
+from hypernova.libraries.gnupg import GPG
 from hypernova.libraries.proc import daemonise
 import os
 import socket
