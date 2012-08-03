@@ -37,6 +37,10 @@ PYTHON_OURSQL_VERSION    := 0.9.2
 PYTHON_OURSQL_SOURCE_DIR := $(BUILD_ROOT_DIR)/deps/python-oursql
 PYTHON_OURSQL_RPM_PREFIX := /usr/local/hypernova
 
+PYTHON_PEXPECT_VERSION    := 2.3
+PYTHON_PEXPECT_SOURCE_DIR := $(BUILD_ROOT_DIR)/deps/python-pexpect
+PYTHON_PEXPECT_RPM_PREFIX := /usr/local/hypernova
+
 RPM_BUILD_DIR  := $(BUILD_ROOT_DIR)/build/rpm
 RPM_OUTPUT_DIR := $(BUILD_ROOT_DIR)/dist/rpm
 RPM_SPEC_DIR   := $(BUILD_ROOT_DIR)/build
@@ -84,7 +88,7 @@ all:
 .PHONY:     build-python-distribute clean-python-distribute rpm-python-distribute venv-python-distribute
 .PHONY:     build-python-gnupg      clean-python-gnupg      rpm-python-gnupg      venv-python-gnupg
 
-build: build-elevator build-python build-python-distribute build-python-gnupg build-python-oursql
+build: build-elevator build-python build-python-distribute build-python-gnupg build-python-oursql build-python-pexpect
 
 build-elevator:
 	$(BUILD_ROOT_DIR)/build/build-elevator.sh \
@@ -118,7 +122,14 @@ build-python-oursql: venv-python-distribute
 		--python-module-source-dir $(PYTHON_OURSQL_SOURCE_DIR) \
 		--python-module-version $(PYTHON_OURSQL_VERSION)
 
-clean: clean-elevator clean-python clean-python-distribute clean-python-gnupg clean-python-oursql
+build-python-pexpect: venv-python-distribute
+	$(BUILD_ROOT_DIR)/build/build-python-module.sh \
+		--python-binary $(PYTHON_VENV_BINARY) \
+		--python-module-name "pexpect" \
+		--python-module-source-dir $(PYTHON_PEXPECT_SOURCE_DIR) \
+		--python-module-version $(PYTHON_PEXPECT_VERSION)
+
+clean: clean-elevator clean-python clean-python-distribute clean-python-gnupg clean-python-oursql clean-python-pexpect
 
 clean-elevator:
 	$(BUILD_ROOT_DIR)/build/clean-elevator.sh \
@@ -150,7 +161,14 @@ clean-python-oursql:
 		--python-module-source-dir $(PYTHON_OURSQL_SOURCE_DIR) \
 		--rpm-output-dir $(RPM_OUTPUT_DIR)
 
-rpm: rpm-elevator rpm-python rpm-python-distribute rpm-python-gnupg rpm-python-oursql
+clean-python-pexpect:
+	$(BUILD_ROOT_DIR)/build/clean-python-module.sh \
+		--is-local-submodule \
+		--python-module-name "pexpect" \
+		--python-module-source-dir $(PYTHON_PEXPECT_SOURCE_DIR) \
+		--rpm-output-dir $(RPM_OUTPUT_DIR)
+
+rpm: rpm-elevator rpm-python rpm-python-distribute rpm-python-gnupg rpm-python-oursql rpm-python-pexpect
 
 rpm-elevator: build-elevator
 	$(BUILD_ROOT_DIR)/build/rpm-elevator.sh \
@@ -208,7 +226,20 @@ rpm-python-oursql: build-python-oursql
 		--rpm-output-dir $(RPM_OUTPUT_DIR) \
 		--rpm-spec-dir $(RPM_SPEC_DIR)
 
-venv: venv-elevator venv-python venv-python-distribute venv-python-gnupg venv-python-oursql
+rpm-python-pexpect: build-python-pexpect
+	$(BUILD_ROOT_DIR)/build/rpm-python-module.sh \
+		--python-distribute-source-dir $(PYTHON_DISTRIBUTE_SOURCE_DIR) \
+		--python-module-st-name "pexpect" \
+		--python-module-name "pexpect" \
+		--python-module-rpm-prefix $(PYTHON_PEXPECT_RPM_PREFIX) \
+		--python-module-source-dir $(PYTHON_PEXPECT_SOURCE_DIR) \
+		--python-module-version $(PYTHON_PEXPECT_VERSION) \
+		--python-source-dir $(PYTHON_SOURCE_DIR) \
+		--rpm-build-dir $(RPM_BUILD_DIR) \
+		--rpm-output-dir $(RPM_OUTPUT_DIR) \
+		--rpm-spec-dir $(RPM_SPEC_DIR)
+
+venv: venv-elevator venv-python venv-python-distribute venv-python-gnupg venv-python-oursql venv-python-pexpect
 
 venv-elevator: build-elevator
 	$(BUILD_ROOT_DIR)/build/venv-elevator.sh \
@@ -243,5 +274,13 @@ venv-python-oursql: build-python-oursql venv-python venv-python-distribute
 		--python-module-st-name "oursql" \
 		--python-module-source-dir $(PYTHON_OURSQL_SOURCE_DIR) \
 		--python-module-version $(PYTHON_OURSQL_VERSION) \
+		--python-sitepackages-dir $(PYTHON_VENV_SITEPACKAGES_DIR)
+
+venv-python-pexpect: build-python-pexpect venv-python venv-python-distribute
+	$(BUILD_ROOT_DIR)/build/venv-python-module.sh \
+		--python-binary $(PYTHON_VENV_BINARY) \
+		--python-module-st-name "pexpect" \
+		--python-module-source-dir $(PYTHON_PEXPECT_SOURCE_DIR) \
+		--python-module-version $(PYTHON_PEXPECT_VERSION) \
 		--python-sitepackages-dir $(PYTHON_VENV_SITEPACKAGES_DIR)
 
