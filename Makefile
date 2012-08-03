@@ -49,16 +49,32 @@ all:
 	@echo HyperNova
 	@echo =========
 	@echo
+	@echo Primary targets
+	@echo ---------------
+	@echo
 	@echo '+-------------------------+----------------------------------------+'
 	@echo '| Target                  | Description                            |'
 	@echo '+-------------------------+----------------------------------------+'
 	@echo '| build                   | build HyperNova and all dependencies   |'
+	@echo '| clean                   | clean all build artefacts              |'
+	@echo '| rpm                     | generate RPM packages of HyperNova and |'
+	@echo '|                         | dependencies                           |'
+	@echo '| venv                    | build the tree and install it to a     |'
+	@echo '|                         | virtualenv                             |'
+	@echo '+-------------------------+----------------------------------------+'
+	@echo
+	@echo Specific targets
+	@echo ----------------
+	@echo
+	@echo '+-------------------------+----------------------------------------+'
+	@echo '| Target                  | Description                            |'
+	@echo '+-------------------------+----------------------------------------+'
 	@echo '| build-elevator          | build just Elevator                    |'
 	@echo '| build-python            | build just Python                      |'
 	@echo '| build-python-distribute | build just Python Distribute module    |'
 	@echo '| build-python-gnupg      | build just Python GnuPG module         |'
 	@echo '| build-python-oursql     | build just Python OurSQL module        |'
-	@echo '| clean                   | clean all build artefacts              |'
+	@echo '| build-python-pexpect    | build just Python pexpect module       |'
 	@echo '| clean-elevator          | clean just Elevator build artefacts    |'
 	@echo '| clean-python            | clean just Python build artefacts      |'
 	@echo '| clean-python-distribute | clean just Python Distribute module    |'
@@ -67,8 +83,8 @@ all:
 	@echo '|                         | artefacts                              |'
 	@echo '| clean-python-oursql     | clean just Python OurSQL module build  |'
 	@echo '|                         | artefacts                              |'
-	@echo '| rpm                     | generate RPM packages of HyperNova and |'
-	@echo '|                         | dependencies                           |'
+	@echo '| clean-python-pexpect    | clean just Python pexpect module build |'
+	@echo '|                         | artefacts                              |'
 	@echo '| rpm-elevator            | generate RPM packages of just Elevator |'
 	@echo '| rpm-python              | generate RPM packages of just Python   |'
 	@echo '| rpm-python-distribute   | generate RPM packages of just Python   |'
@@ -77,8 +93,8 @@ all:
 	@echo '|                         | GnuPG module                           |'
 	@echo '| rpm-python-oursql       | generate RPM packages of just Python   |'
 	@echo '|                         | OurSQL module                          |'
-	@echo '| venv                    | build the tree and install it to a     |'
-	@echo '|                         | virtualenv                             |'
+	@echo '| rpm-python-pexpect      | generate RPM packages of just Python   |'
+	@echo '|                         | pexpect module                         |'
 	@echo '| venv-elevator           | build and install just Elevator        |'
 	@echo '| venv-python             | build and install just Python          |'
 	@echo '| venv-python-distribute  | build and install just Python          |'
@@ -86,6 +102,8 @@ all:
 	@echo '| venv-python-gnupg       | build and install just Python GnuPG    |'
 	@echo '|                         | module                                 |'
 	@echo '| venv-python-oursql      | build and install just Python OurSQL   |'
+	@echo '|                         | module                                 |'
+	@echo '| venv-python-pexpect     | build and install just Python pexpect  |'
 	@echo '|                         | module                                 |'
 	@echo '+-------------------------+----------------------------------------+'
 
@@ -95,6 +113,7 @@ all:
 .PHONY:     build-python-distribute clean-python-distribute rpm-python-distribute venv-python-distribute
 .PHONY:     build-python-gnupg      clean-python-gnupg      rpm-python-gnupg      venv-python-gnupg
 .PHONY:     build-python-oursql     clean-python-oursql     rpm-python-oursql     venv-python-oursql
+.PHONY:     build-python-pexpect    clean-python-pexpect    rpm-python-pexpect    venv-python-pexpect
 
 build: build-elevator build-python build-python-distribute build-python-gnupg build-python-oursql build-python-pexpect
 
