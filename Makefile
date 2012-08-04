@@ -218,6 +218,11 @@ clean-python-pexpect:
 		--python-module-source-dir $(PYTHON_PEXPECT_SOURCE_DIR) \
 		--rpm-output-dir $(RPM_OUTPUT_DIR)
 
+dep-rhel:
+	yum -y install \
+		gcc git make wget \
+		{mysql,zlib}-devel
+
 rpm: venv rpm-elevator rpm-hypernova rpm-python rpm-python-distribute rpm-python-gnupg rpm-python-oursql rpm-python-pexpect
 
 rpm-elevator: build-elevator
