@@ -15,6 +15,12 @@ ELEVATOR_SOURCE_DIR  := $(BUILD_ROOT_DIR)/deps/elevator
 ELEVATOR_RPM_PREFIX  := /usr/local/hypernova
 ELEVATOR_VENV_PREFIX := $(BUILD_ROOT_DIR)/chroot
 
+HYPERNOVA_CHROOT_DIR := $(BUILD_ROOT_DIR)/chroot
+HYPERNOVA_RPM_PREFIX := /usr/local/hypernova
+HYPERNOVA_SOURCE_DIR := $(BUILD_ROOT_DIR)/src
+HYPERNOVA_VENV_DIR   := $(BUILD_ROOT_DIR)/chroot
+HYPERNOVA_VERSION    := 0.1.0
+
 PYTHON_VERSION               := 3.2.3
 PYTHON_SOURCE_URL            := http://python.org/ftp/python/$(PYTHON_VERSION)/Python-$(PYTHON_VERSION).tar.bz2
 PYTHON_SOURCE_DIR            := $(BUILD_ROOT_DIR)/deps/python
@@ -70,12 +76,14 @@ all:
 	@echo '| Target                  | Description                            |'
 	@echo '+-------------------------+----------------------------------------+'
 	@echo '| build-elevator          | build just Elevator                    |'
+	@echo '| build-hypernova         | build just HyperNova                   |'
 	@echo '| build-python            | build just Python                      |'
 	@echo '| build-python-distribute | build just Python Distribute module    |'
 	@echo '| build-python-gnupg      | build just Python GnuPG module         |'
 	@echo '| build-python-oursql     | build just Python OurSQL module        |'
 	@echo '| build-python-pexpect    | build just Python pexpect module       |'
 	@echo '| clean-elevator          | clean just Elevator build artefacts    |'
+	@echo '| clean-hypernova         | clean just HyperNova build artefacts   |'
 	@echo '| clean-python            | clean just Python build artefacts      |'
 	@echo '| clean-python-distribute | clean just Python Distribute module    |'
 	@echo '|                         | build artefacts                        |'
@@ -86,6 +94,8 @@ all:
 	@echo '| clean-python-pexpect    | clean just Python pexpect module build |'
 	@echo '|                         | artefacts                              |'
 	@echo '| rpm-elevator            | generate RPM packages of just Elevator |'
+	@echo '| rpm-hypernova           | generate RPM packages of just          |'
+	@echo '|                         | HyperNova                              |'
 	@echo '| rpm-python              | generate RPM packages of just Python   |'
 	@echo '| rpm-python-distribute   | generate RPM packages of just Python   |'
 	@echo '|                         | Distribute module                      |'
@@ -96,6 +106,7 @@ all:
 	@echo '| rpm-python-pexpect      | generate RPM packages of just Python   |'
 	@echo '|                         | pexpect module                         |'
 	@echo '| venv-elevator           | build and install just Elevator        |'
+	@echo '| venv-hypernova          | build and install just HyperNova       |'
 	@echo '| venv-python             | build and install just Python          |'
 	@echo '| venv-python-distribute  | build and install just Python          |'
 	@echo '|                         | Distribute module                      |'
@@ -109,17 +120,24 @@ all:
 
 .PHONY: all build                   clean                   rpm                   venv
 .PHONY:     build-elevator          clean-elevator          rpm-elevator          venv-elevator
+.PHONY:     build-hypernova         clean-hypernova         rpm-hypernova         venv-hypernova
 .PHONY:     build-python            clean-python            rpm-python            venv-python
 .PHONY:     build-python-distribute clean-python-distribute rpm-python-distribute venv-python-distribute
 .PHONY:     build-python-gnupg      clean-python-gnupg      rpm-python-gnupg      venv-python-gnupg
 .PHONY:     build-python-oursql     clean-python-oursql     rpm-python-oursql     venv-python-oursql
 .PHONY:     build-python-pexpect    clean-python-pexpect    rpm-python-pexpect    venv-python-pexpect
 
-build: build-elevator build-python build-python-distribute build-python-gnupg build-python-oursql build-python-pexpect
+build: build-elevator build-hypernova build-python build-python-distribute build-python-gnupg build-python-oursql build-python-pexpect
 
 build-elevator:
 	$(BUILD_ROOT_DIR)/build/build-elevator.sh \
 		--elevator-source-dir $(ELEVATOR_SOURCE_DIR)
+
+build-hypernova: venv-python-distribute
+	$(BUILD_ROOT_DIR)/build/build-python-module.sh \
+		--python-binary $(PYTHON_VENV_BINARY) \
+		--python-module-name "hypernova" \
+		--python-module-source-dir $(HYPERNOVA_SOURCE_DIR)
 
 build-python:
 	$(BUILD_ROOT_DIR)/build/build-python.sh \
@@ -156,11 +174,16 @@ build-python-pexpect: venv-python-distribute
 		--python-module-source-dir $(PYTHON_PEXPECT_SOURCE_DIR) \
 		--python-module-version $(PYTHON_PEXPECT_VERSION)
 
-clean: clean-elevator clean-python clean-python-distribute clean-python-gnupg clean-python-oursql clean-python-pexpect
+clean: clean-elevator clean-hypernova clean-python clean-python-distribute clean-python-gnupg clean-python-oursql clean-python-pexpect
 
 clean-elevator:
 	$(BUILD_ROOT_DIR)/build/clean-elevator.sh \
 		--elevator-source-dir $(ELEVATOR_SOURCE_DIR) \
+		--rpm-output-dir $(RPM_OUTPUT_DIR)
+
+clean-hypernova:
+	$(BUILD_ROOT_DIR)/build/clean-hypernova.sh \
+		--hypernova-source-dir $(HYPERNOVA_SOURCE_DIR) \
 		--rpm-output-dir $(RPM_OUTPUT_DIR)
 
 clean-python:
@@ -195,13 +218,25 @@ clean-python-pexpect:
 		--python-module-source-dir $(PYTHON_PEXPECT_SOURCE_DIR) \
 		--rpm-output-dir $(RPM_OUTPUT_DIR)
 
-rpm: rpm-elevator rpm-python rpm-python-distribute rpm-python-gnupg rpm-python-oursql rpm-python-pexpect
+rpm: rpm-elevator rpm-hypernova rpm-python rpm-python-distribute rpm-python-gnupg rpm-python-oursql rpm-python-pexpect
 
 rpm-elevator: build-elevator
 	$(BUILD_ROOT_DIR)/build/rpm-elevator.sh \
 		--elevator-rpm-prefix $(ELEVATOR_RPM_PREFIX) \
 		--elevator-source-dir $(ELEVATOR_SOURCE_DIR) \
 		--elevator-version $(ELEVATOR_VERSION) \
+		--rpm-build-dir $(RPM_BUILD_DIR) \
+		--rpm-output-dir $(RPM_OUTPUT_DIR) \
+		--rpm-spec-dir $(RPM_SPEC_DIR)
+
+rpm-hypernova: build-hypernova
+	$(BUILD_ROOT_DIR)/build/rpm-hypernova.sh \
+		--hypernova-rpm-prefix $(HYPERNOVA_RPM_PREFIX) \
+		--hypernova-source-dir $(HYPERNOVA_SOURCE_DIR) \
+		--hypernova-venv-dir $(HYPERNOVA_VENV_DIR) \
+		--hypernova-version $(HYPERNOVA_VERSION) \
+		--python-distribute-source-dir $(PYTHON_DISTRIBUTE_SOURCE_DIR) \
+		--python-source-dir $(PYTHON_SOURCE_DIR) \
 		--rpm-build-dir $(RPM_BUILD_DIR) \
 		--rpm-output-dir $(RPM_OUTPUT_DIR) \
 		--rpm-spec-dir $(RPM_SPEC_DIR)

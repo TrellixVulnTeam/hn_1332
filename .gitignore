@@ -20,6 +20,7 @@ install/python
 src/build
 src/dist
 src/*.egg-info
+src/.hypernova_build_complete
 
 # chroot environment stuff
 chroot/bin/elevator
@@ -49,3 +50,4 @@ install/build/*
 
 # OS temporary rubbish
 .DS_Store
+
