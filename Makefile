@@ -218,7 +218,7 @@ clean-python-pexpect:
 		--python-module-source-dir $(PYTHON_PEXPECT_SOURCE_DIR) \
 		--rpm-output-dir $(RPM_OUTPUT_DIR)
 
-rpm: rpm-elevator rpm-hypernova rpm-python rpm-python-distribute rpm-python-gnupg rpm-python-oursql rpm-python-pexpect
+rpm: venv rpm-elevator rpm-hypernova rpm-python rpm-python-distribute rpm-python-gnupg rpm-python-oursql rpm-python-pexpect
 
 rpm-elevator: build-elevator
 	$(BUILD_ROOT_DIR)/build/rpm-elevator.sh \
