@@ -18,8 +18,6 @@ echo "Running the build"
 ../../install/rhel-push.sh -H localhost -U hnbuild -P 3333
 # Copy the result
 scp -P 3333 -r hnbuild@localhost:/home/hnbuild/hypernova/install/build/RPMS/ .
-# Run the target server system
-#echo "Launch the VM as a target install for HyperNova"
-#qemu-img create -f qcow2 -b centos-6.0.img builder.img 
+
 
 kill $QEMU_PID

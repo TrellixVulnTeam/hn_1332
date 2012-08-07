@@ -47,16 +47,8 @@ GPG_HOME="$SHARED_STATE/lib/gpg"
 
 AGENT_KEY_FILE=server.pub
 
-cat >"$BATCH_FILE" <<EOF
-Key-Type: ${KEY_TYPE}
-Key-Length: ${KEY_LENGTH}
-Name-Real: ${KEY_REAL_NAME}
-Name-Email: ${KEY_EMAIL}
-Name-Comment: ${KEY_COMMENT}
-EOF
-
 gpg --homedir $GPG_HOME --import $KEY_FILE
-gpg --homedir $GPG_HOME --sign-key ${KEY_EMAIL} --yes
+gpg --homedir $GPG_HOME --yes --sign-key $KEY_EMAIL 
 echo "Generating the server key file to send to the client [$AGENT_KEY_FILE]"
 
 gpg --homedir $GPG_HOME --export ${KEY_EMAIL} > $AGENT_KEY_FILE
@@ -66,7 +58,7 @@ The server public key file has been created
 Finally, you will then need to connect the client to the agent 
 by doing :
 	hn-client config node add <name> <iporhostname> 
-		[<portifnot3030>] pathtopubkey"
+		[<portifnot3030>] pathservertopubkey"
 EOF
 
 rm -f "$BATCH_FILE"
