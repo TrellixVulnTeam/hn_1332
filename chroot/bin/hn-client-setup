@@ -63,7 +63,7 @@ Name-Comment: ${KEY_COMMENT}
 EOF
 
 gpg --batch  --gen-key "$BATCH_FILE"
-gpg --export $KEY_EMAIL > {$KEY_FILE}.pub
+gpg --export $KEY_EMAIL > $KEY_FILE.pub
 gpg --export-secret-keys $KEY_EMAIL > $KEY_FILE
 hn-client config key client
 

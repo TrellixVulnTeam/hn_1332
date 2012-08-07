@@ -17,6 +17,7 @@ from hypernova.libraries.configuration import ConfigurationFactory, LoadError
 from hypernova import modules
 import os
 import sys
+from  hypernova.libraries.debug import debug_setup
 
 class ClientActionBase:
     """
@@ -345,6 +346,7 @@ class SimpleClientInterface:
 
 if __name__ == '__main__':
     try:
+        debug_setup()
         config_dir = os.getenv('CONFDIR')
     except KeyError:
         config_dir = None

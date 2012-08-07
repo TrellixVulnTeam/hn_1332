@@ -21,6 +21,7 @@ import os
 import socket
 from socketserver import ThreadingMixIn
 import sys
+from  hypernova.libraries.debug import debug_setup
 
 # Log types, used within hypernova.agent.AgentRequestHandler
 LOG_MESSAGE = 1
@@ -493,6 +494,7 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
 # elsewhere.
 if __name__ == '__main__':
     try:
+        debug_setup()
         Agent(sys.argv[1]).execute()
     except IndexError:
         print('%s <config dir>' %(sys.argv[0]),)

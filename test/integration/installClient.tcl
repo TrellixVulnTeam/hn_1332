@@ -15,24 +15,14 @@ set prompt "\^.*\]\\\$ "
 spawn ssh -p 3333 hnbuild@localhost
 expect -re  $prompt
 
-send "gpg --gen-key\r"
-expect -re "$.*Your selection?"
-send "1\r"
-expect -re "$.*What keysize do you want?"
-send "2048\r"
-expect -re "$.*Key is valid for?"
-send "0\r"
-expect -re "$.*Is this correct?"
-
+send "hn-client-setup --email user@tdm.info -n user\r"
 expect -re  $prompt
 
-
-send "gpg --export email@addr > client.pub\r"
+send "sudo /usr/local/hypernova/bin/hn-agent-add-client  --key-file client.pub --email user@tdm.info"
 expect -re  $prompt
 
-send "gpg --export-secret-keys email@addr > client\r"
+send "hn-client config node add host1 127.0.0.1 server.pub"
 expect -re  $prompt
-
 
 send "exit\r"
 
