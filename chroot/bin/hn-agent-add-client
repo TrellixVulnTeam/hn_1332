@@ -31,9 +31,9 @@ eval set -- "$(getopt -o "ke:" --long "key-file:,email:" -- "$@")"
 
 while true; do
     case "$1" in
-        -k|--key-file) KEY_FILE="$2" ; shift 2 ;;
-        -e|--email) KEY_EMAIL="$2" ; shift 2 ;;
-        *) break                              ;;
+        -k|--key-file) KEY_FILE="$2"  ; shift 2 ;;
+        -e|--email   ) KEY_EMAIL="$2" ; shift 2 ;;
+        *            ) break                    ;;
     esac
 done
                 
@@ -48,7 +48,7 @@ GPG_HOME="$SHARED_STATE/lib/gpg"
 AGENT_KEY_FILE=server.pub
 
 gpg --homedir $GPG_HOME --import $KEY_FILE
-gpg --homedir $GPG_HOME --yes --sign-key $KEY_EMAIL 
+gpg --homedir $GPG_HOME --yes --sign-key $KEY_EMAIL
 echo "Generating the server key file to send to the client [$AGENT_KEY_FILE]"
 
 gpg --homedir $GPG_HOME --export ${KEY_EMAIL} > $AGENT_KEY_FILE

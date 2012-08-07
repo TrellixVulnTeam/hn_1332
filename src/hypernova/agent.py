@@ -15,13 +15,13 @@ import json
 import logging
 import logging.handlers
 from hypernova.libraries.configuration import ConfigurationFactory
+from hypernova.libraries.debug import debug_setup
 from hypernova.libraries.gnupg import GPG
 from hypernova.libraries.proc import daemonise
 import os
 import socket
 from socketserver import ThreadingMixIn
 import sys
-from  hypernova.libraries.debug import debug_setup
 
 # Log types, used within hypernova.agent.AgentRequestHandler
 LOG_MESSAGE = 1
@@ -499,3 +499,4 @@ if __name__ == '__main__':
     except IndexError:
         print('%s <config dir>' %(sys.argv[0]),)
         sys.exit(78)
+
