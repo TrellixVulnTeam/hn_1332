@@ -33,6 +33,7 @@ Source4: python-distribute.tar.bz2
 Source5: python-oursql.tar.bz2
 Source6: python-pyrg.tar.bz2
 Source7: python-pexpect.tar.bz2
+Source8: oss-build-system.tar.bz2
 
 
 %description
@@ -137,9 +138,17 @@ This script is colourised to Python's UnitTest Result.
 Summary: Expect-like interface to interactive process I/O
 Group:   Development/Libraries
 
-
 %description python-pexpect
 Pexpect is a pure Python module that makes Python a better tool for controlling and automating other programs. Pexpect is similar to the Don Libes `Expect` system, but Pexpect as a different interface that is easier to understand. Pexpect is basically a pattern matching system. It runs programs and watches output. When output matches a given pattern Pexpect can respond as if a human were typing responses. Pexpect can be used for automation, testing, and screen scraping. Pexpect can be used for automating interactive console applications such as ssh, ftp, passwd, telnet, etc. It can also be used to control web applications via `lynx`, `w3m`, or some other text-based web browser.
+
+%package phing-deploy
+Summary: An entirely self-contained Phing interpreter for use with the HyperNova
+Group:   Development/Language
+AutoReqProv: no
+
+%description phing-deploy
+An entirely self-contained Phing interpreter for use with the HyperNova
+software stack in order to deploy PHP web sites.
 
 
 %prep
@@ -187,6 +196,10 @@ mv python-pyrg deps
 %setup -q -n src -T -D -a 7
 mv python-pexpect deps
 
+# phing-deploy
+%setup -q -n src -T -D -a 8
+mkdir deps/phing-deploy
+mv oss-build-system/{*.xml,phing,buildlib,config-templates}  deps/phing-deploy
 
 %build
 
@@ -336,3 +349,11 @@ userdel -r 'hnagent'
 %files python-pexpect
 %defattr(-, root, root, -)
                                 /usr/local/hypernova/lib/python*/site-packages/pexpect-*-py3.2.egg
+                                
+%files phing-deploy
+%defattr(-, root, root, -)
+                                /usr/local/hypernova/lib/phing-deploy/phing/*
+                                /usr/local/hypernova/lib/phing-deploy/build-project.xml
+                                /usr/local/hypernova/lib/phing-deploy/buildlib/*
+                                /usr/local/hypernova/lib/phing-deploy/config-templates/*
+                     

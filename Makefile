@@ -47,6 +47,11 @@ PYTHON_PEXPECT_VERSION    := 2.3
 PYTHON_PEXPECT_SOURCE_DIR := $(BUILD_ROOT_DIR)/deps/python-pexpect
 PYTHON_PEXPECT_RPM_PREFIX := /usr/local/hypernova
 
+PHING_DEPLOY_VERSION     := 1.0.0
+PHING_DEPLOY_SOURCE_DIR  := $(BUILD_ROOT_DIR)/deps/oss-build-system/
+PHING_DEPLOY_RPM_PREFIX  := /usr/local/hypernova
+PHING_DEPLOY_VENV_PREFIX := $(BUILD_ROOT_DIR)/chroot
+
 RPM_BUILD_DIR  := $(BUILD_ROOT_DIR)/build/rpm
 RPM_OUTPUT_DIR := $(BUILD_ROOT_DIR)/dist/rpm
 RPM_SPEC_DIR   := $(BUILD_ROOT_DIR)/build
@@ -82,6 +87,7 @@ all:
 	@echo '| build-python-gnupg      | build just Python GnuPG module         |'
 	@echo '| build-python-oursql     | build just Python OurSQL module        |'
 	@echo '| build-python-pexpect    | build just Python pexpect module       |'
+	@echo '| build-phing-deploy		 | build just Phing						  |'
 	@echo '| clean-elevator          | clean just Elevator build artefacts    |'
 	@echo '| clean-hypernova         | clean just HyperNova build artefacts   |'
 	@echo '| clean-python            | clean just Python build artefacts      |'
@@ -93,6 +99,7 @@ all:
 	@echo '|                         | artefacts                              |'
 	@echo '| clean-python-pexpect    | clean just Python pexpect module build |'
 	@echo '|                         | artefacts                              |'
+	@echo '| clean-phing-deploy		 | clean just Phing						  |'
 	@echo '| rpm-elevator            | generate RPM packages of just Elevator |'
 	@echo '| rpm-hypernova           | generate RPM packages of just          |'
 	@echo '|                         | HyperNova                              |'
@@ -126,8 +133,9 @@ all:
 .PHONY:     build-python-gnupg      clean-python-gnupg      rpm-python-gnupg      venv-python-gnupg
 .PHONY:     build-python-oursql     clean-python-oursql     rpm-python-oursql     venv-python-oursql
 .PHONY:     build-python-pexpect    clean-python-pexpect    rpm-python-pexpect    venv-python-pexpect
+.PHONY:     build-phing-deploy      clean-phing-deploy      rpm-phing-deploy      venv-phing-deploy
 
-build: build-elevator build-hypernova build-python build-python-distribute build-python-gnupg build-python-oursql build-python-pexpect
+build: build-elevator build-hypernova build-python build-python-distribute build-python-gnupg build-python-oursql build-python-pexpect build-phing-deploy
 
 build-elevator:
 	$(BUILD_ROOT_DIR)/build/build-elevator.sh \
@@ -174,7 +182,12 @@ build-python-pexpect: venv-python-distribute
 		--python-module-source-dir $(PYTHON_PEXPECT_SOURCE_DIR) \
 		--python-module-version $(PYTHON_PEXPECT_VERSION)
 
-clean: clean-elevator clean-hypernova clean-python clean-python-distribute clean-python-gnupg clean-python-oursql clean-python-pexpect
+
+build-phing-deploy:
+	$(BUILD_ROOT_DIR)/build/build-phing-deploy.sh \
+			--source-dir $(PHING_DEPLOY_SOURCE_DIR)
+			
+clean: clean-elevator clean-hypernova clean-python clean-python-distribute clean-python-gnupg clean-python-oursql clean-python-pexpect clean-phing-deploy
 
 clean-elevator:
 	$(BUILD_ROOT_DIR)/build/clean-elevator.sh \
@@ -217,6 +230,12 @@ clean-python-pexpect:
 		--python-module-name "pexpect" \
 		--python-module-source-dir $(PYTHON_PEXPECT_SOURCE_DIR) \
 		--rpm-output-dir $(RPM_OUTPUT_DIR)
+
+clean-phing-deploy:
+	$(BUILD_ROOT_DIR)/build/clean-phing-deploy.sh \
+		--source-dir $(PHING_DEPLOY_SOURCE_DIR) \
+		--rpm-output-dir $(RPM_OUTPUT_DIR)
+
 
 dep-rhel:
 	yum -y install \
@@ -306,7 +325,17 @@ rpm-python-pexpect: build-python-pexpect
 		--rpm-output-dir $(RPM_OUTPUT_DIR) \
 		--rpm-spec-dir $(RPM_SPEC_DIR)
 
-venv: venv-elevator venv-python venv-python-distribute venv-python-gnupg venv-python-oursql venv-python-pexpect
+rpm-phing-deploy: build-phing-deploy
+	$(BUILD_ROOT_DIR)/build/rpm-phing-deploy.sh \
+		--rpm-prefix $(PHING_DEPLOY_RPM_PREFIX) \
+		--source-dir $(PHING_DEPLOY_SOURCE_DIR) \
+		--version $(PHING_DEPLOY_VERSION) \
+		--rpm-build-dir $(RPM_BUILD_DIR) \
+		--rpm-output-dir $(RPM_OUTPUT_DIR) \
+		--rpm-spec-dir $(RPM_SPEC_DIR)
+
+
+venv: venv-elevator venv-python venv-python-distribute venv-python-gnupg venv-python-oursql venv-python-pexpect venv-phing-deploy
 
 venv-elevator: build-elevator
 	$(BUILD_ROOT_DIR)/build/venv-elevator.sh \
@@ -351,3 +380,7 @@ venv-python-pexpect: build-python-pexpect venv-python venv-python-distribute
 		--python-module-version $(PYTHON_PEXPECT_VERSION) \
 		--python-sitepackages-dir $(PYTHON_VENV_SITEPACKAGES_DIR)
 
+venv-phing-deploy: build-phing-deploy
+	$(BUILD_ROOT_DIR)/build/venv-phing-deploy.sh \
+		--source-dir $(PHING_DEPLOY_SOURCE_DIR) \
+		--venv-prefix $(PHING_DEPLOY_VENV_PREFIX)
