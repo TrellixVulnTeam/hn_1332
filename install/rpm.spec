@@ -260,6 +260,10 @@ find "$RPM_BUILD_ROOT/usr/local/hypernova/etc/profile.d" -type f \
      -exec mv {} "$RPM_BUILD_ROOT/etc/profile.d" \;
 popd
 
+pushd deps/
+cp -r phing-deploy "$RPM_BUILD_ROOT/usr/local/hypernova/lib/"
+popd
+
 # Red Hat specific files
 pushd ../support/rhel
 mkdir -p "$RPM_BUILD_ROOT/etc/init.d"
