@@ -87,7 +87,7 @@ all:
 	@echo '| build-python-gnupg      | build just Python GnuPG module         |'
 	@echo '| build-python-oursql     | build just Python OurSQL module        |'
 	@echo '| build-python-pexpect    | build just Python pexpect module       |'
-	@echo '| build-phing-deploy		 | build just Phing						  |'
+	@echo '| build-phing-deploy      | build just Phing                       |'
 	@echo '| clean-elevator          | clean just Elevator build artefacts    |'
 	@echo '| clean-hypernova         | clean just HyperNova build artefacts   |'
 	@echo '| clean-python            | clean just Python build artefacts      |'
@@ -99,7 +99,7 @@ all:
 	@echo '|                         | artefacts                              |'
 	@echo '| clean-python-pexpect    | clean just Python pexpect module build |'
 	@echo '|                         | artefacts                              |'
-	@echo '| clean-phing-deploy		 | clean just Phing						  |'
+	@echo '| clean-phing-deploy      | clean just Phing                       |'
 	@echo '| rpm-elevator            | generate RPM packages of just Elevator |'
 	@echo '| rpm-hypernova           | generate RPM packages of just          |'
 	@echo '|                         | HyperNova                              |'
@@ -186,7 +186,7 @@ build-python-pexpect: venv-python-distribute
 build-phing-deploy:
 	$(BUILD_ROOT_DIR)/build/build-phing-deploy.sh \
 			--source-dir $(PHING_DEPLOY_SOURCE_DIR)
-			
+
 clean: clean-elevator clean-hypernova clean-python clean-python-distribute clean-python-gnupg clean-python-oursql clean-python-pexpect clean-phing-deploy
 
 clean-elevator:
