@@ -349,11 +349,11 @@ userdel -r 'hnagent'
 %files python-pexpect
 %defattr(-, root, root, -)
                                 /usr/local/hypernova/lib/python*/site-packages/pexpect-*-py3.2.egg
-                                
+
 %files phing-deploy
 %defattr(-, root, root, -)
                                 /usr/local/hypernova/lib/phing-deploy/phing/*
                                 /usr/local/hypernova/lib/phing-deploy/build-project.xml
                                 /usr/local/hypernova/lib/phing-deploy/buildlib/*
                                 /usr/local/hypernova/lib/phing-deploy/config-templates/*
-                     
+

@@ -18,9 +18,10 @@ eval set -- "$(getopt -o "d:" --long "source-dir:" -- "$@")"
 while true; do
     case "$1" in
         -d|--source-dir) PHING_SOURCE_DIR="$2" ; shift 2 ;;
-        *                     ) break                            ;;
+        *              ) break                           ;;
     esac
 done
+
 # Empty for now
 exit 0
 

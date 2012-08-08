@@ -17,13 +17,13 @@ trap error_trap 1 2 3 15 ERR
 eval set -- "$(getopt -o "bforsv:" --long "rpm-build-dir:,rpm-spec-dir:,rpm-output-dir:,rpm-prefix:,source-dir:,version:" -- "$@")"
 while true; do
     case "$1" in
-        -b|--rpm-build-dir     ) RPM_BUILD_DIR="$2"      ; shift 2 ;;
-        -f|--rpm-spec-dir      ) RPM_SPEC_DIR="$2"       ; shift 2 ;;
-        -o|--rpm-output-dir    ) RPM_OUTPUT_DIR="$2"     ; shift 2 ;;
-        -r|--rpm-prefix ) PHING_DEPLOY_RPM_PREFIX="$2"  ; shift 2 ;;
-        -s|--source-dir ) PHING_DEPLOY_DIR="$2"  ; shift 2 ;;
-        -v|--version    ) PHING_DEPLOY_VERSION="$2"     ; shift 2 ;;
-        *                      ) break                             ;;
+        -b|--rpm-build-dir ) RPM_BUILD_DIR="$2"           ; shift 2 ;;
+        -f|--rpm-spec-dir  ) RPM_SPEC_DIR="$2"            ; shift 2 ;;
+        -o|--rpm-output-dir) RPM_OUTPUT_DIR="$2"          ; shift 2 ;;
+        -r|--rpm-prefix    ) PHING_DEPLOY_RPM_PREFIX="$2" ; shift 2 ;;
+        -s|--source-dir    ) PHING_DEPLOY_DIR="$2"        ; shift 2 ;;
+        -v|--version       ) PHING_DEPLOY_VERSION="$2"    ; shift 2 ;;
+        *                  ) break                                  ;;
     esac
 done
 
