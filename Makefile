@@ -342,6 +342,14 @@ venv-elevator: build-elevator
 		--elevator-source-dir $(ELEVATOR_SOURCE_DIR) \
 		--elevator-venv-prefix $(ELEVATOR_VENV_PREFIX)
 
+venv-hypernova: build-hypernova venv-python venv-python-distribute
+	$(BUILD_ROOT_DIR)/build/venv-python-module.sh \
+		--python-binary $(PYTHON_VENV_BINARY) \
+		--python-module-st-name "HyperNova" \
+		--python-module-source-dir $(HYPERNOVA_SOURCE_DIR) \
+		--python-module-version $(HYPERNOVA_VERSION)  \
+		--python-sitepackages-dir $(PYTHON_VENV_SITEPACKAGES_DIR)
+
 venv-python: build-python
 	$(BUILD_ROOT_DIR)/build/venv-python.sh \
 		--python-binary $(PYTHON_VENV_BINARY) \

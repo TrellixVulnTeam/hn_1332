@@ -12,13 +12,15 @@ import os
 import sys
 
 def debug_setup():
-    pydevSrc = os.getenv("PYDEVDGB_PATH")
-    if pydevSrc != None and  os.path.exists(pydevSrc): 	
+    pydev_src = os.getenv("PYDEVDGB_PATH")
+    if pydev_src and os.path.exists(pydev_src):
         if not pydevSrc in sys.path:
-            sys.path.append(pydevSrc)
+            sys.path.append(pydev_src)
             try:
                 import pydevd
-                remotedebg = os.getenv("PYDEVDGB_REMOTEIP", "127.0.0.1")
-                pydevd.settrace(remotedebg, stdoutToServer=True, stderrToServer=True)
+                remote_debug = os.getenv("PYDEVDGB_REMOTEIP", "127.0.0.1")
+                pydevd.settrace(remote_debug, stdoutToServer=True,
+                                stderrToServer=True)
             except ImportError:
                 pass # We carry on anyway
+

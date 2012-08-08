@@ -104,8 +104,13 @@ class ClientConfigAction(ClientActionBase):
                     sys.exit(64)
 
                 try:
+                    (addr, port) = self._args.addr.rsplit(':')
+                except ValueError:
+                    (addr, port) = (self._args.addr, "3030")
+
+                try:
                     self._servers.add_section(self._args.name)
-                    self._servers.set(self._args.name, 'addr',   self._args.addr)
+                    self._servers.set(self._args.name, 'addr',   "%s:%s" %(addr, port))
                     self._servers.set(self._args.name, 'pubkey', key_fingerprint)
                 except configparser.DuplicateSectionError:
                     print('Failed: a node with the specified name already exists', file=sys.stderr)
