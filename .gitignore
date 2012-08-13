@@ -5,6 +5,7 @@
 /.project
 .redcar
 .*.sw?
+*.sublime-*
 *~
 
 # Interpreter temporary files
