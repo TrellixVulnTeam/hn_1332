@@ -14,7 +14,6 @@
 	path = deps/python-pexpect
 	url = https://github.com/LukeCarrier/py3k-pexpect.git
 	ignore = dirty
-
 [submodule "deps/oss-build-system"]
 	path = deps/oss-build-system
 	url = git@dev.ossservices.com:oss-build-system.git
