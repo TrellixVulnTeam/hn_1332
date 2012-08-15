@@ -33,9 +33,12 @@ class Agent:
 
     The agent class provides a long-running daemon process that behaves as an
     HTTP server. Once launched, it listens on the specified address and port
-    combination for PGP-encrypted (and signed) connections, calling out to its
-    modules to perform actions on the server and returning relevant data to the
-    client.
+    combination for connections, calling out to its modules to perform actions
+    on the server and returning relevant data to the client.
+
+    End-to-end security is achieved through the use of the security filters API,
+    which enables the agent and client to encrypt and sign all of their traffic
+    in such a way that it may only be decrypted by the desired instance.
     """
 
     _server = None
@@ -52,7 +55,7 @@ class Agent:
 
     _config = None
 
-    _gpg = None
+    _security_filter = None
 
     def __init__(self, config_root_dir):
         """
@@ -84,7 +87,7 @@ class Agent:
         sys.STDOUT.
         """
 
-        self._init_gpg()
+        self._init_encryption()
         self._config_logging()
 
         if self._config.getboolean('server', 'daemon'):
@@ -129,11 +132,13 @@ class Agent:
             self._main_log.critical('loading configuration failed')
             sys.exit(78)
 
-    def _init_gpg(self):
+    def _init_encryption(self):
         """
-        Initialise GPG encryption and signing mechanisms.
+        Initialise encryption and signing mechanisms.
 
-        See __init__() for more information.
+        Here, we initialise a support encryption system which we will use as a
+        filter for all traffic which passes through the agent. The design is
+        modular to enable easily switching between different technologies.
         """
 
         self._gpg = GPG.get_gpg(gnupghome=self._config['gpg']['key_store'],
@@ -221,6 +226,7 @@ class Agent:
 
             module._agent_init(self._config)
 
+
 class AgentServer(ThreadingMixIn, HTTPServer):
     """
     Agent multi-threaded HTTP server.
@@ -233,6 +239,7 @@ class AgentServer(ThreadingMixIn, HTTPServer):
     For details of the execution workflow used to serve each request, see the
     AgentRequestHandler class.
     """
+
     pass
 
 
@@ -486,6 +493,7 @@ class AgentRequestHandler(BaseHTTPRequestHandler):
                                      sign=self._gpg._secret_key['fingerprint'])
         self.wfile.write(bytes(str(response), 'UTF-8'))
         self.wfile.flush()
+
 
 # Execute the agent application.
 #
